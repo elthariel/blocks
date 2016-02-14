@@ -1,0 +1,24 @@
+
+namespace blocks.fbs;
+
+// Not used anymore but kept for reference and later use in the protocol, maybe ?
+
+struct Pos {
+  x:long;
+  y:long;
+  z:long;
+}
+
+table Block {
+  id: ushort;
+  variant: ushort;
+  air: bool;
+  transparent: bool;
+}
+
+table Chunk {
+  version: ubyte = 0;
+  size: ubyte;
+  cid: Pos (required);
+  blocks: [Block];
+}

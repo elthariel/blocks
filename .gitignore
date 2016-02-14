@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+
+# Cmake build directory
+build
+dist

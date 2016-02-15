@@ -3,13 +3,21 @@ namespace blocks.fbs;
 
 // Not used anymore but kept for reference and later use in the protocol, maybe ?
 
+enum Type:byte { Player = 0, Chunk = 1 }
+
+struct Header {
+  id:long;
+  type:Type;
+  body_size:long;
+}
+
 struct Pos {
   x:long;
   y:long;
   z:long;
 }
 
-table Block {
+struct Block {
   id: ushort;
   variant: ushort;
   air: bool;
@@ -17,8 +25,11 @@ table Block {
 }
 
 table Chunk {
+  header:Header;
   version: ubyte = 0;
   size: ubyte;
   cid: Pos (required);
   blocks: [Block];
 }
+
+root_type Chunk;

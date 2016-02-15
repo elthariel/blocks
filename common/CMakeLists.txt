@@ -23,10 +23,10 @@ set(COMMON_SOURCES
 )
 
 find_path(FLATBUFFERS_HOME
+  /usr/local
   NAMES
   bin/flatc
   PATHS
-  /usr/local
 )
 
 if(FLATBUFFERS_HOME-NOTFOUND)

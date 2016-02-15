@@ -5,15 +5,23 @@ project(blocks_client)
 set(CLIENT_HEADERS
 	./include/seed.hh
 	./include/world_generator.hh
+    ./include/mesher.hh
 	./include/meshing_thread.hh
+    ./include/meshing_task.hh
+    ./include/game.hh
+    ./include/scene.hh
+    ./include/event_handler.hh
 )
 
 set(CLIENT_SOURCES
 	./src/main.cc
-	./src/seed.cc
 	./src/world_generator.cc
 	./src/meshing_thread.cc
-	./src/mesher.cc	
+    ./src/meshing_task.cc
+	./src/mesher.cc
+    ./src/game.cc
+    ./src/scene.cc
+    ./src/event_handler.cc
 )
 
 
@@ -40,9 +48,9 @@ add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_client common
-	p3framework panda pandafx pandaexpress
+  p3framework panda pandafx pandaexpress
   p3dtoolconfig p3dtool p3direct
-	python2.7
+  python2.7 boost_timer
 )
 
 # Here to enable C++11 features, we should make a better use of this :)

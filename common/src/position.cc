@@ -2,6 +2,8 @@
 #include "position.hh"
 #include "constants.hh"
 
+#include <boost/format.hpp>
+
 namespace blocks {
   wpos::wpos(const class cid &_cid, const class cpos &_cpos)
   :pos(
@@ -30,7 +32,7 @@ namespace blocks {
   : pos(
     idx / (consts::chunk_size * consts::chunk_size),
     (idx / consts::chunk_size) % consts::chunk_size,
-    idx % (consts::chunk_size * consts::chunk_size)
+    idx % consts::chunk_size
   ) {}
 
   size_t cpos::to_idx() const {

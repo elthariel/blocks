@@ -14,29 +14,49 @@ namespace blocks {
   public:
     typedef std::shared_ptr<Chunk> ptr;
 
+    const static size_t _flat_size = Power<consts::chunk_size, 3>::value;
+    static size_t size() { return consts::chunk_size; }
+    static size_t flat_size() { return _flat_size; }
 
-    const static size_t _size = Power<consts::chunk_size, 3>::value;
-    static size_t size() { return _size; }
+    Chunk(cid id) : _id(id)
+    {}
 
+    const cid& id() const { return _id; }
 
     Block &operator[](const cpos &p) {
-      return _blocks[p.to_idx() % _size];
+      return at(p);
     }
 
     const Block &operator[](const cpos &p) const {
-      return _blocks[p.to_idx() % _size];
+      return at(p);
     }
 
     Block &operator[] (uint64_t idx) {
-      return _blocks[idx % _size];
+      return at(idx);
     }
 
     const Block &operator[](uint64_t idx) const {
-      return _blocks[idx % _size];
+      return at(idx);
     }
 
+    Block &at(const cpos &p) {
+      return _blocks[p.to_idx() % _flat_size];
+    }
+
+    const Block &at(const cpos &p) const {
+      return _blocks[p.to_idx() % _flat_size];
+    }
+
+    Block &at (uint64_t idx) {
+      return _blocks[idx % _flat_size];
+    }
+
+    const Block &at(uint64_t idx) const {
+      return _blocks[idx % _flat_size];
+    }
 
   protected:
-    Block _blocks[_size];
+    cid _id;
+    Block _blocks[_flat_size];
   };
 }

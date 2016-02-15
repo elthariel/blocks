@@ -3,8 +3,10 @@
 #include <cstdint>
 
 namespace blocks {
-  class Block {
-    enum Flag {
+  class Block
+  {
+    enum Flag : uint32_t
+    {
       AIR            = 1 << 0,
       TRANSPARENT    = 1 << 1
     };
@@ -40,7 +42,7 @@ namespace blocks {
       if (set) {
         _flags |= f;
       } else {
-        _flags &= f;
+        _flags &= ~f;
       }
     }
   };

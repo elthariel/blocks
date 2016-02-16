@@ -9,4 +9,6 @@ namespace blocks
 
   typedef LPoint3f Position;
   typedef LVector3f Direction;
+
+
 }

@@ -2,23 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(blocks_server)
 
-set(SERVER_HEADERS
-	./include/TcpServer.hh
-	./include/Player.hh
-	./include/Server.hh
-	./include/Chunk.hh
-	../common/include/CircularBuffer.hh
-)
-
-set(SERVER_SOURCES
-	./src/main.cc
-	./src/TcpServer.cc
-	./src/Player.cc
-	./src/Server.cc
-	./src/Chunk.cc
-	../common/src/CircularBuffer.cpp
-)
-
+file(GLOB SERVER_HEADERS ./include/*.hh)
+file(GLOB SERVER_SOURCES ./src/*.cc)
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
   # CMake defaults to leaving CMAKE_BUILD_TYPE empty. This screws up
@@ -28,20 +13,24 @@ endif ()
 set(CMAKE_DEBUG_POSTFIX "_d")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/dist")
 
-
 include_directories(
-	${PROJECT_SOURCE_DIR}/include
-	/usr/include/python2.7
+  ${PROJECT_SOURCE_DIR}/include
+  /usr/include/python2.7
+)
+link_directories(
+  ${Boost_LIBRARY_DIRS}
 )
 
-add_executable(blocks_server ${SERVER_HEADERS} ${SERVER_SOURCES})
 
+
+add_definitions(-std=c++14)
+add_executable(blocks_server ${SERVER_HEADERS} ${SERVER_SOURCES})
 set_target_properties(blocks_server PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_server common
- boost_system boost_thread
-	python2.7
- ${LINUX_LIBS}
+  ${Boost_LIBRARIES}
+  ${LINUX_LIBS}
+  python2.7
 )
 
 # Here to enable C++11 features, we should make a better use of this :)

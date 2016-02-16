@@ -24,6 +24,7 @@ include_directories(
 
 link_directories(
   ${PANDA_LIBRARY_DIRS}
+  ${Boost_LIBRARY_DIRS}
 )
 
 add_definitions(-std=c++14)
@@ -31,23 +32,15 @@ add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
 
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
-<<<<<<< HEAD
 target_link_libraries(blocks_client
   common
+  ${Boost_LIBRARIES}
   ${PANDA_LIBRARIES}
-  boost_timer
-=======
-target_link_libraries(blocks_client common boost_system
- p3framework panda pandafx pandaexpress
- p3dtoolconfig p3dtool p3direct
-  python2.7 boost_timer boost_thread
->>>>>>> working network thread while playing
   ${LINUX_LIBS}
 )
 
 # Here to enable C++11 features, we should make a better use of this :)
 # target_compile_features(blocks_client PRIVATE cxx_rvalue_references)
-
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dist/bin)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dist/media)

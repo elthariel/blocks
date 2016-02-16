@@ -23,8 +23,13 @@ namespace blocks {
           wpos w(_id, c);
 
           if (w.z() > _height_map(w.x(), w.y()) * 32 + 10) {
-            (*chunk)[c.to_idx()].id(0);
-            (*chunk)[c.to_idx()].air(true);
+            if (w.z() > 0)
+            {
+              (*chunk)[c.to_idx()].id(0);
+              (*chunk)[c.to_idx()].air(true);
+            }
+            else
+              (*chunk)[c.to_idx()].id(2);
           } else {
             (*chunk)[c.to_idx()].id(1);
           }

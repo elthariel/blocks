@@ -4,6 +4,7 @@
 #include "multi_array.hh"
 
 #include <array>
+#include <list>
 #include <geomNode.h>
 #include <geomVertexData.h>
 #include <geomVertexWriter.h>
@@ -22,6 +23,7 @@ namespace blocks {
     void set_face_visible(const cpos &p, unsigned face, bool visible);
     bool get_face_meshed(const cpos &p, unsigned face);
     void set_face_meshed(const cpos &p, unsigned face, bool meshed);
+    auto &block_ids();
 
   protected:
     uint16_t &flags_at(const cpos &p);
@@ -30,6 +32,7 @@ namespace blocks {
 
     array3<uint16_t> _flags;
     array3<int16_t> _vertices;
+    std::list<int16_t> _block_ids;
   };
 
   class GreedyMesher{
@@ -41,14 +44,16 @@ namespace blocks {
     PT(GeomNode) mesh();
   protected:
     void compute_visible();
-    bool need_mesh(cpos &iter, int face_idx);
+    bool need_mesh(const cpos &iter, int face_idx, uint16_t block_type);
+    void mesh_face(cpos &iter, uint16_t block_type, int d, int u, int v, char front);
     void create_quad(unsigned char face,
                      bool front,
                      const cpos &base,
-                     const cpos& du,
-                     const cpos& dv,
-                     int w,
-                     int h = 1);
+                     const cpos& du, const cpos& dv,
+                     int w, int h = 1);
+
+    void start_mesh();
+    void finish_mesh(PT(GeomNode) geom_node, uint16_t block_type);
 
     MesherWorkBuffer _work;
     Chunk::ptr _chunk;

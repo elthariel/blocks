@@ -43,7 +43,7 @@ namespace blocks
     _window->set_background_type(WindowFramework::BackgroundType::BT_black);
 
     auto *meter = new SceneGraphAnalyzerMeter("Meter", _scene.node());
-    meter->setup_window(_window->get_graphics_output());
+    // meter->setup_window(_window->get_graphics_output());
 
     _window->enable_keyboard();
 

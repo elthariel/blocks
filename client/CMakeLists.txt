@@ -43,6 +43,7 @@ link_directories(
 	${PANDA_HOME}/lib
 )
 
+add_definitions(-std=c++14)
 add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
 
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)

@@ -35,9 +35,6 @@ namespace blocks {
         for (auto k = -2; k <= 2 ; k++)
           _meshing_thread.input_pipe << wg.generate(cid(i, j, k));
 
-    // mt.chunk_queue_put(wg.generate(cid(1, 0, 0)));
-    // mt.chunk_queue_put(wg.generate(cid(0, 1, 0)));
-
     _scene->run();
   }
 }

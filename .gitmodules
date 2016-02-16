@@ -1,0 +1,3 @@
+[submodule "third-party/entityx"]
+	path = third-party/entityx
+	url = https://github.com/alecthomas/entityx.git

@@ -11,18 +11,7 @@ file(GLOB COMMON_HEADERS ./include/*.hh)
 file(GLOB COMMON_SOURCES ./src/*.cc)
 file(GLOB COMMON_TESTS ./tests/*.cc)
 
-find_path(FLATBUFFERS_HOME
-  NAMES
-  bin/flatc
-  PATHS
-  /usr/local
-)
-
-if(FLATBUFFERS_HOME-NOTFOUND)
-  message(SEND_ERROR "flatbuffers not found. Please install it")
-endif(FLATBUFFERS_HOME-NOTFOUND)
-
-set(FLATC "${FLATBUFFERS_HOME}/bin/flatc")
+find_package(FlatBuffers REQUIRED)
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/generated_include)
 foreach(FBS_FILE ${COMMON_FBS})
@@ -30,19 +19,17 @@ foreach(FBS_FILE ${COMMON_FBS})
    set(OUT_NAME ${CMAKE_CURRENT_SOURCE_DIR}/generated_include/${FBS_NAME}_generated.h)
    list(APPEND COMMON_GENERATED_HEADERS ${OUT_NAME})
 
-   message("${OUT_NAME}")
-
    add_custom_command(
      PRE_BUILD
      OUTPUT ${OUT_NAME}
-     COMMAND ${FLATC} -b -c --gen-mutable --raw-binary -o ${CMAKE_CURRENT_SOURCE_DIR}/generated_include/ ${CMAKE_CURRENT_SOURCE_DIR}/${FBS_FILE}
+     COMMAND ${FLATBUFFERS_COMPILER} -b -c --gen-mutable --raw-binary -o ${CMAKE_CURRENT_SOURCE_DIR}/generated_include/ ${CMAKE_CURRENT_SOURCE_DIR}/${FBS_FILE}
      DEPENDS ${FBS_FILE}
      COMMENT "Compiling ${FBS_FILE}"
    )
 endforeach(FBS_FILE)
 
 include_directories(
-  ${FLATBUFFERS_HOME}/include
+  ${FLATBUFFERS_INCLUDE_DIRS}
   )
 
 add_definitions(-std=c++14)

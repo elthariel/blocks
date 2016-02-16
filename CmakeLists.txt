@@ -1,13 +1,10 @@
 
 cmake_minimum_required(VERSION 3.0)
 
-if(APPLE)
-	# set(CMAKE_OSX_DEPLOYMENT_TARGET "10.7")
-  # set(CMAKE_OSX_SYSROOT "/Library/Frameworks/MacOSX10.7.sdk")
-  # set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk")
-endif(APPLE)
-
 project (blocks)
+
+# Let's have a folder to store our own cmake shit
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 set(THIRD_PARTY ${CMAKE_SOURCE_DIR}/third-party)
@@ -18,33 +15,15 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(BLOCKS_COMMON_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/common/include)
 set(BLOCKS_COMMON_GENERATED_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/common/generated_include)
 
-#
-# Let's find a local Panda sdk / install
-#
-find_path(PANDA_HOME
-	include/panda.h
-	PATHS
-	"$ENV{HOME}/code/cxx/panda3d/built"
-	"$ENV{HOME}/usr/local/panda"
-	/Developer/Panda3D
-	/usr/local
-	# Add yours here
-)
-
-if(PANDA_HOME-NOTFOUND)
-	message(SEND_ERROR "Unable to find PANDA_HOME")
-endif()
 
 include_directories(
   ${BLOCKS_COMMON_INCLUDE_DIR}
   ${BLOCKS_COMMON_GENERATED_INCLUDE_DIR}
   ${THIRD_PARTY}/duktape
-  ${PANDA_HOME}/include
 )
 
 #add_definitions(-O0)
 #add_definitions(-stdlib=libstdc++)
-
 
 add_subdirectory(third-party)
 add_subdirectory(common)

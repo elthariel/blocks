@@ -34,9 +34,10 @@ namespace blocks {
     const Block &operator[](uint64_t idx) const {
       return _blocks[idx % _size];
     }
-
+    //
 
   protected:
+    cpos _pos;
     Block _blocks[_size];
   };
 }

@@ -7,6 +7,8 @@ set(SERVER_HEADERS
 	./include/TcpServer.hh
 	./include/Player.hh
 	./include/Server.hh
+	./include/Chunk.hh
+	../common/include/CircularBuffer.hh
 )
 
 set(SERVER_SOURCES
@@ -15,6 +17,8 @@ set(SERVER_SOURCES
 	./src/TcpServer.cc
 	./src/Player.cc
 	./src/Server.cc
+	./src/Chunk.cc
+	../common/src/CircularBuffer.cpp
 )
 
 

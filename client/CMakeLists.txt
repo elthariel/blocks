@@ -2,34 +2,10 @@ cmake_minimum_required(VERSION 3.0)
 
 project(blocks_client)
 
-set(CLIENT_HEADERS
-  # ./include/Client.hh
-  ./include/TcpClient.hh
-  ../common/include/CircularBuffer.hh
-	./include/seed.hh
-	./include/world_generator.hh
-    ./include/mesher.hh
-	./include/meshing_thread.hh
-    ./include/meshing_task.hh
-    ./include/game.hh
-    ./include/scene.hh
-    ./include/event_handler.hh
-)
+file(GLOB CLIENT_HEADERS ./include/*.hh)
+file(GLOB CLIENT_SOURCES ./src/*.cc)
 
-set(CLIENT_SOURCES
-	./src/main.cc
-	./src/world_generator.cc
-	./src/meshing_thread.cc
-    ./src/meshing_task.cc
-	./src/mesher.cc
-    ./src/game.cc
-    ./src/scene.cc
-    ./src/event_handler.cc
-  # ./src/Client.cc
-  ./src/TcpClient.cc
-  ../common/src/CircularBuffer.cpp
-)
-
+find_package(Panda REQUIRED)
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
   # CMake defaults to leaving CMAKE_BUILD_TYPE empty. This screws up
@@ -41,12 +17,14 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/dist")
 
 
 include_directories(
-	${PROJECT_SOURCE_DIR}/include
-	/usr/include/python2.7
+  ${PROJECT_SOURCE_DIR}/include
+  ${PANDA_INCLUDE_DIRS}
+  ${THIRD_PARTY}/entity
 )
 
 link_directories(
-	${PANDA_HOME}/lib
+  ${PANDA_LIBRARY_DIRS}
+  ${Boost_LIBRARY_DIRS}
 )
 
 add_definitions(-std=c++14)
@@ -54,16 +32,15 @@ add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
 
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
-target_link_libraries(blocks_client common boost_system
- p3framework panda pandafx pandaexpress
- p3dtoolconfig p3dtool p3direct
-  python2.7 boost_timer boost_thread
+target_link_libraries(blocks_client
+  common
+  ${Boost_LIBRARIES}
+  ${PANDA_LIBRARIES}
   ${LINUX_LIBS}
 )
 
 # Here to enable C++11 features, we should make a better use of this :)
 # target_compile_features(blocks_client PRIVATE cxx_rvalue_references)
-
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dist/bin)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dist/media)

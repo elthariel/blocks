@@ -1,14 +1,8 @@
 
 cmake_minimum_required(VERSION 3.0)
-
-set(CMAKE_CXX_COMPILER "clang++")
-set(CMAKE_OSX_SYSROOT "/Library/Frameworks/MacOSX10.7.sdk")
-
-if(APPLE)
-  # set(CMAKE_OSX_DEPLOYMENT_TARGET "10.7")
-  # set(CMAKE_OSX_SYSROOT "/Library/Frameworks/MacOSX10.7.sdk")
-  # set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk")
-endif(APPLE)
+if (UNIX)
+  set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+endif()
 
 project (blocks)
 
@@ -21,34 +15,19 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(BLOCKS_COMMON_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/common/include)
 set(BLOCKS_COMMON_GENERATED_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/common/generated_include)
 
-#
-# Let's find a local Panda sdk / install
-#
-find_path(PANDA_HOME
-  NAMES
-  include/panda3d/panda.h
-  include/panda.h
-  PATHS
-  "$ENV{HOME}/code/cxx/panda3d/built"
-  "/data/prog/cpp/panda3d/built"
-  "$ENV{HOME}/usr/local/panda"
-  /Developer/Panda3D
-  /usr/local
-  /usr
-  # Add yours here
-)
-
-message(${PANDA_HOME})
-
-if(PANDA_HOME-NOTFOUND)
-	message(SEND_ERROR "Unable to find PANDA_HOME")
-endif()
+set(Boost_USE_MULTITHREADED YES)
+find_package(Boost 1.58 REQUIRED
+  COMPONENTS
+  system
+  timer
+  thread
+  )
 
 if (UNIX AND NOT APPLE) #i.e. champii
   set(LINUX_LIBS pthread)
   set(PANDA_INCLUDE_DIRS
     ${PANDA_HOME}/include
-   /usr/include/eigen3)
+    /usr/include/eigen3)
 endif(UNIX AND NOT APPLE)
 if (APPLE)
   set(PANDA_INCLUDE_DIRS
@@ -60,19 +39,14 @@ message("${PANDA_INCLUDE_DIRS}")
 include_directories(
   ${BLOCKS_COMMON_INCLUDE_DIR}
   ${BLOCKS_COMMON_GENERATED_INCLUDE_DIR}
-  ${PANDA_INCLUDE_DIRS}
-  ${THIRD_PARTY}/duktape
-  ${PANDA_HOME}/include
+  ${Boost_INCLUDE_DIRS}
 )
 
-add_definitions(-std=c++14)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 add_definitions(-fpermissive)
-
 #add_definitions(-O0)
-#add_definitions(-stdlib=libstdc++)
 
-
-add_subdirectory(third-party)
 add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(server)
+add_subdirectory(third-party)

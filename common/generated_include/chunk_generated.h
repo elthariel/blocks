@@ -18,9 +18,7 @@ struct Message;
 
 enum Type {
   Type_PLAYER = 0,
-  Type_CHUNK = 1,
-  Type_MIN = Type_PLAYER,
-  Type_MAX = Type_CHUNK
+  Type_CHUNK = 1
 };
 
 inline const char **EnumNamesType() {
@@ -34,9 +32,7 @@ enum ChunkActionEnum {
   ChunkActionEnum_ASK_CHUNK = 0,
   ChunkActionEnum_CHUNK = 1,
   ChunkActionEnum_NEW_BLOCK = 2,
-  ChunkActionEnum_DELETE_BLOCK = 3,
-  ChunkActionEnum_MIN = ChunkActionEnum_ASK_CHUNK,
-  ChunkActionEnum_MAX = ChunkActionEnum_DELETE_BLOCK
+  ChunkActionEnum_DELETE_BLOCK = 3
 };
 
 inline const char **EnumNamesChunkActionEnum() {
@@ -48,9 +44,7 @@ inline const char *EnumNameChunkActionEnum(ChunkActionEnum e) { return EnumNames
 
 enum PlayerActionEnum {
   PlayerActionEnum_CONNECT = 0,
-  PlayerActionEnum_MOVE = 1,
-  PlayerActionEnum_MIN = PlayerActionEnum_CONNECT,
-  PlayerActionEnum_MAX = PlayerActionEnum_MOVE
+  PlayerActionEnum_MOVE = 1
 };
 
 inline const char **EnumNamesPlayerActionEnum() {
@@ -63,9 +57,7 @@ inline const char *EnumNamePlayerActionEnum(PlayerActionEnum e) { return EnumNam
 enum Action {
   Action_NONE = 0,
   Action_ChunkAction = 1,
-  Action_PlayerAction = 2,
-  Action_MIN = Action_NONE,
-  Action_MAX = Action_PlayerAction
+  Action_PlayerAction = 2
 };
 
 inline const char **EnumNamesAction() {
@@ -79,9 +71,7 @@ inline bool VerifyAction(flatbuffers::Verifier &verifier, const void *union_obj,
 
 enum AType {
   AType_NONE = 0,
-  AType_Chunk = 1,
-  AType_MIN = AType_NONE,
-  AType_MAX = AType_Chunk
+  AType_Chunk = 1
 };
 
 inline const char **EnumNamesAType() {
@@ -100,15 +90,15 @@ MANUALLY_ALIGNED_STRUCT(8) Pos FLATBUFFERS_FINAL_CLASS {
   int64_t z_;
 
  public:
-  Pos(int64_t _x, int64_t _y, int64_t _z)
-    : x_(flatbuffers::EndianScalar(_x)), y_(flatbuffers::EndianScalar(_y)), z_(flatbuffers::EndianScalar(_z)) { }
+  Pos(int64_t x, int64_t y, int64_t z)
+    : x_(flatbuffers::EndianScalar(x)), y_(flatbuffers::EndianScalar(y)), z_(flatbuffers::EndianScalar(z)) { }
 
   int64_t x() const { return flatbuffers::EndianScalar(x_); }
-  void mutate_x(int64_t _x) { flatbuffers::WriteScalar(&x_, _x); }
+  void mutate_x(int64_t x) { flatbuffers::WriteScalar(&x_, x); }
   int64_t y() const { return flatbuffers::EndianScalar(y_); }
-  void mutate_y(int64_t _y) { flatbuffers::WriteScalar(&y_, _y); }
+  void mutate_y(int64_t y) { flatbuffers::WriteScalar(&y_, y); }
   int64_t z() const { return flatbuffers::EndianScalar(z_); }
-  void mutate_z(int64_t _z) { flatbuffers::WriteScalar(&z_, _z); }
+  void mutate_z(int64_t z) { flatbuffers::WriteScalar(&z_, z); }
 };
 STRUCT_END(Pos, 24);
 
@@ -120,29 +110,26 @@ MANUALLY_ALIGNED_STRUCT(2) Block FLATBUFFERS_FINAL_CLASS {
   uint8_t transparent_;
 
  public:
-  Block(uint16_t _id, uint16_t _variant, bool _air, bool _transparent)
-    : id_(flatbuffers::EndianScalar(_id)), variant_(flatbuffers::EndianScalar(_variant)), air_(flatbuffers::EndianScalar(static_cast<uint8_t>(_air))), transparent_(flatbuffers::EndianScalar(static_cast<uint8_t>(_transparent))) { }
+  Block(uint16_t id, uint16_t variant, uint8_t air, uint8_t transparent)
+    : id_(flatbuffers::EndianScalar(id)), variant_(flatbuffers::EndianScalar(variant)), air_(flatbuffers::EndianScalar(air)), transparent_(flatbuffers::EndianScalar(transparent)) { }
 
   uint16_t id() const { return flatbuffers::EndianScalar(id_); }
-  void mutate_id(uint16_t _id) { flatbuffers::WriteScalar(&id_, _id); }
+  void mutate_id(uint16_t id) { flatbuffers::WriteScalar(&id_, id); }
   uint16_t variant() const { return flatbuffers::EndianScalar(variant_); }
-  void mutate_variant(uint16_t _variant) { flatbuffers::WriteScalar(&variant_, _variant); }
-  bool air() const { return flatbuffers::EndianScalar(air_) != 0; }
-  void mutate_air(bool _air) { flatbuffers::WriteScalar(&air_, static_cast<uint8_t>(_air)); }
-  bool transparent() const { return flatbuffers::EndianScalar(transparent_) != 0; }
-  void mutate_transparent(bool _transparent) { flatbuffers::WriteScalar(&transparent_, static_cast<uint8_t>(_transparent)); }
+  void mutate_variant(uint16_t variant) { flatbuffers::WriteScalar(&variant_, variant); }
+  uint8_t air() const { return flatbuffers::EndianScalar(air_); }
+  void mutate_air(uint8_t air) { flatbuffers::WriteScalar(&air_, air); }
+  uint8_t transparent() const { return flatbuffers::EndianScalar(transparent_); }
+  void mutate_transparent(uint8_t transparent) { flatbuffers::WriteScalar(&transparent_, transparent); }
 };
 STRUCT_END(Block, 6);
 
 struct ChunkAction FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_CHUNK = 4
-  };
-  ChunkActionEnum chunk() const { return static_cast<ChunkActionEnum>(GetField<int8_t>(VT_CHUNK, 0)); }
-  bool mutate_chunk(ChunkActionEnum _chunk) { return SetField(VT_CHUNK, static_cast<int8_t>(_chunk)); }
+  ChunkActionEnum chunk() const { return static_cast<ChunkActionEnum>(GetField<int8_t>(4, 0)); }
+  bool mutate_chunk(ChunkActionEnum chunk) { return SetField(4, static_cast<int8_t>(chunk)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_CHUNK) &&
+           VerifyField<int8_t>(verifier, 4 /* chunk */) &&
            verifier.EndTable();
   }
 };
@@ -150,7 +137,7 @@ struct ChunkAction FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct ChunkActionBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_chunk(ChunkActionEnum chunk) { fbb_.AddElement<int8_t>(ChunkAction::VT_CHUNK, static_cast<int8_t>(chunk), 0); }
+  void add_chunk(ChunkActionEnum chunk) { fbb_.AddElement<int8_t>(4, static_cast<int8_t>(chunk), 0); }
   ChunkActionBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   ChunkActionBuilder &operator=(const ChunkActionBuilder &);
   flatbuffers::Offset<ChunkAction> Finish() {
@@ -167,14 +154,11 @@ inline flatbuffers::Offset<ChunkAction> CreateChunkAction(flatbuffers::FlatBuffe
 }
 
 struct PlayerAction FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_PLAYER = 4
-  };
-  PlayerActionEnum player() const { return static_cast<PlayerActionEnum>(GetField<int8_t>(VT_PLAYER, 0)); }
-  bool mutate_player(PlayerActionEnum _player) { return SetField(VT_PLAYER, static_cast<int8_t>(_player)); }
+  PlayerActionEnum player() const { return static_cast<PlayerActionEnum>(GetField<int8_t>(4, 0)); }
+  bool mutate_player(PlayerActionEnum player) { return SetField(4, static_cast<int8_t>(player)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_PLAYER) &&
+           VerifyField<int8_t>(verifier, 4 /* player */) &&
            verifier.EndTable();
   }
 };
@@ -182,7 +166,7 @@ struct PlayerAction FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct PlayerActionBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_player(PlayerActionEnum player) { fbb_.AddElement<int8_t>(PlayerAction::VT_PLAYER, static_cast<int8_t>(player), 0); }
+  void add_player(PlayerActionEnum player) { fbb_.AddElement<int8_t>(4, static_cast<int8_t>(player), 0); }
   PlayerActionBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   PlayerActionBuilder &operator=(const PlayerActionBuilder &);
   flatbuffers::Offset<PlayerAction> Finish() {
@@ -199,26 +183,20 @@ inline flatbuffers::Offset<PlayerAction> CreatePlayerAction(flatbuffers::FlatBuf
 }
 
 struct Chunk FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_VERSION = 4,
-    VT_SIZE = 6,
-    VT_CID = 8,
-    VT_BLOCKS = 10
-  };
-  uint8_t version() const { return GetField<uint8_t>(VT_VERSION, 0); }
-  bool mutate_version(uint8_t _version) { return SetField(VT_VERSION, _version); }
-  uint8_t size() const { return GetField<uint8_t>(VT_SIZE, 0); }
-  bool mutate_size(uint8_t _size) { return SetField(VT_SIZE, _size); }
-  const Pos *cid() const { return GetStruct<const Pos *>(VT_CID); }
-  Pos *mutable_cid() { return GetStruct<Pos *>(VT_CID); }
-  const flatbuffers::Vector<const Block *> *blocks() const { return GetPointer<const flatbuffers::Vector<const Block *> *>(VT_BLOCKS); }
-  flatbuffers::Vector<const Block *> *mutable_blocks() { return GetPointer<flatbuffers::Vector<const Block *> *>(VT_BLOCKS); }
+  uint8_t version() const { return GetField<uint8_t>(4, 0); }
+  bool mutate_version(uint8_t version) { return SetField(4, version); }
+  uint8_t size() const { return GetField<uint8_t>(6, 0); }
+  bool mutate_size(uint8_t size) { return SetField(6, size); }
+  const Pos *cid() const { return GetStruct<const Pos *>(8); }
+  Pos *mutable_cid() { return GetStruct<Pos *>(8); }
+  const flatbuffers::Vector<const Block *> *blocks() const { return GetPointer<const flatbuffers::Vector<const Block *> *>(10); }
+  flatbuffers::Vector<const Block *> *mutable_blocks() { return GetPointer<flatbuffers::Vector<const Block *> *>(10); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint8_t>(verifier, VT_VERSION) &&
-           VerifyField<uint8_t>(verifier, VT_SIZE) &&
-           VerifyFieldRequired<Pos>(verifier, VT_CID) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BLOCKS) &&
+           VerifyField<uint8_t>(verifier, 4 /* version */) &&
+           VerifyField<uint8_t>(verifier, 6 /* size */) &&
+           VerifyFieldRequired<Pos>(verifier, 8 /* cid */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, 10 /* blocks */) &&
            verifier.Verify(blocks()) &&
            verifier.EndTable();
   }
@@ -227,15 +205,15 @@ struct Chunk FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct ChunkBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_version(uint8_t version) { fbb_.AddElement<uint8_t>(Chunk::VT_VERSION, version, 0); }
-  void add_size(uint8_t size) { fbb_.AddElement<uint8_t>(Chunk::VT_SIZE, size, 0); }
-  void add_cid(const Pos *cid) { fbb_.AddStruct(Chunk::VT_CID, cid); }
-  void add_blocks(flatbuffers::Offset<flatbuffers::Vector<const Block *>> blocks) { fbb_.AddOffset(Chunk::VT_BLOCKS, blocks); }
+  void add_version(uint8_t version) { fbb_.AddElement<uint8_t>(4, version, 0); }
+  void add_size(uint8_t size) { fbb_.AddElement<uint8_t>(6, size, 0); }
+  void add_cid(const Pos *cid) { fbb_.AddStruct(8, cid); }
+  void add_blocks(flatbuffers::Offset<flatbuffers::Vector<const Block *>> blocks) { fbb_.AddOffset(10, blocks); }
   ChunkBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   ChunkBuilder &operator=(const ChunkBuilder &);
   flatbuffers::Offset<Chunk> Finish() {
     auto o = flatbuffers::Offset<Chunk>(fbb_.EndTable(start_, 4));
-    fbb_.Required(o, Chunk::VT_CID);  // cid
+    fbb_.Required(o, 8);  // cid
     return o;
   }
 };
@@ -254,35 +232,27 @@ inline flatbuffers::Offset<Chunk> CreateChunk(flatbuffers::FlatBufferBuilder &_f
 }
 
 struct Message FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_ID = 4,
-    VT_TYPE = 6,
-    VT_ACTION_TYPE = 8,
-    VT_ACTION = 10,
-    VT_BODY_TYPE = 12,
-    VT_BODY = 14
-  };
-  int64_t id() const { return GetField<int64_t>(VT_ID, 0); }
-  bool mutate_id(int64_t _id) { return SetField(VT_ID, _id); }
-  Type type() const { return static_cast<Type>(GetField<int8_t>(VT_TYPE, 0)); }
-  bool mutate_type(Type _type) { return SetField(VT_TYPE, static_cast<int8_t>(_type)); }
-  Action action_type() const { return static_cast<Action>(GetField<uint8_t>(VT_ACTION_TYPE, 0)); }
-  bool mutate_action_type(Action _action_type) { return SetField(VT_ACTION_TYPE, static_cast<uint8_t>(_action_type)); }
-  const void *action() const { return GetPointer<const void *>(VT_ACTION); }
-  void *mutable_action() { return GetPointer<void *>(VT_ACTION); }
-  AType body_type() const { return static_cast<AType>(GetField<uint8_t>(VT_BODY_TYPE, 0)); }
-  bool mutate_body_type(AType _body_type) { return SetField(VT_BODY_TYPE, static_cast<uint8_t>(_body_type)); }
-  const void *body() const { return GetPointer<const void *>(VT_BODY); }
-  void *mutable_body() { return GetPointer<void *>(VT_BODY); }
+  int64_t id() const { return GetField<int64_t>(4, 0); }
+  bool mutate_id(int64_t id) { return SetField(4, id); }
+  Type type() const { return static_cast<Type>(GetField<int8_t>(6, 0)); }
+  bool mutate_type(Type type) { return SetField(6, static_cast<int8_t>(type)); }
+  Action action_type() const { return static_cast<Action>(GetField<uint8_t>(8, 0)); }
+  bool mutate_action_type(Action action_type) { return SetField(8, static_cast<uint8_t>(action_type)); }
+  const void *action() const { return GetPointer<const void *>(10); }
+  void *mutable_action() { return GetPointer<void *>(10); }
+  AType body_type() const { return static_cast<AType>(GetField<uint8_t>(12, 0)); }
+  bool mutate_body_type(AType body_type) { return SetField(12, static_cast<uint8_t>(body_type)); }
+  const void *body() const { return GetPointer<const void *>(14); }
+  void *mutable_body() { return GetPointer<void *>(14); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_ID) &&
-           VerifyField<int8_t>(verifier, VT_TYPE) &&
-           VerifyField<uint8_t>(verifier, VT_ACTION_TYPE) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, VT_ACTION) &&
+           VerifyField<int64_t>(verifier, 4 /* id */) &&
+           VerifyField<int8_t>(verifier, 6 /* type */) &&
+           VerifyField<uint8_t>(verifier, 8 /* action_type */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, 10 /* action */) &&
            VerifyAction(verifier, action(), action_type()) &&
-           VerifyField<uint8_t>(verifier, VT_BODY_TYPE) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BODY) &&
+           VerifyField<uint8_t>(verifier, 12 /* body_type */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, 14 /* body */) &&
            VerifyAType(verifier, body(), body_type()) &&
            verifier.EndTable();
   }
@@ -291,12 +261,12 @@ struct Message FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct MessageBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_id(int64_t id) { fbb_.AddElement<int64_t>(Message::VT_ID, id, 0); }
-  void add_type(Type type) { fbb_.AddElement<int8_t>(Message::VT_TYPE, static_cast<int8_t>(type), 0); }
-  void add_action_type(Action action_type) { fbb_.AddElement<uint8_t>(Message::VT_ACTION_TYPE, static_cast<uint8_t>(action_type), 0); }
-  void add_action(flatbuffers::Offset<void> action) { fbb_.AddOffset(Message::VT_ACTION, action); }
-  void add_body_type(AType body_type) { fbb_.AddElement<uint8_t>(Message::VT_BODY_TYPE, static_cast<uint8_t>(body_type), 0); }
-  void add_body(flatbuffers::Offset<void> body) { fbb_.AddOffset(Message::VT_BODY, body); }
+  void add_id(int64_t id) { fbb_.AddElement<int64_t>(4, id, 0); }
+  void add_type(Type type) { fbb_.AddElement<int8_t>(6, static_cast<int8_t>(type), 0); }
+  void add_action_type(Action action_type) { fbb_.AddElement<uint8_t>(8, static_cast<uint8_t>(action_type), 0); }
+  void add_action(flatbuffers::Offset<void> action) { fbb_.AddOffset(10, action); }
+  void add_body_type(AType body_type) { fbb_.AddElement<uint8_t>(12, static_cast<uint8_t>(body_type), 0); }
+  void add_body(flatbuffers::Offset<void> body) { fbb_.AddOffset(14, body); }
   MessageBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   MessageBuilder &operator=(const MessageBuilder &);
   flatbuffers::Offset<Message> Finish() {

@@ -51,6 +51,7 @@ endif(MINGW OR UNIX)
 
 
 if(UNIX)
+
   install(TARGETS blocks_client
 	RUNTIME DESTINATION bin
 	CONFIGURATIONS All)

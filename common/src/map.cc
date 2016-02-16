@@ -1,5 +1,5 @@
 
-#include "map.hh"
+#include "common/map.hh"
 
 namespace blocks {
   namespace common {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chunk.hh"
+#include "common/chunk.hh"
 #include "pipe.hh"
 
 #include <thread>

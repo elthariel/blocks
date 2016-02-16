@@ -2,7 +2,7 @@
 
 #include "TcpConnection.hh"
 #include "chunk_generated.h"
-#include "chunk.hh"
+#include "common/chunk.hh"
 
 // template <typename... T>
 // class Evented

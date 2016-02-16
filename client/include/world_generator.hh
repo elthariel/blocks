@@ -1,7 +1,7 @@
 #pragma once
 
 #include "constants.hh"
-#include "chunk.hh"
+#include "common/chunk.hh"
 #include "seed.hh"
 
 #include <perlinNoise2.h>

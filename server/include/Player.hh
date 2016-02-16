@@ -4,11 +4,6 @@
 #include "Server.hh"
 #include "position.hh"
 #include "Chunk.hh"
-<<<<<<< HEAD
-#include "chunk_generated.h"
-=======
-
->>>>>>> dcefdfc5ba36c3fe6c1bab3d31cde1f671da4fb1
 
 // struct HasId
 // {

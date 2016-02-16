@@ -11,11 +11,6 @@ namespace blocks {
 
           connect(endpoint);
           _t = new boost::thread(boost::bind(&boost::asio::io_service::run, &_io_service));
-<<<<<<< HEAD
-=======
-          std::cout << "Test" << std::endl;
->>>>>>> dcefdfc5ba36c3fe6c1bab3d31cde1f671da4fb1
-
         }
         catch (std::exception& e)
         {
@@ -45,17 +40,10 @@ namespace blocks {
         {
           std::cout << "Connected to server" << std::endl;
           _socket->read();
-<<<<<<< HEAD
-        }
-        else
-            std::cout << "Error connect" << std::endl;
-=======
-        //   _game->on_connected(socket);
         }
         else
         {
             std::cout << "Error connect" << std::endl;
         }
->>>>>>> dcefdfc5ba36c3fe6c1bab3d31cde1f671da4fb1
     }
 }

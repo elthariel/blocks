@@ -50,7 +50,7 @@ class Chunk : public blocks::fbs::Chunk, public blocks::Chunk
           blocks_vector.push_back(block.serialize());
 
         auto blocks = builder.CreateVectorOfStructs(blocks_vector);
-        auto pos = blocks::fbs::Pos(_pos.x(), _pos.y(), _pos.z());
+        auto pos = blocks::fbs::Pos(_id.x(), _id.y(), _id.z());
         auto chunk = blocks::fbs::CreateChunk(builder, 10, 1, &pos, blocks);
         builder.Finish(chunk);
 

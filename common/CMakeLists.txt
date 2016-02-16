@@ -66,5 +66,5 @@ add_library(common STATIC
 #set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 #set(BUILD_SHARED_LIBRARIES OFF)
 #set(CMAKE_EXE_LINKER_FLAGS "-static")
-add_executable(common_tests ${COMMON_TESTS})
-target_link_libraries(common_tests common boost_unit_test_framework-mt)
+# add_executable(common_tests ${COMMON_TESTS})
+# target_link_libraries(common_tests common boost_unit_test_framework)

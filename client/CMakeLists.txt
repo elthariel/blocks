@@ -54,9 +54,10 @@ add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_client common boost_system
- # p3framework panda pandafx pandaexpress
- # p3dtoolconfig p3dtool p3direct
+ p3framework panda pandafx pandaexpress
+ p3dtoolconfig p3dtool p3direct
   python2.7 boost_timer
+  ${LINUX_LIBS}
 )
 
 # Here to enable C++11 features, we should make a better use of this :)

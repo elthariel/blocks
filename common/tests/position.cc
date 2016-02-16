@@ -11,7 +11,7 @@ using namespace std;
 
 BOOST_AUTO_TEST_CASE( accessors )
 {
-  cpos pos1, pos2(1, 2, 3);
+  cid pos1, pos2(1, 2, 3);
 
   BOOST_CHECK( pos1[0] == 0 );
   BOOST_CHECK( pos1[1] == 0 );

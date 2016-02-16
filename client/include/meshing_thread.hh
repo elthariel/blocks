@@ -3,6 +3,7 @@
 #include "chunk.hh"
 
 #include <thread>
+#include <condition_variable>
 #include <mutex>
 #include <queue>
 #include <atomic>

@@ -41,6 +41,7 @@ set_target_properties(blocks_server PROPERTIES DEBUG_POSTFIX _d)
 target_link_libraries(blocks_server common
  boost_system
 	python2.7
+ ${LINUX_LIBS}
 )
 
 # Here to enable C++11 features, we should make a better use of this :)

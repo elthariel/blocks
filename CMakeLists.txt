@@ -29,6 +29,7 @@ find_path(PANDA_HOME
   include/panda.h
   PATHS
   "$ENV{HOME}/code/cxx/panda3d/built"
+  "/data/prog/cpp/panda3d/built"
   "$ENV{HOME}/usr/local/panda"
   /Developer/Panda3D
   /usr/local
@@ -43,9 +44,10 @@ if(PANDA_HOME-NOTFOUND)
 endif()
 
 if (UNIX AND NOT APPLE) #i.e. champii
+  set(LINUX_LIBS pthread)
   set(PANDA_INCLUDE_DIRS
-    ${PANDA_HOME}/include/panda3d
-    /usr/include/eigen3)
+    ${PANDA_HOME}/include
+   /usr/include/eigen3)
 endif(UNIX AND NOT APPLE)
 if (APPLE)
   set(PANDA_INCLUDE_DIRS
@@ -60,9 +62,9 @@ include_directories(
   ${PANDA_INCLUDE_DIRS}
 )
 
-add_definitions(-std=c++11)
-#add_definitions(-stdlib=libstdc++)
-
+add_definitions(-std=c++14)
+add_definitions(-fpermissive)
+#add_definitions(-O0)
 
 add_subdirectory(common)
 add_subdirectory(client)

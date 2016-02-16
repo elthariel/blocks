@@ -4,6 +4,7 @@
 #include "pipe.hh"
 
 #include <thread>
+#include <atomic>
 #include <utility>
 #include "geomNode.h"
 

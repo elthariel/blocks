@@ -35,6 +35,7 @@ target_link_libraries(blocks_client
   common
   ${PANDA_LIBRARIES}
   boost_timer
+  ${LINUX_LIBS}
 )
 
 # Here to enable C++11 features, we should make a better use of this :)

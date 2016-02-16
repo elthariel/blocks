@@ -6,11 +6,18 @@
 #include <boost/format.hpp>
 
 namespace blocks {
+  //template <>
+  //using base_position = std::tuple<int64_t, int64_t, int64_t>;
   typedef std::tuple<int64_t, int64_t, int64_t> base_position;
 
   struct pos : public base_position {
     using base_position::base_position;
-    pos() :base_position(0, 0, 0) {}
+    //base_position() = delete;
+    constexpr pos() {
+      std::get<0>(*this) = 0;
+      std::get<1>(*this) = 0;
+      std::get<2>(*this) = 0;      
+    }
 
     inline int64_t &x() { return std::get<0>(*this); }
     inline int64_t &y() { return std::get<1>(*this); }
@@ -49,6 +56,11 @@ namespace blocks {
   struct cpos: public pos {
     using pos::pos;
 
+    constexpr cpos() {
+      std::get<0>(*this) = 0;
+      std::get<1>(*this) = 0;
+      std::get<2>(*this) = 0;      
+    }    
     cpos(size_t idx);
     size_t to_idx() const;
     bool valid() const;

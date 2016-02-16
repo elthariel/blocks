@@ -1,20 +1,25 @@
 #pragma once
 
-#include "../../common/include/TcpConnection.hh"
-#include "Client.hh"
+#include <boost/thread.hpp>
 
-class TcpClient {
-  public:
-    TcpClient(boost::asio::io_service& io_service,
-		 boost::asio::ip::tcp::endpoint& endpoint,
-         Client *client);
+#include "TcpConnection.hh"
 
-    void connect(boost::asio::io_service& io_service, boost::asio::ip::tcp::endpoint& endpoint);
+namespace blocks {
+    class Game;
+    class TcpClient {
+      public:
+        TcpClient(char *ip, char *port, Game *game);
+        ~TcpClient();
 
-    void handle_connect(TcpConnection<Client>::pointer socket, const boost::system::error_code& error);
+        void connect(boost::asio::ip::tcp::endpoint& endpoint);
+        void handle_connect(const boost::system::error_code& error);
 
-private:
-    TcpConnection<Client>::pointer _socket;
-    Client *_client;
+    private:
+        boost::thread *_t;
+        boost::asio::io_service _io_service;
+        TcpConnection<Game, Game>::pointer _socket;
+        Game *_game;
 
-};
+    };
+}
+#include "game.hh"

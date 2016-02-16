@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 project(blocks_client)
 
 set(CLIENT_HEADERS
-  ./include/Client.hh
+  # ./include/Client.hh
   ./include/TcpClient.hh
   ../common/include/CircularBuffer.hh
 	./include/seed.hh
@@ -25,7 +25,7 @@ set(CLIENT_SOURCES
     ./src/game.cc
     ./src/scene.cc
     ./src/event_handler.cc
-  ./src/Client.cc
+  # ./src/Client.cc
   ./src/TcpClient.cc
   ../common/src/CircularBuffer.cpp
 )
@@ -57,7 +57,7 @@ set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 target_link_libraries(blocks_client common boost_system
  p3framework panda pandafx pandaexpress
  p3dtoolconfig p3dtool p3direct
-  python2.7 boost_timer
+  python2.7 boost_timer boost_thread
   ${LINUX_LIBS}
 )
 

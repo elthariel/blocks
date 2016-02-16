@@ -43,9 +43,4 @@ table Message {
   body:AType;
 }
 
-table Packet {
-  size:ulong;
-  message:Message;
-}
-
-root_type Packet;
+root_type Message;

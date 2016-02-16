@@ -15,17 +15,19 @@
 // int HasId::__id = 0;
 
 static int NEXT_ID = 0;
+namespace blocks {
 
-class Player
-{
-  public:
-    Player(TcpConnection<Server>::pointer);
+    class Player
+    {
+      public:
+        Player(TcpConnection<Server, Player>::pointer);
 
-    int  id()       { return _id; }
-    void id(int id) { _id = id; }
+        int  id()       { return _id; }
+        void id(int id) { _id = id; }
 
-  private:
-    TcpConnection<Server>::pointer _socket;
-    int _id;
-    blocks::wpos _pos;
-};
+      private:
+        TcpConnection<Server, Player>::pointer _socket;
+        int _id;
+        blocks::wpos _pos;
+    };
+}

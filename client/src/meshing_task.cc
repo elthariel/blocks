@@ -18,7 +18,7 @@ namespace blocks
   {
     if (_mt.mesh_queue_size())
     {
-      cout << "Received a mesh" << endl;
+    //   cout << "Received a mesh" << endl;
 
       auto result = _mt.mesh_queue_get();
       auto nodepath = _scene.attach_new_node(result.second);

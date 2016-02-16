@@ -7,21 +7,8 @@ set(COMMON_FBS
   ./idl/chunk.fbs
 )
 
-set(COMMON_HEADERS
-  ./include/constants.hh
-  ./include/map.hh
-  ./include/position.hh
-  ./include/chunk.hh
-  ./include/meta.hh
-  ./include/multi_array.hh
-)
-
-set(COMMON_SOURCES
-  ./src/map.cc
-  ./src/position.cc
-  ./src/chunk.cc
-  )
-
+file(GLOB COMMON_HEADERS ./include/*.hh)
+file(GLOB COMMON_SOURCES ./src/*.cc)
 file(GLOB COMMON_TESTS ./tests/*.cc)
 
 find_path(FLATBUFFERS_HOME
@@ -56,11 +43,13 @@ endforeach(FBS_FILE)
 
 include_directories(
   ${FLATBUFFERS_HOME}/include
-)
+  )
 
+add_definitions(-std=c++14)
 add_library(common STATIC
   ${COMMON_GENERATED_HEADERS} ${COMMON_HEADERS} ${COMMON_SOURCES}
-)
+  )
+target_link_libraries(common duktape)
 
 # Build tests !
 #set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")

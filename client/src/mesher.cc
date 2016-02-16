@@ -62,6 +62,11 @@ namespace blocks {
     flags_at(p) &= ~(1L << offset);
   }
 
+  auto &MesherWorkBuffer::block_ids()
+  {
+    return _block_ids;
+  }
+
   //
   // Greedy Mesher !
   //
@@ -78,49 +83,71 @@ namespace blocks {
   };
 
   GreedyMesher::GreedyMesher(Chunk::ptr c)
-  : _chunk(c), _work(c->size()),
-    _vxd(new GeomVertexData(c->id(), GeomVertexFormat::get_v3n3t2(), Geom::UH_static)),
-    _vertex(_vxd, "vertex"), _normal(_vxd, "normal"), _uvs(_vxd, "texcoord"),
-    _mesh(new GeomTriangles(Geom::UH_static))
+  : _chunk(c), _work(c->size())
   {
     compute_visible();
-    _vxd->reserve_num_rows(1000);
   }
 
   void GreedyMesher::compute_visible()
   {
     for (size_t idx = 0; idx < Chunk::flat_size(); ++idx)
     {
+      bool visible_face = false;
       cpos pos(idx);
 
       if (_chunk->at(pos).air())
         continue;
 
-      for(auto f = 0; f < neighbors.size(); ++f)
+      for (auto f = 0; f < neighbors.size(); ++f)
       {
         cpos pos_nb = pos + neighbors[f];
-        if (!pos_nb.valid())
+        if (!pos_nb.valid() || _chunk->at(pos_nb).air()
+            || _chunk->at(pos_nb).transparent())
         {
           _work.set_face_visible(pos, f, true);
-          continue;
-        }
-
-        else if (_chunk->at(pos_nb).air() || _chunk->at(pos_nb).transparent())
-        {
-          _work.set_face_visible(pos, f, true);
+          visible_face = true;
           continue;
         }
       }
+      if (visible_face)
+        _work.block_ids().push_back(_chunk->at(pos).id());
     }
+    _work.block_ids().sort();
+    _work.block_ids().unique();
+  }
+
+  void GreedyMesher::start_mesh()
+  {
+    _vxd = new GeomVertexData(_chunk->id(), GeomVertexFormat::get_v3n3t2(), Geom::UH_static);
+    _vertex = GeomVertexWriter(_vxd, "vertex");
+    _normal = GeomVertexWriter(_vxd, "normal");
+    _uvs = GeomVertexWriter(_vxd, "texcoord");
+    _mesh = new GeomTriangles(Geom::UH_static);
+    _vx_count = 0;
+
+    _vxd->reserve_num_rows(1000);
+  }
+
+  void GreedyMesher::finish_mesh(PT(GeomNode) geom_node, uint16_t block_id)
+  {
+    auto name = std::string("blockid:") + std::to_string(block_id);
+    PT(GeomNode) subnode = new GeomNode(name);
+    // Now we've filled our VertexData object, let's create a primitive and everything
+    _mesh->close_primitive();
+    PT(Geom) geom = new Geom(_vxd);
+    geom->add_primitive(_mesh);
+
+    subnode->add_geom(geom);
+    subnode->set_tag("block_id", std::to_string(block_id));
+
+    geom_node->add_child(subnode);
   }
 
   void GreedyMesher::create_quad(unsigned char face,
                                  bool front,
                                  const cpos &base,
-                                 const cpos& du,
-                                 const cpos& dv,
-                                 int w,
-                                 int h)
+                                 const cpos& du, const cpos& dv,
+                                 int w, int h)
   {
     int64_t quads[4][3] = {
       { base[0],             base[1],             base[2]             },
@@ -158,121 +185,127 @@ namespace blocks {
     _vx_count += 4;
   }
 
-  bool GreedyMesher::need_mesh(cpos &pos, int face_idx)
+  bool GreedyMesher::need_mesh(const cpos &pos, int face_idx, uint16_t block_id)
   {
     auto visible = _work.get_face_visible(pos, face_idx);
     auto meshed = _work.get_face_meshed(pos, face_idx);
-    return visible && !meshed;
+    return visible && !meshed && _chunk->at(pos).id() == block_id;
   }
 
-  PT(GeomNode) GreedyMesher::mesh() {
-    bool visible, meshed;
-    cpos iter;
+  void GreedyMesher::mesh_face(cpos &iter,
+                               uint16_t block_id,
+                               int d, int u, int v,
+                               char front)
+  {
+    auto face_idx = d * 2 + front;
+    auto normal = normals[face_idx];
 
-    // Iterate all 3 dimension. d, u, and v will be the index of the dimensions
-    // we iterate. This will allow us to iterate on x/y/z then y/z/x then z/y/x.
-    for (auto d = 0; d < 3; ++d)
+    // We then iterate from 0 to size on 3 axis, using the previously
+    // defined dimension index to compute the position we're at in the
+    // direction we're iterating
+
+    for (auto i = 0; i < consts::chunk_size; i++)
     {
-      unsigned char u, v;
-      u = (d + 1) % 3;
-      v = (d + 2) % 3;
-
-      // Then for each dimension, we iterate the front and back face
-      for (auto front = 0; front < 2; ++front)
+      iter[d] = i;
+      for (auto j = 0; j < consts::chunk_size; j++)
       {
-        auto face_idx = d * 2 + front;
-        auto normal = normals[face_idx];
-
-        // We then iterate from 0 to size on 3 axis, using the previously
-        // defined dimension index to compute the position we're at in the
-        // direction we're iterating
-
-        for (auto i = 0; i < consts::chunk_size; i++)
+        iter[u] = j;
+        for (auto k = 0; k < consts::chunk_size; k++)
         {
-          iter[d] = i;
-          for (auto j = 0; j < consts::chunk_size; j++)
+          iter[v] = k;
+          // iter now have the chunk position of the block we're looking at
+          // and will progress in the correct order for the direction we're
+          // iterating.
+          cpos iter2(iter), du, dv;
+          auto w = 0, h = 0;
+
+          // std::cout << std::string(iter) << std::endl;
+
+          // Here we look for adjacent faces to merge
+          // FIXME: We only do it in one direction now
+          for(auto k2 = k; k2 < consts::chunk_size; ++k2)
           {
-            iter[u] = j;
-            for (auto k = 0; k < consts::chunk_size; k++)
+            iter2[v] = k2;
+
+            if (need_mesh(iter2, face_idx, block_id))
             {
-              iter[v] = k;
-              // iter now have the chunk position of the block we're looking at
-              // and will progress in the correct order for the direction we're
-              // iterating.
-              cpos iter2(iter), du, dv;
-              auto w = 0, h = 0;
+              _work.set_face_meshed(iter2, face_idx, true);
+              dv[v]++; w++;
+            }
+            else
+              break;
+          }
 
-              // std::cout << std::string(iter) << std::endl;
+          // There's a quad to mesh
+          if (dv[v])
+          {
+            du[u]++;
+            h++;
+            // Trying to find if we can aggregate a quad of width 'w' on top of the one
+            // we just found.
+            for(auto j2 = j + 1; j2 < consts::chunk_size; ++j2)
+            {
+              iter2[u] = j2;
 
-              // Here we look for adjacent faces to merge
-              // FIXME: We only do it in one direction now
-              for(auto k2 = k; k2 < consts::chunk_size; ++k2)
+              // Ensure all the faces form k to k + w are visible and need mesh
+              bool line_need_mesh = true;
+              for(auto k2 = k; k2 < k + w; ++k2)
               {
                 iter2[v] = k2;
-
-                if (need_mesh(iter2, face_idx))
-                {
-                  _work.set_face_meshed(iter2, face_idx, true);
-                  dv[v]++; w++;
-                }
-                else
+                line_need_mesh = line_need_mesh && need_mesh(iter2, face_idx, block_id);
+                if (!line_need_mesh)
                   break;
               }
+              // Leave if they don't
+              if (!line_need_mesh)
+                break;
 
-              // There's a quad to mesh
-              if (dv[v])
+              // We can aggreage the 'j2' line
+              for(auto k2 = k; k2 < k + w; ++k2)
               {
-                du[u]++;
-                h++;
-                // Trying to find if we can aggregate a quad of width 'w' on top of the one
-                // we just found.
-                for(auto j2 = j + 1; j2 < consts::chunk_size; ++j2)
-                {
-                  iter2[u] = j2;
-
-                  // Ensure all the faces form k to k + w are visible and need mesh
-                  bool line_need_mesh = true;
-                  for(auto k2 = k; k2 < k + w; ++k2)
-                  {
-                    iter2[v] = k2;
-                    line_need_mesh = line_need_mesh && need_mesh(iter2, face_idx);
-                    if (!line_need_mesh)
-                      break;
-                  }
-                  // Leave if they don't
-                  if (!line_need_mesh)
-                    break;
-
-                  // We can aggreage the 'j2' line
-                  for(auto k2 = k; k2 < k + w; ++k2)
-                  {
-                    iter2[v] = k2;
-                    _work.set_face_meshed(iter2, face_idx, true);
-                  }
-
-                  du[u]++;
-                  h++;
-                }
-
-                cpos base(iter);
-                if (!front)
-                  base[d]++;
-
-                create_quad(face_idx, front, base, du, dv, w, h);
+                iter2[v] = k2;
+                _work.set_face_meshed(iter2, face_idx, true);
               }
+
+              du[u]++;
+              h++;
             }
+
+            cpos base(iter);
+            if (!front)
+              base[d]++;
+
+            create_quad(face_idx, front, base, du, dv, w, h);
           }
         }
       }
     }
+  }
 
-    // Now we've filled our VertexData object, let's creat a primitive and everything
-    _mesh->close_primitive();
-    PT(Geom) geom = new Geom(_vxd);
-    geom->add_primitive(_mesh);
+  PT(GeomNode) GreedyMesher::mesh() {
+    PT(GeomNode) node = new GeomNode(std::string("chunk:") + std::string(_chunk->id()));
+    cpos iter;
 
-    PT(GeomNode) node = new GeomNode(std::string("Chunk:") + std::string(_chunk->id()));
-    node->add_geom(geom);
+    // Iterator over the list of different block ideas we found during the visibility tests
+    for(auto &block_id: _work.block_ids())
+    {
+      start_mesh();
+      // Iterate all 3 dimension. d, u, and v will be the index of the dimensions
+      // we iterate. This will allow us to iterate on x/y/z then y/z/x then z/y/x.
+      for (auto d = 0; d < 3; ++d)
+      {
+        unsigned char u, v;
+        u = (d + 1) % 3;
+        v = (d + 2) % 3;
+
+        // Then for each dimension, we iterate the front and back face
+        for (auto front = 0; front < 2; ++front)
+        {
+          mesh_face(iter, block_id, d, u, v, front);
+        }
+      }
+      finish_mesh(node, block_id);
+    }
 
     return node;
   }

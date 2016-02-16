@@ -13,6 +13,7 @@ endif(APPLE)
 project (blocks)
 
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
+set(THIRD_PARTY ${CMAKE_SOURCE_DIR}/third-party)
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
@@ -60,14 +61,18 @@ include_directories(
   ${BLOCKS_COMMON_INCLUDE_DIR}
   ${BLOCKS_COMMON_GENERATED_INCLUDE_DIR}
   ${PANDA_INCLUDE_DIRS}
+  ${THIRD_PARTY}/duktape
+  ${PANDA_HOME}/include
 )
 
 add_definitions(-std=c++14)
 add_definitions(-fpermissive)
+
 #add_definitions(-O0)
 #add_definitions(-stdlib=libstdc++)
 
 
+add_subdirectory(third-party)
 add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(server)

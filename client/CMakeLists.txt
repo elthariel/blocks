@@ -3,17 +3,24 @@ cmake_minimum_required(VERSION 3.0)
 project(blocks_client)
 
 set(CLIENT_HEADERS
-	./include/seed.hh
-	./include/world_generator.hh
-	./include/meshing_thread.hh
+  ./include/Client.hh
+  ./include/TcpClient.hh
+  ../common/include/CircularBuffer.hh
+#	./include/seed.hh
+#	./include/world_generator.hh
+#	./include/meshing_thread.hh
 )
 
 set(CLIENT_SOURCES
-	./src/main.cc
-	./src/seed.cc
-	./src/world_generator.cc
-	./src/meshing_thread.cc
-	./src/mesher.cc	
+ 	./src/main.cc
+  ./src/Client.cc
+  ./src/TcpClient.cc
+  ../common/src/CircularBuffer.cpp
+
+#	./src/seed.cc
+#	./src/world_generator.cc
+#	./src/meshing_thread.cc
+#	./src/mesher.cc
 )
 
 
@@ -39,9 +46,9 @@ add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
 
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
-target_link_libraries(blocks_client common
-	p3framework panda pandafx pandaexpress
-  p3dtoolconfig p3dtool p3direct
+target_link_libraries(blocks_client common boost_system
+# 	p3framework panda pandafx pandaexpress
+#  p3dtoolconfig p3dtool p3direct
 	python2.7
 )
 

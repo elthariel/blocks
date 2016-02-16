@@ -1,12 +1,27 @@
-#include "pandaFramework.h"
-#include "pandaSystem.h"
-#include "meta.hh"
-#include "multi_array.hh"
+// #include "pandaFramework.h"
+// #include "pandaSystem.h"
+// #include "meta.hh"
+// #include "multi_array.hh"
 
 #include <iostream>
 #include <string>
-
+#include		   <boost/asio.hpp>
+#include		   <boost/thread.hpp>
 using namespace std;
+
+#include "Client.hh"
+
+
+int			   main(int ac, char **av)
+{
+  if (ac != 3)
+  {
+    std::cerr << "Usage : ./client IP PORT" << std::endl;
+    return (0);
+  }
+  Client client(av[1], av[2]);
+  return (0);
+}
 
 // int main(int ac, char **av) {
 //   cout << Power<4, 2>::value << endl;

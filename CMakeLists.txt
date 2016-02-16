@@ -65,5 +65,5 @@ add_definitions(-std=c++11)
 
 
 add_subdirectory(common)
-#add_subdirectory(client)
+add_subdirectory(client)
 add_subdirectory(server)

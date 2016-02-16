@@ -21,13 +21,18 @@ namespace blocks {
       socket->read();
       auto player = new Player(socket);
       _players.insert(std::pair<int, Player *>(player->id(), player));
-      socket->write((uint8_t*)"Toto tata", 10);
+    //   socket->write((uint8_t*)"Toto tata", 10);
     }
 
     void Server::dispatch(TcpConnection<Server, Player>::pointer socket, uint8_t *body)
     {
         std::cout << "Got from " << socket->referer()->id() << body << std::endl;
         // socket->write((uint8_t*)"Toto tata", 10);
+
+    }
+
+    void on_move(uint8_t *buffer)
+    {
 
     }
 }

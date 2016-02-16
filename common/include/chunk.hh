@@ -55,6 +55,11 @@ namespace blocks {
       return _blocks[idx % _flat_size];
     }
 
+    static Chunk *deserialize(uint8_t *buffer)
+    {
+        return nullptr;
+    }
+
   protected:
     cid _id;
     Block _blocks[_flat_size];

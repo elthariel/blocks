@@ -19,6 +19,9 @@ namespace blocks
     void start();
     void dispatch(TcpConnection<blocks::Game, blocks::Game>::pointer, uint8_t *);
 
+    void on_move(uint8_t *);
+    void on_chunk(uint8_t *);
+
   protected:
     PandaFramework    _framework;
     MeshingThread     _meshing_thread;

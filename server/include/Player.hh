@@ -4,7 +4,7 @@
 #include "Server.hh"
 #include "position.hh"
 #include "Chunk.hh"
-
+#include "chunk_generated.h"
 
 // struct HasId
 // {
@@ -24,6 +24,20 @@ namespace blocks {
 
         int  id()       { return _id; }
         void id(int id) { _id = id; }
+
+        std::tuple<uint8_t *, size_t> serialize();
+
+        // static std::tuple<uint8_t *, size_t> create_message(fbs::Type type, fbs::Action action, flatbuffers::Offset<fbs::Player> body)
+        // static void create_message(fbs::Type type, fbs::Action action, flatbuffers::Offset<fbs::Player> body)
+        // {
+        //     flatbuffers::FlatBufferBuilder builder;
+        //
+        //     // auto message = fbs::CreateMessage(builder, type, action, fbs::AType::AType_Player, body.Union());
+        //     //
+        //     // builder.Finish(message);
+        //
+        //     // return std::make_tuple(builder.GetBufferPointer(), builder.GetSize());
+        // }
 
       private:
         TcpConnection<Server, Player>::pointer _socket;

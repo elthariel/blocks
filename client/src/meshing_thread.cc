@@ -22,49 +22,6 @@ namespace blocks {
     _thread.join();
   }
 
-  size_t MeshingThread::chunk_queue_put(Chunk::ptr c)
-  {
-    lock_guard<mutex> lock(_in_mutex);
-
-    _in_queue.push(c);
-    _work_signal.notify_one();
-
-    return _in_queue.size();
-  }
-
-  size_t MeshingThread::chunk_queue_size()
-  {
-    lock_guard<mutex> lock(_in_mutex);
-
-    return _in_queue.size();
-  }
-
-  size_t MeshingThread::mesh_queue_put(MeshingThread::result n)
-{
-    lock_guard<mutex> lock(_out_mutex);
-
-    _out_queue.push(n);
-
-    return _out_queue.size();
-  }
-
-  MeshingThread::result MeshingThread::mesh_queue_get()
-  {
-    lock_guard<mutex> lock(_out_mutex);
-
-    auto res = _out_queue.front();
-    _out_queue.pop();
-
-    return res;
-  }
-
-  size_t MeshingThread::mesh_queue_size()
-  {
-    lock_guard<mutex> lock(_out_mutex);
-
-    return _out_queue.size();
-  }
-
   void MeshingThread::stop()
   {
     cout << "Stopping meshing thread." << endl;
@@ -79,23 +36,8 @@ namespace blocks {
 
     GreedyMesher mesher(chunk);
     MeshingThread::result result(chunk->id(), mesher.mesh());
-    mesh_queue_put(result);
-  }
 
-  Chunk::ptr MeshingThread::wait_for_data()
-  {
-    unique_lock<mutex> lock(_in_mutex);
-    while (_in_queue.empty() && _running)
-      _work_signal.wait_for(lock, chrono::milliseconds(500));
-
-    if (_running)
-    {
-      Chunk::ptr chunk = _in_queue.front();
-      _in_queue.pop();
-      return chunk;
-    }
-    else
-      return Chunk::ptr();
+    output_pipe << result;
   }
 
   void MeshingThread::thread_loop()
@@ -103,7 +45,7 @@ namespace blocks {
     cout << "Started meshing thread." << endl;
 
     while(_running) {
-      Chunk::ptr chunk = wait_for_data();
+      Chunk::ptr chunk = input_pipe.wait_for_data(500, _running);
       if (chunk)
         process_chunk(chunk);
     }

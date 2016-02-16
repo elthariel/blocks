@@ -33,7 +33,7 @@ namespace blocks {
     for (auto i = 0; i < size; i++)
       for (auto j = 0; j < size; j++)
         for (auto k = -2; k <= 2 ; k++)
-        _meshing_thread.chunk_queue_put(wg.generate(cid(i, j, k)));
+          _meshing_thread.input_pipe << wg.generate(cid(i, j, k));
 
     // mt.chunk_queue_put(wg.generate(cid(1, 0, 0)));
     // mt.chunk_queue_put(wg.generate(cid(0, 1, 0)));

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "chunk_generated.h"
 
 namespace blocks {
   class Block
@@ -31,6 +32,11 @@ namespace blocks {
 
     bool transparent() const { return get_flag(TRANSPARENT); }
     void transparent(bool set) { set_flag(TRANSPARENT, set); }
+
+    blocks::fbs::Block serialize() const {
+      blocks::fbs::Block block(id(), variant(), air(), transparent());
+      return block;
+    }
 
   protected:
     uint16_t _id;

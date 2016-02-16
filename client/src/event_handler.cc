@@ -24,13 +24,13 @@ namespace blocks
 
     if (handler == nullptr)
     {
-      std::cout << "Event called on null handler" << std::endl;
+    //   std::cout << "Event called on null handler" << std::endl;
       return;
     }
 
     if (ev == nullptr)
     {
-      std::cout << "Handler received a null event" << std::endl;
+    //   std::cout << "Handler received a null event" << std::endl;
       return;
     }
 

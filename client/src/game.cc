@@ -4,6 +4,7 @@
 // Test
 #include "seed.hh"
 #include "world_generator.hh"
+#include "TcpClient.hh"
 
 #include <iostream>
 
@@ -11,6 +12,7 @@ using namespace std;
 
 namespace blocks {
   Game::Game(int ac, char **av)
+    : _client(av[1], av[2], this)
   {
     _framework.open_framework(ac, av);
 
@@ -36,5 +38,11 @@ namespace blocks {
           _meshing_thread.input_pipe << wg.generate(cid(i, j, k));
 
     _scene->run();
+  }
+
+  void Game::dispatch(TcpConnection<Game, Game>::pointer socket, uint8_t *buffer)
+  {
+      std::cout << "Got " <<  buffer << std::endl;
+      socket->write((uint8_t*)"Toto tata", 10);
   }
 }

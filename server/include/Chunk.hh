@@ -29,32 +29,34 @@
 // private:
 //     std::vector<Observer *> _observers;
 // };
+namespace blocks {
 
-class Block : public blocks::fbs::Block
-{
-  using blocks::fbs::Block::Block;
-};
+    class BlockServer : public fbs::Block
+    {
+      using fbs::Block::Block;
+    };
 
-class Chunk : public blocks::fbs::Chunk, public blocks::Chunk
-{
-  public:
-    // Chunk() {}
-    // using blocks::fbs::Chunk::Chunk;
+    class ChunkServer : public fbs::Chunk, public Chunk
+    {
+      public:
+        // Chunk() {}
+        // using fbs::Chunk::Chunk;
 
-  public:
-      uint8_t *serialize() const {
-        flatbuffers::FlatBufferBuilder builder;
+      public:
+          uint8_t *serialize() const {
+            flatbuffers::FlatBufferBuilder builder;
 
-        std::vector<blocks::fbs::Block> blocks_vector;
-        for (auto block: _blocks)
-          blocks_vector.push_back(block.serialize());
+            std::vector<fbs::Block> blocks_vector;
+            for (auto block: _blocks)
+              blocks_vector.push_back(block.serialize());
 
-        auto blocks = builder.CreateVectorOfStructs(blocks_vector);
-        auto pos = blocks::fbs::Pos(_id.x(), _id.y(), _id.z());
-        auto chunk = blocks::fbs::CreateChunk(builder, 10, 1, &pos, blocks);
-        builder.Finish(chunk);
+            auto blocks = builder.CreateVectorOfStructs(blocks_vector);
+            auto pos = fbs::Pos(_id.x(), _id.y(), _id.z());
+            auto chunk = fbs::CreateChunk(builder, 10, 1, &pos, blocks);
+            builder.Finish(chunk);
 
-        return builder.GetBufferPointer();
-      }
+            return builder.GetBufferPointer();
+          }
 
-};
+    };
+}

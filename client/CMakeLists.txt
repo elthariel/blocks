@@ -31,10 +31,17 @@ add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
 
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
+<<<<<<< HEAD
 target_link_libraries(blocks_client
   common
   ${PANDA_LIBRARIES}
   boost_timer
+=======
+target_link_libraries(blocks_client common boost_system
+ p3framework panda pandafx pandaexpress
+ p3dtoolconfig p3dtool p3direct
+  python2.7 boost_timer boost_thread
+>>>>>>> working network thread while playing
   ${LINUX_LIBS}
 )
 

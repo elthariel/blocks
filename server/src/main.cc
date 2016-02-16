@@ -57,7 +57,7 @@ int main()
   // test2->test();
   // test2->test2();
 
-  Server server;
+  blocks::Server server;
 
   return 0;
 }

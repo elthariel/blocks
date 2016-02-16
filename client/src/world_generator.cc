@@ -13,7 +13,7 @@ namespace blocks {
   }
 
   Chunk::ptr WorldGenerator::generate(cid _id) {
-    boost::timer::auto_cpu_timer t(6, "Chunk generation: %w seconds\n");
+    // boost::timer::auto_cpu_timer t(6, "Chunk generation: %w seconds\n");
     Chunk::ptr chunk = std::make_shared<Chunk>(_id);
 
     for(size_t x = 0; x < consts::chunk_size; x++) {

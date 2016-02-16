@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -12,54 +12,101 @@
 
 using boost::asio::ip::tcp;
 
-template <class T>
-class TcpConnection : public boost::enable_shared_from_this<TcpConnection<T>>
+namespace blocks
 {
-  public:
-    typedef boost::shared_ptr<TcpConnection<T>> pointer;
-
-    static pointer create(boost::asio::io_service& io_service, T *dispatcher)
+    template <class Dispatcher, class Referer>
+    class TcpConnection : public std::enable_shared_from_this<TcpConnection<Dispatcher, Referer>>
     {
-      return pointer(new TcpConnection<T>(io_service, dispatcher));
-    }
+      public:
+        typedef std::shared_ptr<TcpConnection<Dispatcher, Referer>> pointer;
 
-    tcp::socket& socket()
-    {
-      return _socket;
-    }
+        static pointer create(boost::asio::io_service& io_service, Dispatcher *dispatcher)
+        {
+          return pointer(new TcpConnection<Dispatcher, Referer>(io_service, dispatcher));
+        }
 
-    void read()
-    {
-        uint8_t *header = new uint8_t[8];
-        boost::asio::async_read(_socket, boost::asio::buffer(header, 8), boost::asio::transfer_at_least(8),
-             boost::bind(&TcpConnection<T>::handleReadHeader, this, boost::asio::placeholders::error, header));
-    }
+        tcp::socket& socket()
+        {
+          return _socket;
+        }
 
-  private:
-    TcpConnection(boost::asio::io_service& io_service, T *dispatcher)
-      : _socket(io_service), _dispatcher(dispatcher) {}
+        void write(uint8_t *buffer, uint64_t size)
+        {
+            uint8_t *new_buffer = new uint8_t[size + 8];
+            memcpy(new_buffer, (uint8_t*)&size, 8);
+            memcpy(new_buffer + 8, buffer, size);
+            boost::asio::async_write(_socket,
+                                     boost::asio::buffer(new_buffer, size + 8),
+                                     boost::bind(&TcpConnection<Dispatcher, Referer>::handle_write,
+                                                 this,
+                                                 boost::asio::placeholders::error));
+        }
 
-    void handleReadHeader(const boost::system::error_code& error, uint8_t *header)
-    {
-        uint64_t size = *(uint64_t*)header;
-        uint8_t *body = new uint8_t[size];
+        void read()
+        {
+            uint8_t *header = new uint8_t[8];
+            boost::asio::async_read(_socket,
+                                    boost::asio::buffer(header, 8),
+                                    boost::asio::transfer_at_least(8),
+                                    boost::bind(&TcpConnection<Dispatcher, Referer>::handleReadHeader,
+                                                this,
+                                                boost::asio::placeholders::error,
+                                                header));
+        }
 
-        boost::asio::async_read(_socket, boost::asio::buffer(body, size), boost::asio::transfer_at_least(size),
-             boost::bind(&TcpConnection<T>::handleReadBody, this, boost::asio::placeholders::error, header, body));
-    }
+        void attach_referer(Referer *referer)
+        {
+            _referer = referer;
+        }
 
-    void handleReadBody(const boost::system::error_code& error, uint8_t *header, uint8_t *body)
-    {
+        Referer *referer() const
+        {
+            return _referer;
+        }
 
-        if (error)
-            _dispatcher->dispatch(header);
-        else
-            read();
-    }
+      private:
+        TcpConnection(boost::asio::io_service& io_service, Dispatcher *dispatcher)
+          : _socket(io_service), _dispatcher(dispatcher) {}
 
-    void handle_write(const boost::system::error_code&, size_t) {}
+        void handleReadHeader(const boost::system::error_code& error, uint8_t *header)
+        {
+            if (error)
+            {
+                std::cout << "Error read" << std::endl;
+                return ;
+            }
 
-    T *_dispatcher;
-    tcp::socket _socket;
-    CircularBuffer _cb;
-};
+            uint64_t size = *(uint64_t*)header;
+            uint8_t *body = new uint8_t[size];
+
+            boost::asio::async_read(_socket,
+                                    boost::asio::buffer(body, size),
+                                    boost::asio::transfer_at_least(size),
+                                    boost::bind(&TcpConnection<Dispatcher, Referer>::handleReadBody,
+                                                this,
+                                                boost::asio::placeholders::error,
+                                                header,
+                                                body));
+        }
+
+        void handleReadBody(const boost::system::error_code& error, uint8_t *header, uint8_t *body)
+        {
+            if (error)
+                std::cout << "Error read" << std::endl;
+            else
+                _dispatcher->dispatch(this->shared_from_this(), body);
+                read();
+        }
+
+        void handle_write(const boost::system::error_code& e)
+        {
+            if (e)
+                std::cout << "Error write" << std::endl;
+        }
+
+        Dispatcher *_dispatcher;
+        Referer *_referer;
+        tcp::socket _socket;
+        CircularBuffer _cb;
+    };
+}

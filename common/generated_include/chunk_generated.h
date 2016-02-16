@@ -15,7 +15,6 @@ struct Pos;
 struct Block;
 struct Chunk;
 struct Message;
-struct Packet;
 
 enum Type {
   Type_PLAYER = 0,
@@ -323,46 +322,6 @@ inline flatbuffers::Offset<Message> CreateMessage(flatbuffers::FlatBufferBuilder
   return builder_.Finish();
 }
 
-struct Packet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_SIZE = 4,
-    VT_MESSAGE = 6
-  };
-  uint64_t size() const { return GetField<uint64_t>(VT_SIZE, 0); }
-  bool mutate_size(uint64_t _size) { return SetField(VT_SIZE, _size); }
-  const Message *message() const { return GetPointer<const Message *>(VT_MESSAGE); }
-  Message *mutable_message() { return GetPointer<Message *>(VT_MESSAGE); }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint64_t>(verifier, VT_SIZE) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, VT_MESSAGE) &&
-           verifier.VerifyTable(message()) &&
-           verifier.EndTable();
-  }
-};
-
-struct PacketBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_size(uint64_t size) { fbb_.AddElement<uint64_t>(Packet::VT_SIZE, size, 0); }
-  void add_message(flatbuffers::Offset<Message> message) { fbb_.AddOffset(Packet::VT_MESSAGE, message); }
-  PacketBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
-  PacketBuilder &operator=(const PacketBuilder &);
-  flatbuffers::Offset<Packet> Finish() {
-    auto o = flatbuffers::Offset<Packet>(fbb_.EndTable(start_, 2));
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<Packet> CreatePacket(flatbuffers::FlatBufferBuilder &_fbb,
-   uint64_t size = 0,
-   flatbuffers::Offset<Message> message = 0) {
-  PacketBuilder builder_(_fbb);
-  builder_.add_size(size);
-  builder_.add_message(message);
-  return builder_.Finish();
-}
-
 inline bool VerifyAction(flatbuffers::Verifier &verifier, const void *union_obj, Action type) {
   switch (type) {
     case Action_NONE: return true;
@@ -380,13 +339,13 @@ inline bool VerifyAType(flatbuffers::Verifier &verifier, const void *union_obj, 
   }
 }
 
-inline const blocks::fbs::Packet *GetPacket(const void *buf) { return flatbuffers::GetRoot<blocks::fbs::Packet>(buf); }
+inline const blocks::fbs::Message *GetMessage(const void *buf) { return flatbuffers::GetRoot<blocks::fbs::Message>(buf); }
 
-inline Packet *GetMutablePacket(void *buf) { return flatbuffers::GetMutableRoot<Packet>(buf); }
+inline Message *GetMutableMessage(void *buf) { return flatbuffers::GetMutableRoot<Message>(buf); }
 
-inline bool VerifyPacketBuffer(flatbuffers::Verifier &verifier) { return verifier.VerifyBuffer<blocks::fbs::Packet>(); }
+inline bool VerifyMessageBuffer(flatbuffers::Verifier &verifier) { return verifier.VerifyBuffer<blocks::fbs::Message>(); }
 
-inline void FinishPacketBuffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers::Offset<blocks::fbs::Packet> root) { fbb.Finish(root); }
+inline void FinishMessageBuffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers::Offset<blocks::fbs::Message> root) { fbb.Finish(root); }
 
 }  // namespace fbs
 }  // namespace blocks

@@ -24,15 +24,15 @@ namespace blocks {
 
   void MeshingThread::stop()
   {
-    cout << "Stopping meshing thread." << endl;
+    // cout << "Stopping meshing thread." << endl;
     _running = false;
   }
 
   void MeshingThread::process_chunk(Chunk::ptr chunk)
   {
-    boost::timer::auto_cpu_timer t(6, "Chunk meshing: %w seconds\n");
-    cout << "Meshing thread received a chunk: "
-         <<  string(chunk->id()) << endl;
+    // boost::timer::auto_cpu_timer t(6, "Chunk meshing: %w seconds\n");
+    // cout << "Meshing thread received a chunk: "
+    //      <<  string(chunk->id()) << endl;
 
     GreedyMesher mesher(chunk);
     MeshingThread::result result(chunk->id(), mesher.mesh());

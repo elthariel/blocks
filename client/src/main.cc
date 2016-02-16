@@ -7,13 +7,18 @@
 #include <boost/thread.hpp>
 
 using namespace std;
-using namespace blocks;
 
 int main(int ac, char **av)
 {
-  Game game(ac, av);
+  if (ac != 3)
+  {
+    std::cerr << "Usage : ./client IP PORT" << std::endl;
+    return (0);
+  }
 
+  blocks::Game game(ac, av);
   game.start();
+
   return 0;
 }
 

@@ -39,7 +39,7 @@ add_executable(blocks_server ${SERVER_HEADERS} ${SERVER_SOURCES})
 set_target_properties(blocks_server PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_server common
- boost_system
+ boost_system boost_thread
 	python2.7
  ${LINUX_LIBS}
 )

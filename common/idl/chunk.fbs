@@ -5,16 +5,9 @@ namespace blocks.fbs;
 
 enum Type:byte { PLAYER = 0, CHUNK = 1 }
 
-enum ChunkActionEnum:byte { ASK_CHUNK, CHUNK, NEW_BLOCK, DELETE_BLOCK }
+enum Action:byte { MOVE = 0, ASK_CHUNK = 1, CHUNK = 2, NEW_BLOCK = 3, DELETE_BLOCK = 4 }
 
-enum PlayerActionEnum:byte { CONNECT, MOVE }
-
-table ChunkAction { chunk: ChunkActionEnum; }
-table PlayerAction { player: PlayerActionEnum; }
-
-union Action { ChunkAction, PlayerAction }
-
-union AType { Chunk }
+union AType { Player, Chunk }
 
 struct Pos {
   x:long;
@@ -36,11 +29,13 @@ table Chunk {
   blocks: [Block];
 }
 
-table Message {
+table Player {
   id:long;
+  pos:Pos;
+}
+
+table Message {
   type:Type;
   action:Action;
   body:AType;
 }
-
-root_type Message;

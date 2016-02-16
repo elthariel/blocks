@@ -4,6 +4,7 @@
 // Test
 #include "seed.hh"
 #include "world_generator.hh"
+#include "chunk_generated.h"
 #include "TcpClient.hh"
 
 #include <iostream>
@@ -42,7 +43,9 @@ namespace blocks {
 
   void Game::dispatch(TcpConnection<Game, Game>::pointer socket, uint8_t *buffer)
   {
-      std::cout << "Got " <<  buffer << std::endl;
-      socket->write((uint8_t*)"Toto tata", 10);
+      auto message = flatbuffers::GetMutableRoot<fbs::Message>(buffer);
+      auto atype = message->body();
+      auto player = static_cast<const fbs::Player*>(message->body());
+      std::cout << "Got " << player->pos()->x() << std::endl;
   }
 }

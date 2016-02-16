@@ -23,6 +23,19 @@ find_package(Boost 1.58 REQUIRED
   thread
   )
 
+if (UNIX AND NOT APPLE) #i.e. champii
+  set(LINUX_LIBS pthread)
+  set(PANDA_INCLUDE_DIRS
+    ${PANDA_HOME}/include
+    /usr/include/eigen3)
+endif(UNIX AND NOT APPLE)
+if (APPLE)
+  set(PANDA_INCLUDE_DIRS
+    ${PANDA_HOME}/include/panda3d)
+endif(APPLE)
+
+message("${PANDA_INCLUDE_DIRS}")
+
 include_directories(
   ${BLOCKS_COMMON_INCLUDE_DIR}
   ${BLOCKS_COMMON_GENERATED_INCLUDE_DIR}

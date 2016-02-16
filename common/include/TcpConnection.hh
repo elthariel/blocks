@@ -79,6 +79,8 @@ namespace blocks
             uint64_t size = *(uint64_t*)header;
             uint8_t *body = new uint8_t[size];
 
+            std::cout << "Header content " << size <<  std::endl;
+
             boost::asio::async_read(_socket,
                                     boost::asio::buffer(body, size),
                                     boost::asio::transfer_at_least(size),

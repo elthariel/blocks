@@ -62,7 +62,7 @@ if(UNIX)
 
   add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ln -sf ${CMAKE_SOURCE_DIR}/media/textures ${CMAKE_CURRENT_BINARY_DIR}/dist/media/textutes
+    COMMAND ln -sf ${CMAKE_SOURCE_DIR}/media/textures ${CMAKE_CURRENT_BINARY_DIR}/dist/media/textures
     )
 
 endif(UNIX)

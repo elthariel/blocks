@@ -158,6 +158,13 @@ namespace blocks {
     _vx_count += 4;
   }
 
+  bool GreedyMesher::need_mesh(cpos &pos, int face_idx)
+  {
+    auto visible = _work.get_face_visible(pos, face_idx);
+    auto meshed = _work.get_face_meshed(pos, face_idx);
+    return visible && !meshed;
+  }
+
   PT(GeomNode) GreedyMesher::mesh() {
     bool visible, meshed;
     cpos iter;
@@ -193,8 +200,7 @@ namespace blocks {
               // and will progress in the correct order for the direction we're
               // iterating.
               cpos iter2(iter), du, dv;
-              size_t w = 0;
-              du[u] = 1;
+              auto w = 0, h = 0;
 
               // std::cout << std::string(iter) << std::endl;
 
@@ -203,10 +209,8 @@ namespace blocks {
               for(auto k2 = k; k2 < consts::chunk_size; ++k2)
               {
                 iter2[v] = k2;
-                visible = _work.get_face_visible(iter2, face_idx);
-                meshed = _work.get_face_meshed(iter2, face_idx);
 
-                if (visible && !meshed)
+                if (need_mesh(iter2, face_idx))
                 {
                   _work.set_face_meshed(iter2, face_idx, true);
                   dv[v]++; w++;
@@ -215,19 +219,50 @@ namespace blocks {
                   break;
               }
 
-              if (du[u] && dv[v])
+              // There's a quad to mesh
+              if (dv[v])
               {
-                cpos base(iter);
+                du[u]++;
+                h++;
+                // Trying to find if we can aggregate a quad of width 'w' on top of the one
+                // we just found.
+                for(auto j2 = j + 1; j2 < consts::chunk_size; ++j2)
+                {
+                  iter2[u] = j2;
 
+                  // Ensure all the faces form k to k + w are visible and need mesh
+                  bool line_need_mesh = true;
+                  for(auto k2 = k; k2 < k + w; ++k2)
+                  {
+                    iter2[v] = k2;
+                    line_need_mesh = line_need_mesh && need_mesh(iter2, face_idx);
+                    if (!line_need_mesh)
+                      break;
+                  }
+                  // Leave if they don't
+                  if (!line_need_mesh)
+                    break;
+
+                  // We can aggreage the 'j2' line
+                  for(auto k2 = k; k2 < k + w; ++k2)
+                  {
+                    iter2[v] = k2;
+                    _work.set_face_meshed(iter2, face_idx, true);
+                  }
+
+                  du[u]++;
+                  h++;
+                }
+
+                cpos base(iter);
                 if (!front)
                   base[d]++;
 
-                create_quad(face_idx, front, base, du, dv, w);
+                create_quad(face_idx, front, base, du, dv, w, h);
               }
             }
           }
         }
-
       }
     }
 

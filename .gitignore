@@ -27,6 +27,14 @@
 *.out
 *.app
 
+# Emacs things
+*~
+.\#*
+\#*\#
+
 # Cmake build directory
 build
 dist
+
+# Until we've out stuff
+media/textures

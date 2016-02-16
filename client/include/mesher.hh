@@ -41,6 +41,7 @@ namespace blocks {
     PT(GeomNode) mesh();
   protected:
     void compute_visible();
+    bool need_mesh(cpos &iter, int face_idx);
     void create_quad(unsigned char face,
                      bool front,
                      const cpos &base,

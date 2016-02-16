@@ -66,12 +66,17 @@ endif(MINGW OR UNIX)
 
 
 if(UNIX)
-	install(TARGETS blocks_client
-		RUNTIME DESTINATION bin
-		CONFIGURATIONS All)
+  install(TARGETS blocks_client
+	RUNTIME DESTINATION bin
+	CONFIGURATIONS All)
 
-	install(DIRECTORY ${CMAKE_SOURCE_DIR}/dist/media
-		DESTINATION ./
-		CONFIGURATIONS Release RelWithDebInfo Debug
-	)
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/dist/media
+	DESTINATION ./
+	CONFIGURATIONS Release RelWithDebInfo Debug)
+
+  add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ln -sf ${CMAKE_SOURCE_DIR}/media/textures ${CMAKE_CURRENT_BINARY_DIR}/dist/media/textutes
+    )
+
 endif(UNIX)

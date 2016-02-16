@@ -38,7 +38,7 @@ namespace blocks
     }
 
     _scene = _window->get_render();
-    _scene.set_antialias(AntialiasAttrib::M_auto);
+    // _scene.set_antialias(AntialiasAttrib::M_auto);
 
     _window->set_background_type(WindowFramework::BackgroundType::BT_black);
 
@@ -46,13 +46,6 @@ namespace blocks
     meter->setup_window(_window->get_graphics_output());
 
     _window->enable_keyboard();
-
-
-    NodePath m = _window->load_model(_framework.get_models(), "box.egg");
-    m.set_color(1, 0, 0, 1);
-    // m.reparent_to(_scene);
-    // NodePath m2 = _window->load_model(_framework.get_models(), "environment");
-    // m2.reparent_to(_scene);
   }
 
   void Scene::init_scene()

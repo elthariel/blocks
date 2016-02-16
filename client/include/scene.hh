@@ -20,6 +20,7 @@ namespace blocks {
 
     void create_window();
     void init_scene();
+    void init_lights();
     void run();
 
     NodePath root() { return _scene; }
@@ -28,5 +29,7 @@ namespace blocks {
     PandaFramework &_framework;
     WindowFramework *_window;
     NodePath _scene;
+    NodePath _sun;
+    NodePath _ambient_light;
   };
 }

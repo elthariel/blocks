@@ -2,12 +2,15 @@
 
 #include <tuple>
 #include <cstdint>
+#include <string>
+#include <boost/format.hpp>
 
 namespace blocks {
   typedef std::tuple<int64_t, int64_t, int64_t> base_position;
 
   struct pos : public base_position {
     using base_position::base_position;
+    pos() :base_position(0, 0, 0) {}
 
     inline int64_t &x() { return std::get<0>(*this); }
     inline int64_t &y() { return std::get<1>(*this); }
@@ -15,6 +18,28 @@ namespace blocks {
     inline const int64_t &x() const { return std::get<0>(*this); }
     inline const int64_t &y() const { return std::get<1>(*this); }
     inline const int64_t &z() const { return std::get<2>(*this); }
+
+    int64_t &operator[](size_t idx) {
+      if (idx == 0)
+        return std::get<0>(*this);
+      else if (idx == 1)
+        return std::get<1>(*this);
+      else
+        return std::get<2>(*this);
+    }
+
+    const int64_t &operator[](size_t idx) const {
+      if (idx == 0)
+        return std::get<0>(*this);
+      else if (idx == 1)
+        return std::get<1>(*this);
+      else
+        return std::get<2>(*this);
+    }
+
+    operator std::string() const {
+      return boost::str(boost::format("%1%:%2%:%3%") % x() % y() % z());
+    }
   };
 
   struct cid: public pos {

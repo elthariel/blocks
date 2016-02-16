@@ -5,6 +5,9 @@
 
 #include <array>
 #include <geomNode.h>
+#include <geomVertexData.h>
+#include <geomVertexWriter.h>
+#include <geomTriangles.h>
 #include <lvector3.h>
 
 namespace blocks {
@@ -38,8 +41,22 @@ namespace blocks {
     PT(GeomNode) mesh();
   protected:
     void compute_visible();
+    bool need_mesh(cpos &iter, int face_idx);
+    void create_quad(unsigned char face,
+                     bool front,
+                     const cpos &base,
+                     const cpos& du,
+                     const cpos& dv,
+                     int w,
+                     int h = 1);
 
     MesherWorkBuffer _work;
     Chunk::ptr _chunk;
+
+    // Panda Data
+    size_t _vx_count = 0;
+    PT(GeomVertexData) _vxd;
+    PT(GeomTriangles) _mesh;
+    GeomVertexWriter _vertex, _normal, _uvs;
   };
 }

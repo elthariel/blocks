@@ -6,21 +6,28 @@ set(CLIENT_HEADERS
   ./include/Client.hh
   ./include/TcpClient.hh
   ../common/include/CircularBuffer.hh
-#	./include/seed.hh
-#	./include/world_generator.hh
-#	./include/meshing_thread.hh
+	./include/seed.hh
+	./include/world_generator.hh
+    ./include/mesher.hh
+	./include/meshing_thread.hh
+    ./include/meshing_task.hh
+    ./include/game.hh
+    ./include/scene.hh
+    ./include/event_handler.hh
 )
 
 set(CLIENT_SOURCES
- 	./src/main.cc
+	./src/main.cc
+	./src/world_generator.cc
+	./src/meshing_thread.cc
+    ./src/meshing_task.cc
+	./src/mesher.cc
+    ./src/game.cc
+    ./src/scene.cc
+    ./src/event_handler.cc
   ./src/Client.cc
   ./src/TcpClient.cc
   ../common/src/CircularBuffer.cpp
-
-#	./src/seed.cc
-#	./src/world_generator.cc
-#	./src/meshing_thread.cc
-#	./src/mesher.cc
 )
 
 
@@ -47,9 +54,9 @@ add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_client common boost_system
-# 	p3framework panda pandafx pandaexpress
-#  p3dtoolconfig p3dtool p3direct
-	python2.7
+ # p3framework panda pandafx pandaexpress
+ # p3dtoolconfig p3dtool p3direct
+  python2.7 boost_timer
 )
 
 # Here to enable C++11 features, we should make a better use of this :)
@@ -65,12 +72,17 @@ endif(MINGW OR UNIX)
 
 
 if(UNIX)
-	install(TARGETS blocks_client
-		RUNTIME DESTINATION bin
-		CONFIGURATIONS All)
+  install(TARGETS blocks_client
+	RUNTIME DESTINATION bin
+	CONFIGURATIONS All)
 
-	install(DIRECTORY ${CMAKE_SOURCE_DIR}/dist/media
-		DESTINATION ./
-		CONFIGURATIONS Release RelWithDebInfo Debug
-	)
+  install(DIRECTORY ${CMAKE_SOURCE_DIR}/dist/media
+	DESTINATION ./
+	CONFIGURATIONS Release RelWithDebInfo Debug)
+
+  add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ln -sf ${CMAKE_SOURCE_DIR}/media/textures ${CMAKE_CURRENT_BINARY_DIR}/dist/media/textures
+    )
+
 endif(UNIX)

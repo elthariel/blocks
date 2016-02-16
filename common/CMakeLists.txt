@@ -20,7 +20,9 @@ set(COMMON_SOURCES
   ./src/map.cc
   ./src/position.cc
   ./src/chunk.cc
-)
+  )
+
+file(GLOB COMMON_TESTS ./tests/*.cc)
 
 find_path(FLATBUFFERS_HOME
   /usr/local
@@ -59,3 +61,10 @@ include_directories(
 add_library(common STATIC
   ${COMMON_GENERATED_HEADERS} ${COMMON_HEADERS} ${COMMON_SOURCES}
 )
+
+# Build tests !
+#set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+#set(BUILD_SHARED_LIBRARIES OFF)
+#set(CMAKE_EXE_LINKER_FLAGS "-static")
+add_executable(common_tests ${COMMON_TESTS})
+target_link_libraries(common_tests common boost_unit_test_framework-mt)

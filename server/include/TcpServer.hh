@@ -7,7 +7,6 @@
 
 class Server;
 #include "TcpConnection.hh"
-
 using boost::asio::ip::tcp;
 
 
@@ -19,7 +18,7 @@ class TcpServer
   private:
     int  _port = 3000;
     void start_accept();
-    void handle_accept(TcpConnection::pointer, const boost::system::error_code&);
+    void handle_accept(TcpConnection<Server>::pointer, const boost::system::error_code&);
 
     tcp::acceptor _acceptor;
     Server *_server;

@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.0)
 project(blocks_server)
 
 set(SERVER_HEADERS
-	./include/TcpConnection.hh
 	./include/TcpServer.hh
 	./include/Player.hh
 	./include/Server.hh
@@ -13,7 +12,6 @@ set(SERVER_HEADERS
 
 set(SERVER_SOURCES
 	./src/main.cc
-	./src/TcpConnection.cc
 	./src/TcpServer.cc
 	./src/Player.cc
 	./src/Server.cc

@@ -1,7 +1,10 @@
 #pragma once
 
 #include "TcpConnection.hh"
+#include "Server.hh"
 #include "position.hh"
+#include "Chunk.hh"
+
 
 // struct HasId
 // {
@@ -16,13 +19,13 @@ static int NEXT_ID = 0;
 class Player
 {
   public:
-    Player(TcpConnection::pointer);
+    Player(TcpConnection<Server>::pointer);
 
     int  id()       { return _id; }
     void id(int id) { _id = id; }
 
   private:
-    TcpConnection::pointer _socket;
+    TcpConnection<Server>::pointer _socket;
     int _id;
     blocks::wpos _pos;
 };

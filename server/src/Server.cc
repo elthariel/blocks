@@ -14,14 +14,14 @@ Server::Server()
   }
 }
 
-void Server::connect_player(TcpConnection::pointer socket)
+void Server::on_connect_player(TcpConnection<Server>::pointer socket)
 {
   socket->read();
   auto player = new Player(socket);
   _players.insert(std::pair<int, Player *>(player->id(), player));
 }
 
-void Server::dispatch()
+void Server::dispatch(uint8_t *body)
 {
 
 }

@@ -12,6 +12,7 @@ namespace blocks {
     typedef std::map<cid, std::shared_ptr<Chunk>> chunk_map;
 
     class Map {
+    public:
       Chunk::ptr get(cid);
       void set(cid, Chunk::ptr);
       bool exists(cid);

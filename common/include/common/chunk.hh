@@ -55,9 +55,33 @@ namespace blocks {
       return _blocks[idx % _flat_size];
     }
 
-    static Chunk *deserialize(uint8_t *buffer)
+    static ptr deserialize(fbs::Chunk const *chunk)
     {
-        return nullptr;
+        auto blocks = chunk->blocks();
+        auto pos = chunk->cid();
+
+        cid _cid(pos->x(), pos->y(), pos->z());
+
+        auto res = ptr(new Chunk(_cid));
+        auto size = blocks->Length();
+
+        for (int i = 0; i < size; i++)
+        {
+            auto block = blocks->Get(i);
+            res->at(i) = Block(block->id(), block->variant(), block->air(), block->transparent());
+        }
+        return res;
+    }
+
+    flatbuffers::Offset<fbs::Chunk> serialize(flatbuffers::FlatBufferBuilder &builder)
+    {
+        std::vector<fbs::Block> blocks_vector;
+        for (auto block: _blocks)
+          blocks_vector.push_back(block.serialize());
+
+        auto blocks = builder.CreateVectorOfStructs(blocks_vector);
+        auto pos = fbs::Pos(_id.x(), _id.y(), _id.z());
+        return fbs::CreateChunk(builder, 0, 8, &pos, blocks);
     }
 
   protected:

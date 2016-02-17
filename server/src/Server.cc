@@ -23,15 +23,26 @@ namespace blocks {
       _players.insert(std::pair<int, Player *>(player->id(), player));
     }
 
-    void Server::dispatch(TcpConnection<Server, Player>::pointer socket, uint8_t *body)
+    void Server::on_ask_chunk(TcpConnection<Server, Player>::pointer socket, fbs::Message *message)
     {
-        std::cout << "Got from " << socket->referer()->id() << body << std::endl;
-        // socket->write((uint8_t*)"Toto tata", 10);
-
+        auto pos = static_cast<const fbs::PosObj *>(message->body())->pos();
+        cid _cid(pos->x(), pos->y(), pos->z());
+        auto chunk = _map.get(_cid);
+        socket->write(Protocole::create_message(fbs::Action::Action_CHUNK, fbs::AType::AType_Chunk, chunk));
     }
 
-    void on_move(uint8_t *buffer)
+    void Server::dispatch(TcpConnection<Server, Player>::pointer socket, uint8_t *buffer)
     {
-
+        auto message = flatbuffers::GetMutableRoot<fbs::Message>(buffer);
+        switch(message->action())
+        {
+            case fbs::Action::Action_INITIAL_POS  : break;
+            case fbs::Action::Action_MOVE         : break;
+            case fbs::Action::Action_ASK_CHUNK    : on_ask_chunk(socket, message); break;
+            case fbs::Action::Action_CHUNK        : break;
+            case fbs::Action::Action_NEW_BLOCK    : break;
+            case fbs::Action::Action_DELETE_BLOCK : break;
+        }
     }
+
 }

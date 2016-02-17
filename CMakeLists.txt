@@ -4,7 +4,9 @@ if (UNIX)
   set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 endif()
 
+
 project (blocks)
+
 
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 set(THIRD_PARTY ${CMAKE_SOURCE_DIR}/third-party)
@@ -15,6 +17,8 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(BLOCKS_COMMON_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/common/include)
 set(BLOCKS_COMMON_GENERATED_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/common/generated_include)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
 set(Boost_USE_MULTITHREADED YES)
 find_package(Boost 1.58 REQUIRED
   COMPONENTS
@@ -23,18 +27,7 @@ find_package(Boost 1.58 REQUIRED
   thread
   )
 
-if (UNIX AND NOT APPLE) #i.e. champii
-  set(LINUX_LIBS pthread)
-  set(PANDA_INCLUDE_DIRS
-    ${PANDA_HOME}/include
-    /usr/include/eigen3)
-endif(UNIX AND NOT APPLE)
-if (APPLE)
-  set(PANDA_INCLUDE_DIRS
-    ${PANDA_HOME}/include/panda3d)
-endif(APPLE)
-
-message("${PANDA_INCLUDE_DIRS}")
+find_package(Panda REQUIRED)
 
 include_directories(
   ${BLOCKS_COMMON_INCLUDE_DIR}
@@ -42,7 +35,6 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
 )
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 add_definitions(-fpermissive)
 #add_definitions(-O3)
 

@@ -28,11 +28,13 @@ namespace blocks
     // Panda 3D
     void start();
     AsyncTask::DoneStatus do_task();
-    void dispatch(TcpConnection<blocks::Game, blocks::Game>::pointer, uint8_t *);
 
-    // Champii's having fun !
-    void on_move(uint8_t *);
-    void on_chunk(uint8_t *);
+    // Network
+    void dispatch(TcpConnection<Game, Game>::pointer, uint8_t *);
+    void on_initial_pos(TcpConnection<Game, Game>::pointer, fbs::Message*);
+    void on_move(fbs::Message*);
+    void on_chunk(fbs::Message*);
+
 
   protected:
     PandaFramework    _framework;
@@ -44,5 +46,8 @@ namespace blocks
 
     // Entities and stuff like that
     ex::Entity        _player;
+
+    // Network
+    TcpConnection<Game, Game>::pointer _socket = nullptr;
   };
 }

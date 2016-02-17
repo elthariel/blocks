@@ -5,8 +5,6 @@ project(blocks_client)
 file(GLOB_RECURSE CLIENT_HEADERS ./include/ *.hh)
 file(GLOB_RECURSE CLIENT_SOURCES ./src/ *.cc)
 
-find_package(Panda REQUIRED)
-
 if (CMAKE_BUILD_TYPE STREQUAL "")
   # CMake defaults to leaving CMAKE_BUILD_TYPE empty. This screws up
   # differentiation between debug and release builds.
@@ -35,8 +33,8 @@ set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 target_link_libraries(blocks_client
   common
   entityx
-  ${Boost_LIBRARIES}
   ${PANDA_LIBRARIES}
+  ${Boost_LIBRARIES}
   ${LINUX_LIBS}
 )
 

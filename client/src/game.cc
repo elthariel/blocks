@@ -9,10 +9,9 @@
 #include "components/basic.hh"
 
 // Test
-#include "seed.hh"
-#include "world_generator.hh"
 #include "chunk_generated.h"
 #include "TcpClient.hh"
+#include "Protocole.hh"
 
 #include <iostream>
 
@@ -70,15 +69,6 @@ namespace blocks {
     AsyncTaskManager::get_global_ptr()->add(_meshing_task.get());
     AsyncTaskManager::get_global_ptr()->add(this);
 
-    seed s = seed::from_file("/dev/urandom");
-    WorldGenerator wg(s);
-
-    auto size = 24;
-    for (auto i = 0; i < size; i++)
-      for (auto j = 0; j < size; j++)
-        for (auto k = -2; k <= 2 ; k++)
-          _meshing_thread.input_pipe << wg.generate(cid(i, j, k));
-
     _scene->run();
   }
 
@@ -94,8 +84,42 @@ namespace blocks {
   void Game::dispatch(TcpConnection<Game, Game>::pointer socket, uint8_t *buffer)
   {
       auto message = flatbuffers::GetMutableRoot<fbs::Message>(buffer);
-      auto atype = message->body();
+      switch(message->action())
+      {
+          case fbs::Action::Action_INITIAL_POS  : on_initial_pos(socket, message); break;
+          case fbs::Action::Action_MOVE         : break;
+          case fbs::Action::Action_ASK_CHUNK    : break;
+          case fbs::Action::Action_CHUNK        : on_chunk(message); break;
+          case fbs::Action::Action_NEW_BLOCK     : break;
+          case fbs::Action::Action_DELETE_BLOCK  : break;
+
+      }
+
+  }
+
+  void Game::on_initial_pos(TcpConnection<Game, Game>::pointer socket, fbs::Message *message)
+  {
+      if (_socket == nullptr)
+        _socket = socket;
+
       auto player = static_cast<const fbs::Player*>(message->body());
-      std::cout << "Got " << player->pos()->x() << std::endl;
+      auto size = 8;
+      for (auto i = 0; i < size; i++)
+        for (auto j = 0; j < size; j++)
+          for (auto k = -2; k <= 2 ; k++)
+          {
+            auto pos = cid(i, j, k);
+            _socket->write(Protocole::create_message(fbs::Action::Action_ASK_CHUNK,
+                                                       fbs::AType::AType_PosObj, &pos));
+          }
+  }
+
+
+  void Game::on_chunk(fbs::Message *message)
+  {
+    auto chunk = static_cast<const fbs::Chunk*>(message->body());
+    auto test = Chunk::deserialize(chunk);
+    _meshing_thread.input_pipe << test;
+
   }
 }

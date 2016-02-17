@@ -15,22 +15,23 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/dist")
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
-  /usr/include/python2.7
+  ${PANDA_INCLUDE_DIRS}
 )
+
 link_directories(
+  ${PANDA_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS}
 )
-
-
 
 add_definitions(-std=c++14)
 add_executable(blocks_server ${SERVER_HEADERS} ${SERVER_SOURCES})
 set_target_properties(blocks_server PROPERTIES DEBUG_POSTFIX _d)
 
-target_link_libraries(blocks_server common
+target_link_libraries(blocks_server
+  common
+  ${PANDA_LIBRARIES}
   ${Boost_LIBRARIES}
   ${LINUX_LIBS}
-  python2.7
 )
 
 # Here to enable C++11 features, we should make a better use of this :)

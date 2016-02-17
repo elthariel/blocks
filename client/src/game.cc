@@ -2,8 +2,6 @@
 #include "game.hh"
 
 // Test
-#include "seed.hh"
-#include "world_generator.hh"
 #include "chunk_generated.h"
 #include "TcpClient.hh"
 #include "Protocole.hh"
@@ -30,11 +28,6 @@ namespace blocks {
     AsyncTaskManager::get_global_ptr()->add(_meshing_task.get());
     AsyncTaskManager::get_global_ptr()->add(_event_handler.get());
 
-    seed s = seed::from_file("/dev/urandom");
-    WorldGenerator wg(s);
-
-        //   _meshing_thread.input_pipe << wg.generate(cid(i, j, k));
-
     _scene->run();
   }
 
@@ -44,7 +37,12 @@ namespace blocks {
       switch(message->action())
       {
           case fbs::Action::Action_INITIAL_POS  : on_initial_pos(socket, message); break;
-        //   case fbs::Action::Action_CHUNK        : on_chunk(message); break;
+          case fbs::Action::Action_MOVE         : break;
+          case fbs::Action::Action_ASK_CHUNK    : break;
+          case fbs::Action::Action_CHUNK        : on_chunk(message); break;
+          case fbs::Action::Action_NEW_BLOCK     : break;
+          case fbs::Action::Action_DELETE_BLOCK  : break;
+
       }
 
   }
@@ -67,8 +65,11 @@ namespace blocks {
   }
 
 
-  // void Game::dispatch(TcpConnection<Game, Game>::pointer socket, uint8_t *buffer)
-  // {
-  //
-  // }
+  void Game::on_chunk(fbs::Message *message)
+  {
+    auto chunk = static_cast<const fbs::Chunk*>(message->body());
+    auto test = Chunk::deserialize(chunk);
+    _meshing_thread.input_pipe << test;
+
+  }
 }

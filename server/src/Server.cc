@@ -26,26 +26,23 @@ namespace blocks {
     void Server::on_ask_chunk(TcpConnection<Server, Player>::pointer socket, fbs::Message *message)
     {
         auto pos = static_cast<const fbs::PosObj *>(message->body())->pos();
-        std::cout << "Ask Chunk " << pos->x() << ":" << pos->y() << ":" << pos->z() << ":" << std::endl;
+        cid _cid(pos->x(), pos->y(), pos->z());
+        auto chunk = _map.get(_cid);
+        socket->write(Protocole::create_message(fbs::Action::Action_CHUNK, fbs::AType::AType_Chunk, chunk));
     }
-
-    // void on_move(uint8_t *buffer)
-    // {
-    //
-    // }
 
     void Server::dispatch(TcpConnection<Server, Player>::pointer socket, uint8_t *buffer)
     {
-        std::cout << "Got from " << socket->referer()->id() << buffer << std::endl;
-
         auto message = flatbuffers::GetMutableRoot<fbs::Message>(buffer);
         switch(message->action())
         {
-            case fbs::Action::Action_ASK_CHUNK  : on_ask_chunk(socket, message); break;
-          //   case fbs::Action::Action_CHUNK        : on_chunk(message); break;
+            case fbs::Action::Action_INITIAL_POS  : break;
+            case fbs::Action::Action_MOVE         : break;
+            case fbs::Action::Action_ASK_CHUNK    : on_ask_chunk(socket, message); break;
+            case fbs::Action::Action_CHUNK        : break;
+            case fbs::Action::Action_NEW_BLOCK    : break;
+            case fbs::Action::Action_DELETE_BLOCK : break;
         }
-
-
     }
 
 }

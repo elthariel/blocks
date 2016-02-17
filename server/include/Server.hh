@@ -3,6 +3,8 @@
 #include <map>
 
 #include "TcpConnection.hh"
+#include "Map.hh"
+#include "Protocole.hh"
 
 namespace blocks {
 
@@ -21,7 +23,7 @@ namespace blocks {
       private:
         TcpServer *_tcp_server;
         std::map<int, Player *> _players;
-        // Map _map;
+        Map _map;
     };
 }
 #include "TcpServer.hh"

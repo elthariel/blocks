@@ -44,7 +44,7 @@ include_directories(
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 add_definitions(-fpermissive)
-#add_definitions(-O0)
+#add_definitions(-O3)
 
 add_subdirectory(common)
 add_subdirectory(client)

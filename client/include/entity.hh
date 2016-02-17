@@ -1,14 +1,6 @@
 
-#include "lpoint3.h"
-#include "lvector3.h"
-#include <entityx.h>
+#include "common/util.hh"
 
-namespace blocks
-{
-  namespace ex = entityx;
+#include <entityx/entityx.h>
 
-  typedef LPoint3f Position;
-  typedef LVector3f Direction;
-
-
-}
+namespace ex = entityx;

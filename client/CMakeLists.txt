@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(blocks_client)
 
-file(GLOB CLIENT_HEADERS ./include/*.hh)
-file(GLOB CLIENT_SOURCES ./src/*.cc)
+file(GLOB_RECURSE CLIENT_HEADERS ./include/ *.hh)
+file(GLOB_RECURSE CLIENT_SOURCES ./src/ *.cc)
 
 find_package(Panda REQUIRED)
 
@@ -19,7 +19,7 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/dist")
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${PANDA_INCLUDE_DIRS}
-  ${THIRD_PARTY}/entity
+  ${THIRD_PARTY}/entityx
 )
 
 link_directories(
@@ -34,6 +34,7 @@ set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_client
   common
+  entityx
   ${Boost_LIBRARIES}
   ${PANDA_LIBRARIES}
   ${LINUX_LIBS}

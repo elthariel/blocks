@@ -5,6 +5,8 @@
 #include "systems/input.hh"
 #include "systems/window_manager.hh"
 #include "systems/camera_control.hh"
+#include "systems/network.hh"
+#include "systems/chunk_loader.hh"
 
 #include "components/basic.hh"
 
@@ -19,7 +21,6 @@ using namespace std;
 
 namespace blocks {
   Game::Game(int ac, char **av)
-    : _client(av[1], av[2], this)
   {
     _framework.open_framework(ac, av);
     _scene = make_shared<Scene>(_framework);
@@ -34,6 +35,8 @@ namespace blocks {
     systems.add<systems::Input>(_framework, _scene->window());
     systems.add<systems::WindowManager>(_scene->window());
     systems.add<systems::CameraControl>();
+    systems.add<systems::Network>(_meshing_thread, "127.0.0.1", "3000");
+    systems.add<systems::ChunkLoader>(_map);
 
     systems.configure();
   }
@@ -44,6 +47,8 @@ namespace blocks {
     systems.update<systems::Input>(dt);
     systems.update<systems::WindowManager>(dt);
     systems.update<systems::CameraControl>(dt);
+    systems.update<systems::Network>(dt);
+    systems.update<systems::ChunkLoader>(dt);
   }
 
   void Game::create_entities()
@@ -81,45 +86,4 @@ namespace blocks {
     return AsyncTask::DS_cont;
   }
 
-  void Game::dispatch(TcpConnection<Game, Game>::pointer socket, uint8_t *buffer)
-  {
-      auto message = flatbuffers::GetMutableRoot<fbs::Message>(buffer);
-      switch(message->action())
-      {
-          case fbs::Action::Action_INITIAL_POS  : on_initial_pos(socket, message); break;
-          case fbs::Action::Action_MOVE         : break;
-          case fbs::Action::Action_ASK_CHUNK    : break;
-          case fbs::Action::Action_CHUNK        : on_chunk(message); break;
-          case fbs::Action::Action_NEW_BLOCK     : break;
-          case fbs::Action::Action_DELETE_BLOCK  : break;
-
-      }
-
-  }
-
-  void Game::on_initial_pos(TcpConnection<Game, Game>::pointer socket, fbs::Message *message)
-  {
-      if (_socket == nullptr)
-        _socket = socket;
-
-      auto player = static_cast<const fbs::Player*>(message->body());
-      auto size = 8;
-      for (auto i = 0; i < size; i++)
-        for (auto j = 0; j < size; j++)
-          for (auto k = -2; k <= 2 ; k++)
-          {
-            auto pos = cid(i, j, k);
-            _socket->write(Protocole::create_message(fbs::Action::Action_ASK_CHUNK,
-                                                       fbs::AType::AType_PosObj, &pos));
-          }
-  }
-
-
-  void Game::on_chunk(fbs::Message *message)
-  {
-    auto chunk = static_cast<const fbs::Chunk*>(message->body());
-    auto test = Chunk::deserialize(chunk);
-    _meshing_thread.input_pipe << test;
-
-  }
 }

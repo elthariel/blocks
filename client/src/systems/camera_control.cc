@@ -1,6 +1,6 @@
 
 #include "systems/camera_control.hh"
-
+#include "events/player.hh"
 
 namespace blocks
 {
@@ -8,8 +8,8 @@ namespace blocks
   {
     void CameraControl::configure(ex::EventManager &events)
     {
-      events.subscribe<KeyPress>(*this);
-      events.subscribe<MouseMove>(*this);
+      events.subscribe<events::key>(*this);
+      events.subscribe<events::mouse>(*this);
     }
 
     float cam_sensitivity = 50.0;
@@ -30,7 +30,7 @@ namespace blocks
 
         cam.set_hpr(hpr);
 
-        LPoint3 pos = cam.get_pos();
+        LPoint3 _pos = cam.get_pos();
         LPoint3 offset(0);
         auto forward = cam.get_quat().get_forward();
         auto right = cam.get_quat().get_right();
@@ -39,7 +39,10 @@ namespace blocks
         offset += forward * move_speed * move.get_y();
         offset += move_absolute * move_speed;
 
-        cam.set_fluid_pos(pos + offset);
+        cam.set_fluid_pos(_pos + offset);
+
+        position = cam.get_pos();
+        direction = cam.get_quat().get_forward();
       };
 
       entities.each<components::Player,
@@ -52,32 +55,32 @@ namespace blocks
       move_absolute.set(0, 0, 0);
     }
 
-    void CameraControl::receive(const KeyPress &e)
+    void CameraControl::receive(const events::key &e)
     {
-      if (e.type == KeyPress::Type::DOWN || e.type == KeyPress::Type::REPEAT)
+      if (e.type == events::key::ktype::DOWN || e.type == events::key::ktype::REPEAT)
       {
         switch (e.code)
         {
-        case KeyPress::Code::MOVE_RIGHT:
+        case events::key::kcode::MOVE_RIGHT:
           move.add_x(1);
           break;
-        case KeyPress::Code::MOVE_LEFT:
+        case events::key::kcode::MOVE_LEFT:
           move.add_x(-1);
           break;
-        case KeyPress::Code::MOVE_FORWARD:
+        case events::key::kcode::MOVE_FORWARD:
           move.add_y(1);
           break;
-        case KeyPress::Code::MOVE_BACKWARD:
+        case events::key::kcode::MOVE_BACKWARD:
           move.add_y(-1);
           break;
-        case KeyPress::Code::MOVE_JUMP:
+        case events::key::kcode::MOVE_JUMP:
           move_absolute.add_z(1);
           break;
         }
       }
     }
 
-    void CameraControl::receive(const MouseMove &e)
+    void CameraControl::receive(const events::mouse &e)
     {
       mouse_offset = e.offset;
     }

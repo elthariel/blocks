@@ -31,16 +31,16 @@ namespace blocks
     void Input::register_mappings(PandaFramework &framework)
     {
       // Basic movement keys
-      _mappings["w"] = KeyPress::Code::MOVE_FORWARD;
-      _mappings["s"] = KeyPress::Code::MOVE_BACKWARD;
-      _mappings["a"] = KeyPress::Code::MOVE_LEFT;
-      _mappings["d"] = KeyPress::Code::MOVE_RIGHT;
-      _mappings["space"] = KeyPress::Code::MOVE_JUMP;
+      _mappings["w"] = events::key::kcode::MOVE_FORWARD;
+      _mappings["s"] = events::key::kcode::MOVE_BACKWARD;
+      _mappings["a"] = events::key::kcode::MOVE_LEFT;
+      _mappings["d"] = events::key::kcode::MOVE_RIGHT;
+      _mappings["space"] = events::key::kcode::MOVE_JUMP;
 
       // System keys
-      _mappings["g"] = KeyPress::Code::SYS_GRAB_MOUSE;
-      _mappings["f"] = KeyPress::Code::SYS_FULLSCREEN;
-      _mappings["q"] = KeyPress::Code::SYS_EXIT;
+      _mappings["g"] = events::key::kcode::SYS_GRAB_MOUSE;
+      _mappings["f"] = events::key::kcode::SYS_FULLSCREEN;
+      _mappings["q"] = events::key::kcode::SYS_EXIT;
 
       for(auto &kv: _mappings)
       {
@@ -59,8 +59,8 @@ namespace blocks
       for (auto i = 0; i < _key_down.size(); i++) {
         if (_key_down[i])
         {
-          KeyPress kp(KeyPress::Type::REPEAT, KeyPress::Code(i));
-          event_manager.emit<KeyPress>(kp);
+          events::key kp(events::key::ktype::REPEAT, events::key::kcode(i));
+          event_manager.emit<events::key>(kp);
         }
       }
 
@@ -79,20 +79,20 @@ namespace blocks
           name.erase(dash);
         }
 
-        KeyPress kp;
+        events::key kp;
         kp.code = _mappings[name];
         if (type == "down")
         {
-          kp.type = KeyPress::Type::DOWN;
+          kp.type = events::key::ktype::DOWN;
           _key_down[kp.code] = true;
         }
         else
         {
-          kp.type = KeyPress::Type::UP;
+          kp.type = events::key::ktype::UP;
           _key_down[kp.code] = false;
         }
 
-        event_manager.emit<KeyPress>(kp);
+        event_manager.emit<events::key>(kp);
 
         _incoming_events.pop();
       }
@@ -110,12 +110,12 @@ namespace blocks
         _diff = pos - _last_pos;
         _last_pos = pos;
 
-        MouseMove mm;
+        events::mouse mm;
         mm.size.set_x(w);
         mm.size.set_y(h);
         mm.position = pos;
         mm.offset = _diff;
-        event_manager.emit<MouseMove>(mm);
+        event_manager.emit<events::mouse>(mm);
       }
     }
 

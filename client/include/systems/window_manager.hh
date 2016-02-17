@@ -21,7 +21,8 @@ namespace blocks
                   ex::EventManager &events,
                   ex::TimeDelta dt) {}
       void configure(ex::EventManager &events);
-      void receive(const KeyPress &kp);
+
+      void receive(const events::key &kp);
 
     protected:
       void toggle_grab_mouse();

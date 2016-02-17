@@ -1,6 +1,6 @@
 #pragma once
 
-#include "systems/input.hh"
+#include "events/input.hh"
 #include "components/basic.hh"
 
 namespace blocks
@@ -15,8 +15,8 @@ namespace blocks
                   ex::EventManager &events,
                   ex::TimeDelta dt);
 
-      void receive(const KeyPress &e);
-      void receive(const MouseMove &e);
+      void receive(const events::key &e);
+      void receive(const events::mouse &e);
     protected:
       LPoint2f  mouse_offset;
       LVector3f move;

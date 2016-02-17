@@ -37,7 +37,8 @@ namespace blocks {
         return std::get<2>(*this);
     }
 
-    const int64_t &operator[](size_t idx) const {
+    const int64_t &operator[](size_t idx) const
+    {
       if (idx == 0)
         return std::get<0>(*this);
       else if (idx == 1)
@@ -46,16 +47,24 @@ namespace blocks {
         return std::get<2>(*this);
     }
 
-    operator std::string() const {
+    operator std::string() const
+    {
       return boost::str(boost::format("%1%:%2%:%3%") % x() % y() % z());
     }
 
-    flatbuffers::Offset<fbs::PosObj> serialize(flatbuffers::FlatBufferBuilder &builder)
+    template <class T>
+    T operator+(const T& other)
+    {
+      return T(x() + other.x(),
+               y() + other.y(),
+               z() + other.z());
+    }
+
+    flatbuffers::Offset<fbs::PosObj> serialize(flatbuffers::FlatBufferBuilder &builder) const
     {
         auto pos = fbs::Pos(x(), y(), z());
         return fbs::CreatePosObj(builder, &pos);
     }
-
   };
 
   struct cid: public pos {
@@ -84,15 +93,4 @@ namespace blocks {
     cid cid() const;
     cpos cpos() const;
   };
-
-  template <typename T>
-  T operator+ (const T& a, const T& b) {
-    return T(
-      a.x() + b.x(),
-      a.y() + b.y(),
-      a.z() + b.z()
-    );
-  }
-
-  template cpos operator+<cpos>(const cpos &, const cpos &);
 }

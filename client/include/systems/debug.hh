@@ -1,6 +1,8 @@
 
 #include "entity.hh"
-#include "systems/input.hh"
+#include "events/input.hh"
+#include "events/map.hh"
+#include "events/network.hh"
 
 namespace blocks
 {
@@ -13,10 +15,13 @@ namespace blocks
                   ex::EventManager &events,
                   ex::TimeDelta dt);
 
-      void receive(const KeyPress &e);
-      void receive(const MouseMove &e);
       void receive(const ex::EntityCreatedEvent &e);
       void receive(const ex::EntityDestroyedEvent &e);
+      void receive(const events::key &e);
+      void receive(const events::mouse &e);
+      void receive(const events::server_connected &e);
+      void receive(const events::server_disconnected &e);
+      void receive(const events::load_chunk &e);
     protected:
     };
   }

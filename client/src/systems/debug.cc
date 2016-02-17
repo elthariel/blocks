@@ -13,10 +13,13 @@ namespace blocks
   {
     void Debug::configure(ex::EventManager &events)
     {
-      events.subscribe<KeyPress>(*this);
-      events.subscribe<MouseMove>(*this);
       events.subscribe<ex::EntityCreatedEvent>(*this);
       events.subscribe<ex::EntityDestroyedEvent>(*this);
+      events.subscribe<events::key>(*this);
+      events.subscribe<events::mouse>(*this);
+      events.subscribe<events::server_connected>(*this);
+      events.subscribe<events::server_disconnected>(*this);
+      events.subscribe<events::load_chunk>(*this);
     }
 
     void Debug::update(ex::EntityManager &entities,
@@ -25,13 +28,13 @@ namespace blocks
     {
     }
 
-    void Debug::receive(const KeyPress &kp)
+    void Debug::receive(const events::key &kp)
     {
       if (getenv("DEBUG_KEYS"))
         cout << "KeyPress: " << kp.type << ":" << kp.code << endl;
     }
 
-    void Debug::receive(const MouseMove &mm)
+    void Debug::receive(const events::mouse &mm)
     {
       if (getenv("DEBUG_MOUSE"))
         cout << "MouseMove: " << mm.position.get_x() << ":"
@@ -48,6 +51,21 @@ namespace blocks
     {
       if (getenv("DEBUG_ENTITY"))
         cout << "Destroyed entity: " << e.entity << endl;
+    }
+
+    void Debug::receive(const events::server_connected &e)
+    {
+      cout << "Server connected" << endl;
+    }
+
+    void Debug::receive(const events::server_disconnected &e)
+    {
+      cout << "Server disconnected" << endl;
+    }
+
+    void Debug::receive(const events::load_chunk &e)
+    {
+      cout << "Requested Chunk: " << string(e.id) << endl;
     }
   }
 }

@@ -3,15 +3,22 @@
 
 namespace blocks {
   namespace common {
-    std::shared_ptr<Chunk> Map::get(cid _cid) {
-      return _map[_cid];
+    Chunk::ptr Map::get(const cid &_cid) const
+    {
+      if (_map.count(_cid))
+        return _map.at(_cid);
+      else
+        // Null pointer
+        return Chunk::ptr();
     }
 
-    void Map::set(cid _cid, Chunk::ptr _chunk) {
+    void Map::set(const cid &_cid, Chunk::ptr _chunk)
+    {
       _map[_cid] = _chunk;
     }
 
-    bool Map::exists(cid _cid) {
+    bool Map::exists(const cid &_cid) const
+    {
       return _map.count(_cid) == 1;
     }
   }

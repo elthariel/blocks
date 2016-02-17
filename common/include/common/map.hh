@@ -1,5 +1,6 @@
 #pragma once
 
+#include "util.hh"
 #include "position.hh"
 #include "chunk.hh"
 
@@ -9,13 +10,14 @@
 
 namespace blocks {
   namespace common {
-    typedef std::map<cid, std::shared_ptr<Chunk>> chunk_map;
+    typedef std::map<cid, Chunk::ptr> chunk_map;
 
-    class Map {
+    class Map : public nocopy
+    {
     public:
-      Chunk::ptr get(cid);
-      void set(cid, Chunk::ptr);
-      bool exists(cid);
+      Chunk::ptr get(const cid &) const;
+      void set(const cid &, Chunk::ptr);
+      bool exists(const cid &) const;
     protected:
       chunk_map _map;
     };

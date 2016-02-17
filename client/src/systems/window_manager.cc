@@ -15,18 +15,18 @@ namespace blocks
 
     void WindowManager::configure(ex::EventManager &events)
     {
-      events.subscribe<KeyPress>(*this);
+      events.subscribe<events::key>(*this);
     }
 
-    void WindowManager::receive(const KeyPress &kp)
+    void WindowManager::receive(const events::key &kp)
     {
-      if (kp.type == KeyPress::Type::DOWN)
+      if (kp.type == events::key::ktype::DOWN)
       {
-        if (kp.code == KeyPress::Code::SYS_GRAB_MOUSE)
+        if (kp.code == events::key::kcode::SYS_GRAB_MOUSE)
           toggle_grab_mouse();
-        else if (kp.code == KeyPress::Code::SYS_FULLSCREEN)
+        else if (kp.code == events::key::kcode::SYS_FULLSCREEN)
           toggle_fullscreen();
-        else if (kp.code == KeyPress::Code::SYS_EXIT)
+        else if (kp.code == events::key::kcode::SYS_EXIT)
           exit(0);
       }
     }
@@ -47,8 +47,6 @@ namespace blocks
 
     void WindowManager::toggle_grab_mouse()
     {
-      recenter_mouse();
-
       auto props = _window.get_graphics_window()->get_properties();
       if (props.get_mouse_mode() == WindowProperties::M_absolute)
       {

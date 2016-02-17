@@ -5,6 +5,8 @@
 #include <string>
 #include <boost/format.hpp>
 
+#include "chunk_generated.h"
+
 namespace blocks {
   //template <>
   //using base_position = std::tuple<int64_t, int64_t, int64_t>;
@@ -16,7 +18,7 @@ namespace blocks {
     constexpr pos() {
       std::get<0>(*this) = 0;
       std::get<1>(*this) = 0;
-      std::get<2>(*this) = 0;      
+      std::get<2>(*this) = 0;
     }
 
     inline int64_t &x() { return std::get<0>(*this); }
@@ -47,6 +49,13 @@ namespace blocks {
     operator std::string() const {
       return boost::str(boost::format("%1%:%2%:%3%") % x() % y() % z());
     }
+
+    flatbuffers::Offset<fbs::PosObj> serialize(flatbuffers::FlatBufferBuilder &builder)
+    {
+        auto pos = fbs::Pos(x(), y(), z());
+        return fbs::CreatePosObj(builder, &pos);
+    }
+
   };
 
   struct cid: public pos {
@@ -59,8 +68,8 @@ namespace blocks {
     constexpr cpos() {
       std::get<0>(*this) = 0;
       std::get<1>(*this) = 0;
-      std::get<2>(*this) = 0;      
-    }    
+      std::get<2>(*this) = 0;
+    }
     cpos(size_t idx);
     size_t to_idx() const;
     bool valid() const;

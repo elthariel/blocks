@@ -3,11 +3,9 @@ namespace blocks.fbs;
 
 // Not used anymore but kept for reference and later use in the protocol, maybe ?
 
-enum Type:byte { PLAYER = 0, CHUNK = 1 }
+enum Action:byte { INITIAL_POS = 0, MOVE = 1, ASK_CHUNK = 2, CHUNK = 3, NEW_BLOCK = 4, DELETE_BLOCK = 5 }
 
-enum Action:byte { MOVE = 0, ASK_CHUNK = 1, CHUNK = 2, NEW_BLOCK = 3, DELETE_BLOCK = 4 }
-
-union AType { Player, Chunk }
+union AType { Player, Chunk, PosObj}
 
 struct Pos {
   x:long;
@@ -20,6 +18,10 @@ struct Block {
   variant: ushort;
   air: bool;
   transparent: bool;
+}
+
+table PosObj {
+  pos:Pos;
 }
 
 table Chunk {
@@ -35,7 +37,6 @@ table Player {
 }
 
 table Message {
-  type:Type;
   action:Action;
   body:AType;
 }

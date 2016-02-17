@@ -19,10 +19,11 @@ namespace blocks
     Game(const Game &) = delete;
 
     void start();
-    void dispatch(TcpConnection<blocks::Game, blocks::Game>::pointer, uint8_t *);
+    void dispatch(TcpConnection<Game, Game>::pointer, uint8_t *);
 
-    void on_move(uint8_t *);
-    void on_chunk(uint8_t *);
+    void on_initial_pos(TcpConnection<Game, Game>::pointer, fbs::Message*);
+    void on_move(fbs::Message*);
+    void on_chunk(fbs::Message*);
 
   protected:
     PandaFramework    _framework;
@@ -32,5 +33,7 @@ namespace blocks
     EventHandler::ptr _event_handler;
     Scene::ptr        _scene;
     TcpClient         _client;
+
+    TcpConnection<Game, Game>::pointer _socket = nullptr;
   };
 }

@@ -6,6 +6,7 @@
 #include "world_generator.hh"
 #include "chunk_generated.h"
 #include "TcpClient.hh"
+#include "Protocole.hh"
 
 #include <iostream>
 
@@ -32,11 +33,7 @@ namespace blocks {
     seed s = seed::from_file("/dev/urandom");
     WorldGenerator wg(s);
 
-    auto size = 8;
-    for (auto i = 0; i < size; i++)
-      for (auto j = 0; j < size; j++)
-        for (auto k = -2; k <= 2 ; k++)
-          _meshing_thread.input_pipe << wg.generate(cid(i, j, k));
+        //   _meshing_thread.input_pipe << wg.generate(cid(i, j, k));
 
     _scene->run();
   }
@@ -44,8 +41,34 @@ namespace blocks {
   void Game::dispatch(TcpConnection<Game, Game>::pointer socket, uint8_t *buffer)
   {
       auto message = flatbuffers::GetMutableRoot<fbs::Message>(buffer);
-      auto atype = message->body();
-      auto player = static_cast<const fbs::Player*>(message->body());
-      std::cout << "Got " << player->pos()->x() << std::endl;
+      switch(message->action())
+      {
+          case fbs::Action::Action_INITIAL_POS  : on_initial_pos(socket, message); break;
+        //   case fbs::Action::Action_CHUNK        : on_chunk(message); break;
+      }
+
   }
+
+  void Game::on_initial_pos(TcpConnection<Game, Game>::pointer socket, fbs::Message *message)
+  {
+      if (_socket == nullptr)
+        _socket = socket;
+
+      auto player = static_cast<const fbs::Player*>(message->body());
+      auto size = 8;
+      for (auto i = 0; i < size; i++)
+        for (auto j = 0; j < size; j++)
+          for (auto k = -2; k <= 2 ; k++)
+          {
+            auto pos = cid(i, j, k);
+            _socket->write(Protocole::create_message(fbs::Action::Action_ASK_CHUNK,
+                                                       fbs::AType::AType_PosObj, &pos));
+          }
+  }
+
+
+  // void Game::dispatch(TcpConnection<Game, Game>::pointer socket, uint8_t *buffer)
+  // {
+  //
+  // }
 }

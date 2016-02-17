@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tuple>
+
 #include "TcpConnection.hh"
 #include "chunk_generated.h"
 #include "common/chunk.hh"
@@ -29,34 +31,24 @@
 // private:
 //     std::vector<Observer *> _observers;
 // };
-namespace blocks {
-
-    class BlockServer : public fbs::Block
-    {
-      using fbs::Block::Block;
-    };
-
-    class ChunkServer : public fbs::Chunk, public Chunk
+namespace blocks
+{
+    class ChunkServer : public Chunk
     {
       public:
         // Chunk() {}
         // using fbs::Chunk::Chunk;
 
       public:
-          uint8_t *serialize() const {
-            flatbuffers::FlatBufferBuilder builder;
+          flatbuffers::Offset<fbs::Chunk> serialize(flatbuffers::FlatBufferBuilder &builder)
+          {
+              std::vector<fbs::Block> blocks_vector;
+              for (auto block: _blocks)
+                blocks_vector.push_back(block.serialize());
 
-            std::vector<fbs::Block> blocks_vector;
-            for (auto block: _blocks)
-              blocks_vector.push_back(block.serialize());
-
-            auto blocks = builder.CreateVectorOfStructs(blocks_vector);
-            auto pos = fbs::Pos(_id.x(), _id.y(), _id.z());
-            auto chunk = fbs::CreateChunk(builder, 10, 1, &pos, blocks);
-            builder.Finish(chunk);
-
-            return builder.GetBufferPointer();
+              auto blocks = builder.CreateVectorOfStructs(blocks_vector);
+              auto pos = fbs::Pos(_id.x(), _id.y(), _id.z());
+              return fbs::CreateChunk(builder, 0, 8, &pos, blocks);
           }
-
     };
 }

@@ -30,8 +30,11 @@ namespace blocks
           return _socket;
         }
 
-        void write(uint8_t *buffer, uint64_t size)
+        void write(std::tuple<uint8_t *, uint64_t> pair)
         {
+            auto buffer = std::get<0>(pair);
+            auto size = std::get<1>(pair);
+
             uint8_t *new_buffer = new uint8_t[size + 8];
             memcpy(new_buffer, (uint8_t*)&size, 8);
             memcpy(new_buffer + 8, buffer, size);

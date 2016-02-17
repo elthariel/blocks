@@ -14,7 +14,9 @@ namespace blocks {
         Server();
 
         void on_connect_player(TcpConnection<Server, Player>::pointer);
-        void dispatch(TcpConnection<Server, Player>::pointer , uint8_t *body);
+        void dispatch(TcpConnection<Server, Player>::pointer, uint8_t*);
+
+        void on_ask_chunk(TcpConnection<Server, Player>::pointer, fbs::Message*);
 
       private:
         TcpServer *_tcp_server;

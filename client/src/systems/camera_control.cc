@@ -22,7 +22,8 @@ namespace blocks
                         components::Player &player,
                         components::Position &position,
                         components::Direction &direction,
-                        components::Camera &cam) {
+                        components::Camera &cam)
+      {
         LVecBase3 hpr = cam.get_hpr();
 
         hpr.add_x(mouse_offset.get_x() * cam_sensitivity * -1.0);

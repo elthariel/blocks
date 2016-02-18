@@ -17,11 +17,14 @@ namespace blocks {
       public:
         TcpServer(boost::asio::io_service&, Server*);
 
+        void send_all_except(TcpConnection<Server, Player>::pointer, std::tuple<uint8_t *, uint64_t>);
+
       private:
         int  _port = 3000;
         void start_accept();
         void handle_accept(TcpConnection<Server, Player>::pointer, const boost::system::error_code&);
 
+        std::vector<TcpConnection<Server, Player>::pointer> _sockets;
         tcp::acceptor _acceptor;
         Server *_server;
     };

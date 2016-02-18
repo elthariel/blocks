@@ -23,8 +23,16 @@ namespace blocks {
     {
       if (!error)
       {
+        _sockets.push_back(new_connection);
         _server->on_connect_player(new_connection);
         start_accept();
       }
+    }
+
+    void TcpServer::send_all_except(TcpConnection<Server, Player>::pointer except, std::tuple<uint8_t *, uint64_t> buffer)
+    {
+      for (auto socket: _sockets)
+        if (socket != except)
+          socket->write(buffer);
     }
 }

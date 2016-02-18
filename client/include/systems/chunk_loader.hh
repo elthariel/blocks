@@ -23,6 +23,7 @@ namespace blocks
 
     protected:
       Map &_map;
+      
       bool _connected = false;
     };
   }

@@ -36,6 +36,7 @@ include_directories(
 )
 
 add_definitions(-fpermissive)
+# add_definitions(-stdlib)
 #add_definitions(-O3)
 
 add_subdirectory(common)

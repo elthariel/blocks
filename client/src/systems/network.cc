@@ -1,6 +1,7 @@
 
 #include "systems/network.hh"
 #include "events/network.hh"
+#include "components/basic.hh"
 #include "Protocole.hh"
 
 namespace blocks
@@ -8,7 +9,7 @@ namespace blocks
   namespace systems
   {
     Network::Network(blocks::MeshingThread &mt, std::string host, std::string port)
-      : _meshing_thread(mt), _client(*this, host, port)
+      : _meshing_thread(mt), _client(*this, host, port), _last_pos(0, 0, 0)
     {
     }
 
@@ -21,10 +22,30 @@ namespace blocks
                          ex::EventManager &events,
                          ex::TimeDelta dt)
     {
+      _passed += dt;
+
+      auto lambda = [=](ex::Entity entity,
+                        components::Player &player,
+                        components::Position &position)
+      {
+        wpos pos(position.get_x(), position.get_y(), position.get_z());
+        if (pos != _last_pos && _passed > 0.01)
+        {
+            _passed = 0;
+            _last_pos = pos;
+            _socket->write(Protocole::create_message(fbs::Action::Action_MOVE,
+                                                     fbs::AType::AType_PosObj,
+                                                     &pos));
+        }
+      };
+
+      entities.each<components::Player,
+                    components::Position>(lambda);
+
       if (_socket != nullptr && !_connect_event_sent)
       {
-        events.emit<events::server_connected>();
         _connect_event_sent = true;
+        events.emit<events::server_connected>();
       }
     }
 
@@ -40,12 +61,14 @@ namespace blocks
       auto message = flatbuffers::GetMutableRoot<blocks::fbs::Message>(buffer);
       switch(message->action())
       {
-        case fbs::Action::Action_INITIAL_POS  : on_initial_pos(socket, message); break;
-        case fbs::Action::Action_MOVE         : break;
-        case fbs::Action::Action_ASK_CHUNK    : break;
-        case fbs::Action::Action_CHUNK        : on_chunk(message); break;
-        case fbs::Action::Action_NEW_BLOCK     : break;
-        case fbs::Action::Action_DELETE_BLOCK  : break;
+        case fbs::Action::Action_INITIAL_POS       : on_initial_pos(socket, message); break;
+        case fbs::Action::Action_MOVE              : on_move(message); break;
+        case fbs::Action::Action_ASK_CHUNK         : break;
+        case fbs::Action::Action_CHUNK             : on_chunk(message); break;
+        case fbs::Action::Action_NEW_BLOCK         : break;
+        case fbs::Action::Action_DELETE_BLOCK      : break;
+        case fbs::Action::Action_PLAYER_CONNECT    : on_player_connect(message); break;
+        case fbs::Action::Action_PLAYER_DISCONNECT : break;
       }
     }
 
@@ -56,22 +79,23 @@ namespace blocks
         _socket = socket;
 
       auto player = static_cast<const fbs::Player*>(message->body());
-    //   auto size = 8;
-    //   for (auto i = 0; i < size; i++)
-    //     for (auto j = 0; j < size; j++)
-    //       for (auto k = -2; k <= 2 ; k++)
-    //       {
-    //         auto pos = cid(i, j, k);
-    //         _socket->write(Protocole::create_message(fbs::Action::Action_ASK_CHUNK,
-    //                                                  fbs::AType::AType_PosObj, &pos));
-    //       }
+      // initial pos event
     }
 
     void Network::on_chunk(blocks::fbs::Message *message)
     {
-      auto fbs_chunk = static_cast<const blocks::fbs::Chunk*>(message->body());
-      auto game_chunk = blocks::Chunk::deserialize(fbs_chunk);
-      _meshing_thread.input_pipe << game_chunk;
+      auto chunk = static_cast<const blocks::fbs::Chunk*>(message->body());
+      _meshing_thread.input_pipe << blocks::Chunk::deserialize(chunk);
+    }
+
+    void Network::on_move(blocks::fbs::Message *message)
+    {
+      auto player = static_cast<const blocks::fbs::Player*>(message->body());
+    }
+
+    void Network::on_player_connect(blocks::fbs::Message *message)
+    {
+      auto player = static_cast<const blocks::fbs::Player*>(message->body());
     }
   }
 }

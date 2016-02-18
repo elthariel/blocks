@@ -3,7 +3,14 @@ namespace blocks.fbs;
 
 // Not used anymore but kept for reference and later use in the protocol, maybe ?
 
-enum Action:byte { INITIAL_POS = 0, MOVE = 1, ASK_CHUNK = 2, CHUNK = 3, NEW_BLOCK = 4, DELETE_BLOCK = 5 }
+enum Action:byte { INITIAL_POS = 0,
+                   MOVE = 1,
+                   ASK_CHUNK = 2,
+                   CHUNK = 3,
+                   NEW_BLOCK = 4,
+                   DELETE_BLOCK = 5,
+                   PLAYER_CONNECT = 6,
+                   PLAYER_DISCONNECT = 7 }
 
 union AType { Player, Chunk, PosObj}
 

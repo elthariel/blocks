@@ -8,6 +8,9 @@
 #include <directionalLight.h>
 #include <ambientLight.h>
 
+// XXX
+#include <texturePool.h>
+
 #include <iostream>
 
 using namespace std;
@@ -20,6 +23,7 @@ namespace blocks
     create_window();
     init_scene();
     init_lights();
+    init_skybox();
     _scene.ls();
   }
 
@@ -72,8 +76,27 @@ namespace blocks
     _scene.set_light(_sun);
     _scene.set_light(_ambient_light);
 
-  //   auto cube = _scene.attach_new_node(models::make<models::Cube>("cube", 1, 2, 3));
-  //   cube.set_render_mode_wireframe();
+    auto cube = _scene.attach_new_node(models::make<models::Box>("cube", 1, 2, 3));
+    cube.set_render_mode_wireframe();
+  }
+
+  void Scene::init_skybox()
+  {
+    auto cam = window().get_camera_group();
+    _skybox = cam.attach_new_node(models::make<models::Box>("skybox", 10000));
+    _skybox.set_compass();
+    _skybox.set_two_sided(true);
+    _skybox.set_depth_write(false);
+    _skybox.set_depth_test(false);
+    _skybox.set_bin("background", 1);
+    _skybox.set_pos(-5000, -5000, -5000);
+    _skybox.set_tex_gen(TextureStage::get_default(), TexGenAttrib::M_world_cube_map);
+    //_skybox.set_tex_projector(TextureStage::get_default(), _scene, _skybox);
+    // //_skybox.set_tex_pos(TextureStage::get_default(), 0, 0, 0);
+    // _skybox.set_tex_scale(TextureStage::get_default(), 10);
+
+    auto tex = TexturePool::load_cube_map("../media/textures/debug_skybox_#.png");
+    _skybox.set_texture(tex);
   }
 
   void Scene::run()

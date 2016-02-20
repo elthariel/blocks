@@ -21,6 +21,7 @@ namespace blocks {
     void create_window();
     void init_scene();
     void init_lights();
+    void init_skybox();
     void run();
 
     NodePath root() { return _scene; }

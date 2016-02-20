@@ -31,6 +31,8 @@ namespace blocks
         SYS_GRAB_MOUSE,
         SYS_FULLSCREEN,
         SYS_EXIT,
+        DEBUG_WIREFRAME,
+        DEBUG_PHYSICS,
         COUNT
       } code;
 

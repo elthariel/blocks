@@ -31,7 +31,7 @@ namespace blocks {
 
   void Game::create_systems()
   {
-    systems.add<systems::Debug>();
+    systems.add<systems::Debug>(*this);
     systems.add<systems::Input>(_framework, _scene->window());
     systems.add<systems::WindowManager>(_scene->window());
     systems.add<systems::CameraControl>();

@@ -39,8 +39,12 @@ namespace blocks
 
       // System keys
       _mappings["g"] = events::key::kcode::SYS_GRAB_MOUSE;
-      _mappings["f"] = events::key::kcode::SYS_FULLSCREEN;
+      _mappings["p"] = events::key::kcode::SYS_FULLSCREEN;
       _mappings["q"] = events::key::kcode::SYS_EXIT;
+
+      // Debug keys
+      _mappings["["] = events::key::kcode::DEBUG_WIREFRAME;
+      _mappings["]"] = events::key::kcode::DEBUG_PHYSICS;
 
       for(auto &kv: _mappings)
       {

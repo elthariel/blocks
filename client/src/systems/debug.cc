@@ -1,6 +1,7 @@
 
 #include "systems/debug.hh"
 #include "systems/input.hh"
+#include "game.hh"
 
 #include <iostream>
 #include <cstdlib>
@@ -11,6 +12,11 @@ namespace blocks
 {
   namespace systems
   {
+    Debug::Debug(Game &game)
+      : _game(game)
+    {
+    }
+
     void Debug::configure(ex::EventManager &events)
     {
       events.subscribe<ex::EntityCreatedEvent>(*this);
@@ -32,6 +38,22 @@ namespace blocks
     {
       if (getenv("DEBUG_KEYS"))
         cout << "KeyPress: " << kp.type << ":" << kp.code << endl;
+
+      if (kp.type == events::key::ktype::DOWN)
+      {
+        auto root = _game._scene->root();
+        switch(kp.code)
+        {
+        case events::key::kcode::DEBUG_WIREFRAME:
+          if (root.has_render_mode())
+            root.clear_render_mode();
+          else
+            root.set_render_mode_wireframe();
+          break;
+        default:
+          break;
+        }
+      }
     }
 
     void Debug::receive(const events::mouse &mm)

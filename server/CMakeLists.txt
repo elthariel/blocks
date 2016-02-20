@@ -28,7 +28,7 @@ add_executable(blocks_server ${SERVER_HEADERS} ${SERVER_SOURCES})
 set_target_properties(blocks_server PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_server
-  odb
+  # odb
   common
   ${PANDA_LIBRARIES}
   ${Boost_LIBRARIES}

@@ -2,6 +2,7 @@
 
 #include "map.hh"
 #include "events/network.hh"
+#include "meshing_thread.hh"
 
 namespace blocks
 {
@@ -23,7 +24,7 @@ namespace blocks
 
     protected:
       Map &_map;
-      
+
       bool _connected = false;
     };
   }

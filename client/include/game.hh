@@ -8,6 +8,7 @@
 #include "TcpConnection.hh"
 #include "TcpClient.hh"
 #include "map.hh"
+#include "components/basic.hh"
 
 #include <asyncTask.h>
 
@@ -24,7 +25,9 @@ namespace blocks
     void create_systems();
     void update_systems(ex::TimeDelta dt);
     void create_entities();
-    void create_player();
+    void create_player(wpos &pos);
+    ex::Entity create_character(wpos &pos);
+
 
     // Panda 3D
     void start();

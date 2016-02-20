@@ -8,8 +8,8 @@ namespace blocks
 {
   namespace systems
   {
-    Network::Network(blocks::MeshingThread &mt, std::string host, std::string port)
-      : _meshing_thread(mt), _client(*this, host, port), _last_pos(0, 0, 0)
+    Network::Network(blocks::MeshingThread &mt, std::string host, std::string port, Game *game)
+      : _meshing_thread(mt), _client(*this, host, port), _last_pos(0, 0, 0), _game(game)
     {
     }
 
@@ -80,6 +80,9 @@ namespace blocks
 
       auto player = static_cast<const fbs::Player*>(message->body());
       // initial pos event
+      auto _pos = player->pos();
+      wpos pos(_pos->x(), _pos->y(), _pos->z());
+      _game->create_player(pos);
     }
 
     void Network::on_chunk(blocks::fbs::Message *message)
@@ -91,11 +94,20 @@ namespace blocks
     void Network::on_move(blocks::fbs::Message *message)
     {
       auto player = static_cast<const blocks::fbs::Player*>(message->body());
+      auto entity = _characters.at(player->id());
+      auto ppos = player->pos();
+      auto pos = entity.component<components::Position>();
+      pos.get()->set(ppos->x(), ppos->y(), ppos->z());
+      std::cout << "Move" << ppos->x() << ":" <<  ppos->y() << ":" <<  ppos->z() << std::endl;
     }
 
     void Network::on_player_connect(blocks::fbs::Message *message)
     {
       auto player = static_cast<const blocks::fbs::Player*>(message->body());
+
+      auto _pos = player->pos();
+      wpos pos(_pos->x(), _pos->y(), _pos->z());
+      _characters.insert(std::pair<int, ex::Entity>(player->id(), _game->create_character(pos)));
     }
   }
 }

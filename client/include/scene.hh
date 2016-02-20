@@ -3,6 +3,8 @@
 #include <pandaFramework.h>
 #include <pandaSystem.h>
 
+#include "position.hh"
+
 #include <memory>
 
 namespace blocks {
@@ -21,6 +23,7 @@ namespace blocks {
     void create_window();
     void init_scene();
     void init_lights();
+    NodePath make_character(wpos &);
     void run();
 
     NodePath root() { return _scene; }

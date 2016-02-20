@@ -11,5 +11,13 @@ namespace blocks
     struct server_disconnected
     {
     };
+
+    struct client_connected
+    {
+    };
+
+    struct client_disconnected
+    {
+    };
   }
 }

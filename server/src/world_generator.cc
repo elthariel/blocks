@@ -22,7 +22,7 @@ namespace blocks {
           cpos c(x, y, z);
           wpos w(_id, c);
 
-          if (w.z() > _height_map(w.x(), w.y()) * 32 + 10) {
+          if (w.z() > _height_map(w.x(), w.y()) * 8 + 10) {
             if (w.z() > 0)
             {
               (*chunk)[c.to_idx()].id(0);

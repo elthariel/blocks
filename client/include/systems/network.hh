@@ -9,6 +9,7 @@
 namespace blocks
 {
   class TcpClient;
+  class Game;
 
   namespace systems
   {
@@ -16,7 +17,7 @@ namespace blocks
                      public ex::Receiver<Network>,
                      public nocopy
     {
-      Network(MeshingThread &mt, std::string host, std::string port);
+      Network(MeshingThread &mt, std::string host, std::string port, Game *);
 
       // Entity things
       void configure(ex::EventManager &events);
@@ -45,7 +46,10 @@ namespace blocks
 
       // FIXME: hack
       wpos _last_pos;
+      Game *_game;
+      std::map<int, ex::Entity> _characters;
     };
 
   }
 }
+#include "game.hh"

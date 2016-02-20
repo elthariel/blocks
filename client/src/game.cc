@@ -35,7 +35,7 @@ namespace blocks {
     systems.add<systems::Input>(_framework, _scene->window());
     systems.add<systems::WindowManager>(_scene->window());
     systems.add<systems::CameraControl>();
-    systems.add<systems::Network>(_meshing_thread, "127.0.0.1", "3000");
+    systems.add<systems::Network>(_meshing_thread, "127.0.0.1", "3000", this);
     systems.add<systems::ChunkLoader>(_map);
 
     systems.configure();
@@ -53,23 +53,36 @@ namespace blocks {
 
   void Game::create_entities()
   {
-    create_player();
+    // create_player();
   }
 
-  void Game::create_player()
+  void Game::create_player(wpos &pos)
   {
     _player = entities.create();
     _player.assign<components::Player>();
-    _player.assign<components::Position>(0, 0, 0);
+    _player.assign<components::Position>(pos.x(), pos.y(), pos.z());
     _player.assign<components::Direction>(0, 1, 0);
-    _player.assign<components::Camera>(_scene->window().get_camera_group());
+    auto camera = _scene->window().get_camera_group();
+    camera.set_fluid_pos(LPoint3(pos.x(), pos.y(), pos.z()));
+    _player.assign<components::Camera>(camera);
+  }
+
+  ex::Entity Game::create_character(wpos &pos)
+  {
+    auto character = entities.create();
+
+    character.assign<components::Character>();
+    character.assign<components::Position>(pos.x(), pos.y(), pos.y());
+    character.assign<components::Model>(_scene->make_character(pos));
+
+    return character;
   }
 
   void Game::start()
   {
     cout << "Starting Game !" << endl;
 
-    create_entities();
+    // create_entities();
 
     AsyncTaskManager::get_global_ptr()->add(_meshing_task.get());
     AsyncTaskManager::get_global_ptr()->add(this);

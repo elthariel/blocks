@@ -13,7 +13,6 @@ endif ()
 set(CMAKE_DEBUG_POSTFIX "_d")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/dist")
 
-
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${PANDA_INCLUDE_DIRS}

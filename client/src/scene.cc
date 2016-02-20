@@ -72,8 +72,15 @@ namespace blocks
     _scene.set_light(_sun);
     _scene.set_light(_ambient_light);
 
-  //   auto cube = _scene.attach_new_node(models::make<models::Cube>("cube", 1, 2, 3));
-  //   cube.set_render_mode_wireframe();
+  }
+
+  NodePath Scene::make_character(wpos &pos)
+  {
+    NodePath box = _scene.attach_new_node(models::make<models::Box>("box", 1, 1, 1));
+    box.set_pos(pos.x(), pos.y(), pos.z());
+    box.set_render_mode_wireframe();
+
+    return box;
   }
 
   void Scene::run()

@@ -7,10 +7,9 @@
 #include <antialiasAttrib.h>
 #include <directionalLight.h>
 #include <ambientLight.h>
-
-// XXX
 #include <texturePool.h>
 
+#include <cstdlib>
 #include <iostream>
 
 using namespace std;
@@ -55,8 +54,16 @@ namespace blocks
     _scene.set_antialias(AntialiasAttrib::M_auto);
     _window->set_background_type(WindowFramework::BackgroundType::BT_black);
 
-    auto *meter = new SceneGraphAnalyzerMeter("Meter", _scene.node());
-    // meter->setup_window(_window->get_graphics_output());
+    _camera = window().get_camera_group();
+    _camera.set_pos(0, 0, 0);
+    _camera.set_hpr(0, 0, 0);
+    _camera.heads_up(0, 10, 1);
+
+    if (getenv("GRAPH_METER"))
+    {
+      auto *meter = new SceneGraphAnalyzerMeter("Meter", _scene.node());
+      meter->setup_window(_window->get_graphics_output());
+    }
   }
 
   void Scene::init_lights()
@@ -82,11 +89,7 @@ namespace blocks
 
   void Scene::init_skybox()
   {
-    auto cam = window().get_camera_group();
-    cam.set_pos(0, 0, 0);
-    cam.heads_up(0, 10, 1);
-
-    _skybox = cam.attach_new_node(models::make<models::Box>("skybox", 10000));
+    _skybox = _camera.attach_new_node(models::make<models::Box>("skybox", 10000));
     _skybox.set_compass();
     _skybox.set_two_sided(true);
     _skybox.set_depth_write(false);

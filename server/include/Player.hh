@@ -14,14 +14,17 @@ namespace blocks {
       public:
         Player(TcpConnection<Server, Player>::pointer);
 
-        int  id()       { return _id; }
-        void id(int id) { _id = id; }
+        int  id()           { return _id; }
+        void id(int id)     { _id = id; }
+
+        wpos pos()          { return _pos; }
+        void pos(wpos &pos) { _pos = pos; }
 
         flatbuffers::Offset<fbs::Player> serialize(flatbuffers::FlatBufferBuilder &builder);
 
       private:
         TcpConnection<Server, Player>::pointer _socket;
         int _id;
-        blocks::wpos _pos;
+        wpos _pos;
     };
 }

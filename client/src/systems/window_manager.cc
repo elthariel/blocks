@@ -66,18 +66,21 @@ namespace blocks
 
     void WindowManager::toggle_fullscreen()
     {
-      auto props = _window.get_graphics_window()->get_properties();
-
-      if (props.get_fullscreen())
-      {
-        props.set_fullscreen(false);
-      }
-      else
-      {
-        props.set_fullscreen(true);
-      }
-
-      _window.get_graphics_window()->request_properties(props);
+    //
+    //   DISABLED: can mess with multiple screen setup (occurs on Debian KDE)
+    //
+    //   auto props = _window.get_graphics_window()->get_properties();
+      //
+    //   if (props.get_fullscreen())
+    //   {
+    //     props.set_fullscreen(false);
+    //   }
+    //   else
+    //   {
+    //     props.set_fullscreen(true);
+    //   }
+      //
+    //   _window.get_graphics_window()->request_properties(props);
     }
   }
 }

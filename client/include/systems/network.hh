@@ -30,6 +30,7 @@ namespace blocks
       void on_initial_pos(TcpClient::connection::pointer, fbs::Message*);
       void on_move(fbs::Message*);
       void on_chunk(fbs::Message*);
+      void on_player_connect(fbs::Message*);
 
     protected:
       MeshingThread &_meshing_thread;
@@ -40,6 +41,10 @@ namespace blocks
       // Network
       TcpClient::connection::pointer _socket = nullptr;
       TcpClient _client;
+      ex::TimeDelta _passed = 0;
+
+      // FIXME: hack
+      wpos _last_pos;
     };
 
   }

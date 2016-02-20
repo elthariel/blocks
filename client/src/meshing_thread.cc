@@ -28,7 +28,7 @@ namespace blocks {
     _running = false;
   }
 
-  void MeshingThread::process_chunk(Chunk::ptr chunk)
+  void MeshingThread::process_chunk(common::Chunk::ptr chunk)
   {
     // boost::timer::auto_cpu_timer t(6, "Chunk meshing: %w seconds\n");
     // cout << "Meshing thread received a chunk: "
@@ -45,7 +45,7 @@ namespace blocks {
     cout << "Started meshing thread." << endl;
 
     while(_running) {
-      Chunk::ptr chunk = input_pipe.wait_for_data(500, _running);
+      common::Chunk::ptr chunk = input_pipe.wait_for_data(500, _running);
       if (chunk)
         process_chunk(chunk);
     }

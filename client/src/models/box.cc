@@ -28,9 +28,9 @@ namespace blocks
       PT(Geom) geom = new Geom(_vxd);
       PT(GeomTriangles) mesh;
       std::array<LVector3f, 6> normals = {
-        LVector3f(1.0, 0.0, 0.0), LVector3f(-1.0, 0.0, 0.0),
-        LVector3f(0.0, 1.0, 0.0), LVector3f(0.0, -1.0, 0.0),
-        LVector3f(0.0, 0.0, 1.0), LVector3f(0.0, 0.0, -1.0)
+        LVector3f(-1.0, 0.0, 0.0), LVector3f(1.0, 0.0, 0.0),
+        LVector3f(0.0, -1.0, 0.0), LVector3f(0.0, 1.0, 0.0),
+        LVector3f(0.0, 0.0, -1.0), LVector3f(0.0, 0.0, 1.0)
       };
 
       float whd[3] = {_w, _h, _d};
@@ -47,28 +47,28 @@ namespace blocks
 
         auto face = 2 * d;
         _vertex.add_data3f(0,             0,             0);
-        _vertex.add_data3f(dd[0],         dd[1],         dd[2]);
-        _vertex.add_data3f(dd[0] + du[0], dd[1] + du[1], dd[2] + du[2]);
-        _vertex.add_data3f(        du[0],         du[1],         du[2]);
+        _vertex.add_data3f(du[0],         du[1],         du[2]);
+        _vertex.add_data3f(du[0] + dv[0], du[1] + dv[1], du[2] + dv[2]);
+        _vertex.add_data3f(        dv[0],         dv[1],         dv[2]);
         _uvs.add_data2f(0, 0);
-        _uvs.add_data2f(whd[d], 0);
-        _uvs.add_data2f(whd[d], whd[u]);
-        _uvs.add_data2f(0,      whd[u]);
+        _uvs.add_data2f(whd[u], 0);
+        _uvs.add_data2f(whd[u], whd[v]);
+        _uvs.add_data2f(0,      whd[v]);
         for (auto i = 0; i < 4; i++)
           _normal.add_data3f(normals[face][0], normals[face][1], normals[face][2]);
 
 
         face++;
-        _vertex.add_data3f(0             + dv[0], 0             + dv[1], 0             + dv[2]);
-        _vertex.add_data3f(dd[0]         + dv[0], dd[1]         + dv[1], dd[2]         + dv[2]);
-        _vertex.add_data3f(dd[0] + du[0] + dv[0], dd[1] + du[1] + dv[1], dd[2] + du[2] + dv[2]);
-        _vertex.add_data3f(        du[0] + dv[0],         du[1] + dv[1],         du[2] + dv[2]);
+        _vertex.add_data3f(0             + dd[0], 0             + dd[1], 0             + dd[2]);
+        _vertex.add_data3f(du[0]         + dd[0], du[1]         + dd[1], du[2]         + dd[2]);
+        _vertex.add_data3f(du[0] + dv[0] + dd[0], du[1] + dv[1] + dd[1], du[2] + dv[2] + dd[2]);
+        _vertex.add_data3f(        dv[0] + dd[0],         dv[1] + dd[1],         dv[2] + dd[2]);
         for (auto i = 0; i < 4; i++)
           _normal.add_data3f(normals[face][0], normals[face][1], normals[face][2]);
         _uvs.add_data2f(0, 0);
-        _uvs.add_data2f(whd[d], 0);
-        _uvs.add_data2f(whd[d], whd[u]);
-        _uvs.add_data2f(0,      whd[u]);
+        _uvs.add_data2f(whd[u], 0);
+        _uvs.add_data2f(whd[u], whd[v]);
+        _uvs.add_data2f(0,      whd[v]);
 
 
         for(auto i = 0; i < 2; i++)

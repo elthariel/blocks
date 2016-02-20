@@ -18,12 +18,13 @@ namespace blocks
   {
     // return AsyncTask::DS_cont;
 
+
     if (_mt.output_pipe.size())
     {
       auto result = _mt.output_pipe.dequeue();
       auto nodepath = _scene.attach_new_node(result.second);
-      cpos cp;
-      wpos wp(result.first, cp);
+      common::cpos cp;
+      common::wpos wp(result.first, cp);
 
       auto subnodes = nodepath.get_children();
       for(auto i = 0; i < subnodes.size(); i++)

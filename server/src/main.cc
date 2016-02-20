@@ -51,7 +51,7 @@ int main()
   //
   // auto test = blocks::fbs::GetChunk(buff);
   //
-  // auto test2 = static_cast<const Chunk<> *>(test);
+  // auto test2 = static_cast<const <> *>(test);
 
   // std::cout << test2->get_version() << std::endl;
   // test2->test();

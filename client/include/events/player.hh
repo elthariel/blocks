@@ -1,5 +1,5 @@
 
-#include "position.hh"
+#include "common/position.hh"
 
 namespace blocks
 {

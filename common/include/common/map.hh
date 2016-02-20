@@ -1,7 +1,7 @@
 #pragma once
 
 #include "util.hh"
-#include "position.hh"
+#include "common/position.hh"
 #include "chunk.hh"
 
 #include <map>

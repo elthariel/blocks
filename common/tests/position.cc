@@ -1,4 +1,4 @@
-#include "position.hh"
+#include "common/position.hh"
 
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE pos

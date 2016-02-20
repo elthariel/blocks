@@ -2,7 +2,7 @@
 #include "systems/chunk_loader.hh"
 #include "components/basic.hh"
 #include "events/map.hh"
-#include "position.hh"
+#include "common/position.hh"
 
 #include <iostream>
 using namespace std;
@@ -35,14 +35,14 @@ namespace blocks
                      components::Player &player,
                      components::Position &position)
         {
-          wpos w(position.get_x(), position.get_y(), position.get_z());
-          cid current_id = w.cid();
+          common::wpos w(position.get_x(), position.get_y(), position.get_z());
+          common::cid current_id = w.cid();
 
           for (auto i = -load; i <= load; ++i)
             for (auto j = -load; j <= load; ++j)
               for (auto k = -load_height; k <= load_height; ++k)
               {
-                cid iter = cid(i, j, k) + current_id;
+                common::cid iter = common::cid(i, j, k) + current_id;
                 if (!(_map.exists(iter) || _map.loading(iter)))
                 {
                   events.emit<events::load_chunk>(iter);

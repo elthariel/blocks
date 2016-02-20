@@ -45,7 +45,7 @@ namespace blocks
       ex::TimeDelta _passed = 0;
 
       // FIXME: hack
-      wpos _last_pos;
+      common::wpos _last_pos;
       Game *_game;
       std::map<int, ex::Entity> _characters;
     };

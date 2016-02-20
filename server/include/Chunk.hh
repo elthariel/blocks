@@ -33,11 +33,11 @@
 // // };
 // namespace blocks
 // {
-//     class ChunkServer : public Chunk
+//     class ChunkServer : public 
 //     {
 //       public:
-//         // Chunk() {}
-//         // using fbs::Chunk::Chunk;
+//         // () {}
+//         // using fbs::::;
 //
 //       public:
 //     };

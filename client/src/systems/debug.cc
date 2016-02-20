@@ -65,7 +65,7 @@ namespace blocks
 
     void Debug::receive(const events::load_chunk &e)
     {
-      cout << "Requested Chunk: " << string(e.id) << endl;
+      cout << "Requested : " << string(e.id) << endl;
     }
   }
 }

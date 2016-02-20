@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entity.hh"
-#include "position.hh"
+#include "common/position.hh"
 
 #include <lpoint3.h>
 #include <lvector3.h>
@@ -15,9 +15,9 @@ namespace blocks
     {
       using LPoint3f::LPoint3f;
       Position(const LVecBase3f &other) : LPoint3f(other) {}
-      wpos to_wpos()
+      common::wpos to_wpos()
       {
-        wpos res(get_x(), get_y(), get_z());
+        common::wpos res(get_x(), get_y(), get_z());
         return res;
       }
     };

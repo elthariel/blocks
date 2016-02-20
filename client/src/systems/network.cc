@@ -28,7 +28,7 @@ namespace blocks
                         components::Player &player,
                         components::Position &position)
       {
-        wpos pos(position.get_x(), position.get_y(), position.get_z());
+        common::wpos pos(position.get_x(), position.get_y(), position.get_z());
         if (pos != _last_pos && _passed > 0.01)
         {
             _passed = 0;
@@ -81,14 +81,14 @@ namespace blocks
       auto player = static_cast<const fbs::Player*>(message->body());
       // initial pos event
       auto _pos = player->pos();
-      wpos pos(_pos->x(), _pos->y(), _pos->z());
+      common::wpos pos(_pos->x(), _pos->y(), _pos->z());
       _game->create_player(pos);
     }
 
     void Network::on_chunk(blocks::fbs::Message *message)
     {
       auto chunk = static_cast<const blocks::fbs::Chunk*>(message->body());
-      _meshing_thread.input_pipe << blocks::Chunk::deserialize(chunk);
+      _meshing_thread.input_pipe << blocks::common::Chunk::deserialize(chunk);
     }
 
     void Network::on_move(blocks::fbs::Message *message)
@@ -106,7 +106,7 @@ namespace blocks
       auto player = static_cast<const blocks::fbs::Player*>(message->body());
 
       auto _pos = player->pos();
-      wpos pos(_pos->x(), _pos->y(), _pos->z());
+      common::wpos pos(_pos->x(), _pos->y(), _pos->z());
       _characters.insert(std::pair<int, ex::Entity>(player->id(), _game->create_character(pos)));
     }
   }

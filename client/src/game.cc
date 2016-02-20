@@ -56,7 +56,7 @@ namespace blocks {
     // create_player();
   }
 
-  void Game::create_player(wpos &pos)
+  void Game::create_player(common::wpos &pos)
   {
     _player = entities.create();
     _player.assign<components::Player>();
@@ -67,7 +67,7 @@ namespace blocks {
     _player.assign<components::Camera>(camera);
   }
 
-  ex::Entity Game::create_character(wpos &pos)
+  ex::Entity Game::create_character(common::wpos &pos)
   {
     auto character = entities.create();
 

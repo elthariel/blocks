@@ -2,12 +2,21 @@
 
 #include "TcpConnection.hh"
 #include "Server.hh"
-#include "position.hh"
+#include "common/position.hh"
 #include "Chunk.hh"
 
 static int NEXT_ID = 0;
 
 namespace blocks {
+
+    // #pragma db object
+    // class player_db
+    // {
+    // public:
+    // private:
+    //     int _id;
+    //     pos_db _pos;
+    // };
 
     class Player
     {
@@ -17,14 +26,15 @@ namespace blocks {
         int  id()           { return _id; }
         void id(int id)     { _id = id; }
 
-        wpos pos()          { return _pos; }
-        void pos(wpos &pos) { _pos = pos; }
+        common::wpos pos()          { return _pos; }
+        void pos(common::wpos &pos) { _pos = pos; }
 
+        // Player *deserialize(player_db&);
         flatbuffers::Offset<fbs::Player> serialize(flatbuffers::FlatBufferBuilder &builder);
 
       private:
         TcpConnection<Server, Player>::pointer _socket;
         int _id;
-        wpos _pos;
+        common::wpos _pos;
     };
 }

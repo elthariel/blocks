@@ -1,6 +1,6 @@
 #pragma once
 
-#include "position.hh"
+#include "common/position.hh"
 
 namespace blocks
 {
@@ -8,9 +8,9 @@ namespace blocks
   {
     struct load_chunk
     {
-      cid id;
+      common::cid id;
 
-      load_chunk(const cid &_id) : id(_id) {}
+      load_chunk(const common::cid &_id) : id(_id) {}
     };
   }
 }

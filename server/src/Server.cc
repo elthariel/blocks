@@ -29,7 +29,7 @@ namespace blocks {
     void Server::on_ask_chunk(TcpConnection<Server, Player>::pointer socket, fbs::Message *message)
     {
         auto pos = static_cast<const fbs::PosObj *>(message->body())->pos();
-        cid _cid(pos->x(), pos->y(), pos->z());
+        common::cid _cid(pos->x(), pos->y(), pos->z());
         auto chunk = _map.get(_cid);
         socket->write(Protocole::create_message(fbs::Action::Action_CHUNK, fbs::AType::AType_Chunk, chunk));
     }
@@ -39,7 +39,7 @@ namespace blocks {
         auto player = socket->referer();
         auto pos = static_cast<const fbs::PosObj *>(message->body())->pos();
 
-        wpos _pos(pos->x(), pos->y(), pos->z());
+        common::wpos _pos(pos->x(), pos->y(), pos->z());
         player->pos(_pos);
 
         _tcp_server->send_all_except(socket, Protocole::create_message(fbs::Action::Action_MOVE,

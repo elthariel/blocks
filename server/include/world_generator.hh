@@ -11,7 +11,7 @@ namespace blocks {
   public:
     WorldGenerator(const seed &_seed);
 
-    Chunk::ptr generate(cid _id);
+  common::Chunk::ptr generate(common::cid _id);
   protected:
     const seed _seed;
     PerlinNoise2 _height_map;

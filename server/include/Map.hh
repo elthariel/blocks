@@ -11,8 +11,8 @@ namespace blocks
       public:
         Map();
 
-        std::shared_ptr<Chunk> get(cid _cid);
-        void generate(cid _cid);
+        std::shared_ptr<common::Chunk> get(common::cid _cid);
+        void generate(common::cid _cid);
 
       private:
         WorldGenerator _wg;

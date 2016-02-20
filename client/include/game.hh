@@ -25,8 +25,8 @@ namespace blocks
     void create_systems();
     void update_systems(ex::TimeDelta dt);
     void create_entities();
-    void create_player(wpos &pos);
-    ex::Entity create_character(wpos &pos);
+    void create_player(common::wpos &pos);
+    ex::Entity create_character(common::wpos &pos);
 
 
     // Panda 3D

@@ -3,7 +3,7 @@
 #include <pandaFramework.h>
 #include <pandaSystem.h>
 
-#include "position.hh"
+#include "common/position.hh"
 
 #include <memory>
 
@@ -23,7 +23,8 @@ namespace blocks {
     void create_window();
     void init_scene();
     void init_lights();
-    NodePath make_character(wpos &);
+    NodePath make_character(common::wpos &);
+    void init_skybox();
     void run();
 
     NodePath root() { return _scene; }

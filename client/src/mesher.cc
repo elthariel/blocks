@@ -23,39 +23,39 @@ namespace blocks {
         }
   }
 
-  uint16_t MesherWorkBuffer::get_vertex_id(const cpos &p) {
+  uint16_t MesherWorkBuffer::get_vertex_id(const common::cpos &p) {
     return _vertices[p.x()][p.y()][p.z()];
   }
 
-  void MesherWorkBuffer::set_vertex_id(const cpos &p, uint16_t vxid) {
+  void MesherWorkBuffer::set_vertex_id(const common::cpos &p, uint16_t vxid) {
     _vertices[p.x()][p.y()][p.z()] = vxid;
   }
 
-  bool MesherWorkBuffer::get_face_visible(const cpos &p, unsigned face) {
+  bool MesherWorkBuffer::get_face_visible(const common::cpos &p, unsigned face) {
     return get_flag(p, face);
   }
 
-  void MesherWorkBuffer::set_face_visible(const cpos &p, unsigned face, bool visible) {
+  void MesherWorkBuffer::set_face_visible(const common::cpos &p, unsigned face, bool visible) {
     return set_flag(p, face, visible);
   }
 
-  bool MesherWorkBuffer::get_face_meshed(const cpos &p, unsigned face) {
+  bool MesherWorkBuffer::get_face_meshed(const common::cpos &p, unsigned face) {
     return get_flag(p, face + 6);
   }
 
-  void MesherWorkBuffer::set_face_meshed(const cpos &p, unsigned face, bool meshed) {
+  void MesherWorkBuffer::set_face_meshed(const common::cpos &p, unsigned face, bool meshed) {
     return set_flag(p, face + 6, meshed);
   }
 
-  uint16_t &MesherWorkBuffer::flags_at(const cpos &p) {
+  uint16_t &MesherWorkBuffer::flags_at(const common::cpos &p) {
     return _flags[p.x()][p.y()][p.z()];
   }
 
-  bool MesherWorkBuffer::get_flag(const cpos &p, unsigned offset) {
+  bool MesherWorkBuffer::get_flag(const common::cpos &p, unsigned offset) {
     return flags_at(p) & (1L << offset);
   }
 
-  void MesherWorkBuffer::set_flag(const cpos &p, unsigned offset, bool set) {
+  void MesherWorkBuffer::set_flag(const common::cpos &p, unsigned offset, bool set) {
     if (set)
     flags_at(p) |= 1L << offset;
     else
@@ -76,13 +76,13 @@ namespace blocks {
     LVector3f(0.0, 0.0, 1.0), LVector3f(0.0, 0.0, -1.0)
   };
 
-  const std::array<const cpos, 6> GreedyMesher::neighbors = {
-    cpos(1, 0, 0), cpos(-1, 0, 0),
-    cpos(0, 1, 0), cpos(0, -1, 0),
-    cpos(0, 0, 1), cpos(0, 0, -1)
+  const std::array<const common::cpos, 6> GreedyMesher::neighbors = {
+    common::cpos(1, 0, 0), common::cpos(-1, 0, 0),
+    common::cpos(0, 1, 0), common::cpos(0, -1, 0),
+    common::cpos(0, 0, 1), common::cpos(0, 0, -1)
   };
 
-  GreedyMesher::GreedyMesher(Chunk::ptr c)
+  GreedyMesher::GreedyMesher(common::Chunk::ptr c)
   : _chunk(c), _work(c->size())
   {
     compute_visible();
@@ -90,17 +90,17 @@ namespace blocks {
 
   void GreedyMesher::compute_visible()
   {
-    for (size_t idx = 0; idx < Chunk::flat_size(); ++idx)
+    for (size_t idx = 0; idx < common::Chunk::flat_size(); ++idx)
     {
       bool visible_face = false;
-      cpos pos(idx);
+      common::cpos pos(idx);
 
       if (_chunk->at(pos).air())
         continue;
 
       for (auto f = 0; f < neighbors.size(); ++f)
       {
-        cpos pos_nb = pos + neighbors[f];
+        common::cpos pos_nb = pos + neighbors[f];
         if (!pos_nb.valid() || _chunk->at(pos_nb).air()
             || _chunk->at(pos_nb).transparent())
         {
@@ -145,8 +145,8 @@ namespace blocks {
 
   void GreedyMesher::create_quad(unsigned char face,
                                  bool front,
-                                 const cpos &base,
-                                 const cpos& du, const cpos& dv,
+                                 const common::cpos &base,
+                                 const common::cpos& du, const common::cpos& dv,
                                  int w, int h)
   {
     int64_t quads[4][3] = {
@@ -185,14 +185,14 @@ namespace blocks {
     _vx_count += 4;
   }
 
-  bool GreedyMesher::need_mesh(const cpos &pos, int face_idx, uint16_t block_id)
+  bool GreedyMesher::need_mesh(const common::cpos &pos, int face_idx, uint16_t block_id)
   {
     auto visible = _work.get_face_visible(pos, face_idx);
     auto meshed = _work.get_face_meshed(pos, face_idx);
     return visible && !meshed && _chunk->at(pos).id() == block_id;
   }
 
-  void GreedyMesher::mesh_face(cpos &iter,
+  void GreedyMesher::mesh_face(common::cpos &iter,
                                uint16_t block_id,
                                int d, int u, int v,
                                char front)
@@ -216,7 +216,7 @@ namespace blocks {
           // iter now have the chunk position of the block we're looking at
           // and will progress in the correct order for the direction we're
           // iterating.
-          cpos iter2(iter), du, dv;
+          common::cpos iter2(iter), du, dv;
           auto w = 0, h = 0;
 
           // std::cout << std::string(iter) << std::endl;
@@ -271,7 +271,7 @@ namespace blocks {
               h++;
             }
 
-            cpos base(iter);
+            common::cpos base(iter);
             if (!front)
               base[d]++;
 
@@ -284,7 +284,7 @@ namespace blocks {
 
   PT(GeomNode) GreedyMesher::mesh() {
     PT(GeomNode) node = new GeomNode(std::string("chunk:") + std::string(_chunk->id()));
-    cpos iter;
+    common::cpos iter;
 
     // Iterator over the list of different block ideas we found during the visibility tests
     for(auto &block_id: _work.block_ids())

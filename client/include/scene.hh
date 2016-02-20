@@ -22,6 +22,7 @@ namespace blocks {
 
     void create_window();
     void init_scene();
+    void init_camera();
     void init_lights();
     NodePath make_character(common::wpos &);
     void init_skybox();

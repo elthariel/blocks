@@ -24,7 +24,7 @@ namespace blocks
       void receive(const events::mouse &e);
       void receive(const events::server_connected &e);
       void receive(const events::server_disconnected &e);
-      void receive(const events::load_chunk &e);
+      void receive(const events::chunk_requested &e);
       protected:
       Game &_game;
     };

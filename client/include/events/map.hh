@@ -6,11 +6,11 @@ namespace blocks
 {
   namespace events
   {
-    struct load_chunk
+    struct chunk_requested
     {
       common::cid id;
 
-      load_chunk(const common::cid &_id) : id(_id) {}
+      chunk_requested(const common::cid &_id) : id(_id) {}
     };
   }
 }

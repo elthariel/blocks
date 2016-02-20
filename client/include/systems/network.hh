@@ -1,10 +1,11 @@
 #pragma once
 
 #include "entity.hh"
-#include "meshing_thread.hh"
 #include "TcpClient.hh"
+#include "pipe.hh"
 
 #include "events/map.hh"
+#include "events/network.hh"
 
 namespace blocks
 {
@@ -17,27 +18,37 @@ namespace blocks
                      public ex::Receiver<Network>,
                      public nocopy
     {
-      Network(MeshingThread &mt, std::string host, std::string port, Game *);
+      Network(std::string host, std::string port, Game *);
 
-      // Entity things
+      // Entity setup things
       void configure(ex::EventManager &events);
       void update(ex::EntityManager &entities,
                   ex::EventManager &events,
                   ex::TimeDelta dt);
-      void receive(const events::load_chunk &e);
 
-      // Network
+      // Network in network thread
       void dispatch(TcpClient::connection::pointer, uint8_t *);
-      void on_initial_pos(TcpClient::connection::pointer, fbs::Message*);
-      void on_move(fbs::Message*);
-      void on_chunk(fbs::Message*);
-      void on_player_connect(fbs::Message*);
+
+      // Network events dispatch
+      void dispatch_events(ex::EntityManager &entities, ex::EventManager &em);
+      template <class network_event_type>
+      void emit(ex::EventManager &em, fbs::Message *msg)
+      {
+        auto tmp = static_cast<typename network_event_type::message_type *>(msg->body());
+        network_event_type e(tmp);
+        em.emit<network_event_type>(e);
+      }
+
+      // Events handler
+      void receive(const events::chunk_requested &e);
+      void receive(const events::player_initial_pos &e);
+      void receive(const events::player_moved &e);
+      void receive(const events::player_connected &e);
 
     protected:
-      MeshingThread &_meshing_thread;
-
-      // Entity things
-      bool _connect_event_sent = false;
+      // Game/Network thread communication
+      Pipe<fbs::Message *> _network_to_game_pipe;
+      // Pipe<fbs::Message *> _game_to_network_pipe;
 
       // Network
       TcpClient::connection::pointer _socket = nullptr;

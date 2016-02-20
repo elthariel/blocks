@@ -1,3 +1,4 @@
+#pragma once
 
 #include <queue>
 #include <memory>
@@ -56,7 +57,7 @@ namespace blocks
       return dequeue_nolock();
     }
 
-    Pipe<T> operator>>(T &value)
+    Pipe<T> &operator>>(T &value)
     {
       value = dequeue();
       return *this;

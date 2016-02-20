@@ -8,14 +8,17 @@ namespace blocks
 {
   namespace systems
   {
-    Network::Network(blocks::MeshingThread &mt, std::string host, std::string port, Game *game)
-      : _meshing_thread(mt), _client(*this, host, port), _last_pos(0, 0, 0), _game(game)
+    Network::Network(std::string host, std::string port, Game *game)
+      : _client(*this, host, port), _last_pos(0, 0, 0), _game(game)
     {
     }
 
     void Network::configure(ex::EventManager &em)
     {
-      em.subscribe<events::load_chunk>(*this);
+      em.subscribe<events::chunk_requested>(*this);
+      em.subscribe<events::player_moved>(*this);
+      em.subscribe<events::player_connected>(*this);
+      em.subscribe<events::player_initial_pos>(*this);
     }
 
     void Network::update(ex::EntityManager &entities,
@@ -42,58 +45,68 @@ namespace blocks
       entities.each<components::Player,
                     components::Position>(lambda);
 
-      if (_socket != nullptr && !_connect_event_sent)
+      dispatch_events(entities, events);
+    }
+
+    void Network::dispatch(TcpClient::connection::pointer socket, uint8_t *buffer)
+    {
+      auto message = flatbuffers::GetMutableRoot<blocks::fbs::Message>(buffer);
+      if (message != nullptr)
+        _network_to_game_pipe << message;
+
+      if (_socket == nullptr)
+        _socket = socket;
+    }
+
+    void Network::dispatch_events(ex::EntityManager &entities, ex::EventManager &em)
+    {
+      fbs::Message *msg;
+
+      while (_network_to_game_pipe.size())
       {
-        _connect_event_sent = true;
-        events.emit<events::server_connected>();
+        _network_to_game_pipe >> msg;
+        if (msg != nullptr)
+        {
+          switch(msg->action())
+          {
+          case fbs::Action::Action_INITIAL_POS:
+            em.emit<events::server_connected>();
+            emit<events::player_initial_pos>(em, msg);
+            break;
+          case fbs::Action::Action_MOVE:
+            emit<events::player_moved>(em, msg);
+            break;
+          case fbs::Action::Action_CHUNK:
+            emit<events::chunk_received>(em, msg);
+            break;
+          case fbs::Action::Action_PLAYER_CONNECT:
+            emit<events::player_connected>(em, msg);
+            break;
+          default:
+            break;
+          }
+        }
       }
     }
 
-    void Network::receive(const events::load_chunk &e)
+    void Network::receive(const events::chunk_requested &e)
     {
       _socket->write(Protocole::create_message(fbs::Action::Action_ASK_CHUNK,
                                                fbs::AType::AType_PosObj, &e.id));
     }
 
-
-    void Network::dispatch(TcpClient::connection::pointer socket, uint8_t *buffer)
+    void Network::receive(const events::player_initial_pos &e)
     {
-      auto message = flatbuffers::GetMutableRoot<blocks::fbs::Message>(buffer);
-      switch(message->action())
-      {
-        case fbs::Action::Action_INITIAL_POS       : on_initial_pos(socket, message); break;
-        case fbs::Action::Action_MOVE              : on_move(message); break;
-        case fbs::Action::Action_ASK_CHUNK         : break;
-        case fbs::Action::Action_CHUNK             : on_chunk(message); break;
-        case fbs::Action::Action_NEW_BLOCK         : break;
-        case fbs::Action::Action_DELETE_BLOCK      : break;
-        case fbs::Action::Action_PLAYER_CONNECT    : on_player_connect(message); break;
-        case fbs::Action::Action_PLAYER_DISCONNECT : break;
-      }
-    }
-
-    void Network::on_initial_pos(TcpClient::connection::pointer socket,
-                                 blocks::fbs::Message *message)
-    {
-      if (_socket == nullptr)
-        _socket = socket;
-
-      auto player = static_cast<const fbs::Player*>(message->body());
+      auto player = e.msg;
       // initial pos event
       auto _pos = player->pos();
       common::wpos pos(_pos->x(), _pos->y(), _pos->z());
       _game->create_player(pos);
     }
 
-    void Network::on_chunk(blocks::fbs::Message *message)
+    void Network::receive(const events::player_moved &e)
     {
-      auto chunk = static_cast<const blocks::fbs::Chunk*>(message->body());
-      _meshing_thread.input_pipe << blocks::common::Chunk::deserialize(chunk);
-    }
-
-    void Network::on_move(blocks::fbs::Message *message)
-    {
-      auto player = static_cast<const blocks::fbs::Player*>(message->body());
+      auto player = e.msg;
       auto entity = _characters.at(player->id());
       auto ppos = player->pos();
       auto pos = entity.component<components::Position>();
@@ -101,10 +114,9 @@ namespace blocks
       std::cout << "Move" << ppos->x() << ":" <<  ppos->y() << ":" <<  ppos->z() << std::endl;
     }
 
-    void Network::on_player_connect(blocks::fbs::Message *message)
+    void Network::receive(const events::player_connected &e)
     {
-      auto player = static_cast<const blocks::fbs::Player*>(message->body());
-
+      auto player = e.msg;
       auto _pos = player->pos();
       common::wpos pos(_pos->x(), _pos->y(), _pos->z());
       _characters.insert(std::pair<int, ex::Entity>(player->id(), _game->create_character(pos)));

@@ -1,14 +1,15 @@
 #pragma once
 
+#include "common/util.hh"
+#include "common/position.hh"
+
 #include <pandaFramework.h>
 #include <pandaSystem.h>
-
-#include "common/position.hh"
 
 #include <memory>
 
 namespace blocks {
-  class Scene
+  class Scene : public nocopy
   {
   public:
     typedef shared_ptr<Scene> ptr;

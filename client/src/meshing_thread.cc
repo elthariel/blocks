@@ -10,9 +10,11 @@
 using namespace std;
 
 namespace blocks {
-  MeshingThread::MeshingThread()
+  MeshingThread::MeshingThread(Pipe<common::Chunk::ptr> &_input,
+                               Pipe<MeshingThread::result> &_output)
   : _running(true),
-    _thread([=] { thread_loop(); })
+    _thread([=] { thread_loop(); }),
+    _input_pipe(_input), _output_pipe(_output)
   {
   }
 
@@ -37,7 +39,7 @@ namespace blocks {
     GreedyMesher mesher(chunk);
     MeshingThread::result result(chunk->id(), mesher.mesh());
 
-    output_pipe << result;
+    _output_pipe << result;
   }
 
   void MeshingThread::thread_loop()
@@ -45,7 +47,7 @@ namespace blocks {
     cout << "Started meshing thread." << endl;
 
     while(_running) {
-      common::Chunk::ptr chunk = input_pipe.wait_for_data(500, _running);
+      common::Chunk::ptr chunk = _input_pipe.wait_for_data(500, _running);
       if (chunk)
         process_chunk(chunk);
     }

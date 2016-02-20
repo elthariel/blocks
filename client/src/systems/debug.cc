@@ -25,7 +25,7 @@ namespace blocks
       events.subscribe<events::mouse>(*this);
       events.subscribe<events::server_connected>(*this);
       events.subscribe<events::server_disconnected>(*this);
-      events.subscribe<events::load_chunk>(*this);
+      events.subscribe<events::chunk_requested>(*this);
     }
 
     void Debug::update(ex::EntityManager &entities,
@@ -85,7 +85,7 @@ namespace blocks
       cout << "Server disconnected" << endl;
     }
 
-    void Debug::receive(const events::load_chunk &e)
+    void Debug::receive(const events::chunk_requested &e)
     {
       cout << "Requested : " << string(e.id) << endl;
     }

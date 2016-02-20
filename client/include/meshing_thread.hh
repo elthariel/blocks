@@ -6,6 +6,7 @@
 #include <thread>
 #include <atomic>
 #include <utility>
+#include <memory>
 #include "geomNode.h"
 
 namespace blocks {
@@ -13,19 +14,22 @@ namespace blocks {
   {
   public:
     typedef std::pair<common::cid, PT(GeomNode)> result;
+    typedef shared_ptr<MeshingThread> ptr;
 
-    MeshingThread();
+    MeshingThread(Pipe<common::Chunk::ptr> &_input,
+                  Pipe<MeshingThread::result> &_output);
     ~MeshingThread();
 
     void stop();
 
-    Pipe<common::Chunk::ptr> input_pipe;
-    Pipe<result> output_pipe;
   protected:
     void thread_loop();
     void process_chunk(common::Chunk::ptr chunk);
 
     std::thread _thread;
     std::atomic_bool _running;
+
+    Pipe<common::Chunk::ptr> &_input_pipe;
+    Pipe<MeshingThread::result> &_output_pipe;
   };
 }

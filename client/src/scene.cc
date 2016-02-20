@@ -72,7 +72,7 @@ namespace blocks
 
     auto cam = dynamic_cast<Camera *>(_camera.find("camera").node());
     auto lens = cam->get_lens();
-    lens->set_far(consts::chunk_size * 16);
+    // lens->set_far(consts::chunk_size * 16);
     lens->set_fov(80);
   }
 

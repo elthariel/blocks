@@ -24,7 +24,6 @@ namespace blocks {
   {
     _framework.open_framework(ac, av);
     _scene = make_shared<Scene>(_framework);
-    _meshing_task = make_shared<MeshingTask>(_meshing_thread, _scene->root());
 
     create_systems();
   }
@@ -35,8 +34,8 @@ namespace blocks {
     systems.add<systems::Input>(_framework, _scene->window());
     systems.add<systems::WindowManager>(_scene->window());
     systems.add<systems::CameraControl>();
-    systems.add<systems::Network>(_meshing_thread, "127.0.0.1", "3000", this);
-    systems.add<systems::ChunkLoader>(_map);
+    systems.add<systems::Network>("127.0.0.1", "3000", this);
+    systems.add<systems::ChunkLoader>(_map, _scene->root());
 
     systems.configure();
   }
@@ -83,8 +82,6 @@ namespace blocks {
     cout << "Starting Game !" << endl;
 
     // create_entities();
-
-    AsyncTaskManager::get_global_ptr()->add(_meshing_task.get());
     AsyncTaskManager::get_global_ptr()->add(this);
 
     _scene->run();

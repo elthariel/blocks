@@ -36,7 +36,6 @@ namespace blocks
 
   protected:
     PandaFramework    _framework;
-    MeshingThread     _meshing_thread;
 
     MeshingTask::ptr  _meshing_task;
     Scene::ptr        _scene;

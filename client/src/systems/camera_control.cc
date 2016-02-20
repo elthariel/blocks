@@ -18,7 +18,7 @@ namespace blocks
                                ex::EventManager &events,
                                ex::TimeDelta dt)
     {
-      auto lambda = [=](ex::Entity entity,
+      auto lambda = [&](ex::Entity entity,
                         components::Player &player,
                         components::Position &position,
                         components::Direction &direction,
@@ -40,7 +40,8 @@ namespace blocks
         offset += forward * move_speed * move.get_y();
         offset += move_absolute * move_speed;
 
-        cam.set_fluid_pos(_pos + offset);
+        auto final_pos = _pos + offset;
+        cam.set_fluid_pos(final_pos);
 
         position = cam.get_pos();
         direction = cam.get_quat().get_forward();
@@ -76,6 +77,8 @@ namespace blocks
           break;
         case events::key::kcode::MOVE_JUMP:
           move_absolute.add_z(1);
+          break;
+        default:
           break;
         }
       }

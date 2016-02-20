@@ -19,7 +19,7 @@ namespace blocks
   namespace systems
   {
     Input::Input(PandaFramework &framework, WindowFramework &window)
-      : _window(window)
+      : _window(window), _last_pos(0, 0), _diff(0, 0)
     {
       for(auto i = 0; i < _key_down.size(); ++i)
         _key_down[i] = false;

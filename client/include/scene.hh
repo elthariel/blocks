@@ -29,6 +29,7 @@ namespace blocks {
     PandaFramework &_framework;
     WindowFramework *_window;
     NodePath _scene;
+    NodePath _skybox;
     NodePath _sun;
     NodePath _ambient_light;
   };

@@ -1,5 +1,7 @@
 
 #include "scene.hh"
+#include "models/make.hh"
+#include "models/box.hh"
 
 #include <sceneGraphAnalyzerMeter.h>
 #include <antialiasAttrib.h>
@@ -69,6 +71,9 @@ namespace blocks
 
     _scene.set_light(_sun);
     _scene.set_light(_ambient_light);
+
+  //   auto cube = _scene.attach_new_node(models::make<models::Cube>("cube", 1, 2, 3));
+  //   cube.set_render_mode_wireframe();
   }
 
   void Scene::run()

@@ -28,6 +28,10 @@ namespace blocks
       using NodePath::NodePath;
     };
 
+    struct Character
+    {
+    };
+
     struct Player
     {
     };

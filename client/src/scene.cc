@@ -83,19 +83,21 @@ namespace blocks
   void Scene::init_skybox()
   {
     auto cam = window().get_camera_group();
+    cam.set_pos(0, 0, 0);
+    cam.heads_up(0, 10, 1);
+
     _skybox = cam.attach_new_node(models::make<models::Box>("skybox", 10000));
     _skybox.set_compass();
     _skybox.set_two_sided(true);
     _skybox.set_depth_write(false);
     _skybox.set_depth_test(false);
     _skybox.set_bin("background", 1);
+    _skybox.set_light_off();
     _skybox.set_pos(-5000, -5000, -5000);
-    _skybox.set_tex_gen(TextureStage::get_default(), TexGenAttrib::M_world_cube_map);
-    //_skybox.set_tex_projector(TextureStage::get_default(), _scene, _skybox);
-    // //_skybox.set_tex_pos(TextureStage::get_default(), 0, 0, 0);
-    // _skybox.set_tex_scale(TextureStage::get_default(), 10);
+    //_skybox.set_tex_gen(TextureStage::get_default(), TexGenAttrib::M_world_cube_map);
+    _skybox.set_tex_gen(TextureStage::get_default(), TexGenAttrib::M_world_position);
 
-    auto tex = TexturePool::load_cube_map("../media/textures/debug_skybox_#.png");
+    auto tex = TexturePool::load_cube_map("../media/textures/skybox_#.png");
     _skybox.set_texture(tex);
   }
 

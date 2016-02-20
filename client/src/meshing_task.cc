@@ -16,7 +16,8 @@ namespace blocks
 
   AsyncTask::DoneStatus MeshingTask::do_task()
   {
-    return AsyncTask::DS_cont;
+    // return AsyncTask::DS_cont;
+
 
     if (_mt.output_pipe.size())
     {

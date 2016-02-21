@@ -18,7 +18,12 @@ namespace blocks
     ChunkLoader::ChunkLoader(Map &map, NodePath scene)
       : _map(map), _scene(scene)
     {
-      for (auto i = 0; i < 8; i++)
+      auto cores = std::thread::hardware_concurrency();
+      auto threads = cores / 2;
+      if (threads < 1)
+        threads = 1;
+
+      for (auto i = 0; i < threads; i++)
         _meshing_threads.push_back(
           std::make_shared<MeshingThread>(_pipe_to_mesher, _pipe_from_mesher)
         );
@@ -31,7 +36,7 @@ namespace blocks
       events.subscribe<events::chunk_received>(*this);
     }
 
-    static int load = 4;
+    static int load = 6;
     static int load_height = 2;
     void ChunkLoader::update(ex::EntityManager &entities,
                              ex::EventManager &events,
@@ -68,7 +73,7 @@ namespace blocks
     void ChunkLoader::fetch_meshed_chunks()
     {
       // return;
-      if (_pipe_from_mesher.size())
+      while (_pipe_from_mesher.size())
       {
         auto result = _pipe_from_mesher.dequeue();
         auto nodepath = _scene.attach_new_node(result.second);

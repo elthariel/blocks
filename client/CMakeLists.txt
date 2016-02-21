@@ -13,14 +13,20 @@ endif ()
 set(CMAKE_DEBUG_POSTFIX "_d")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/dist")
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(BULLET bullet REQUIRED)
+
+
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${PANDA_INCLUDE_DIRS}
+  ${BULLET_INCLUDE_DIRS}
   ${THIRD_PARTY}/entityx
 )
 
 link_directories(
   ${PANDA_LIBRARY_DIRS}
+  ${BULLET_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS}
 )
 
@@ -33,6 +39,7 @@ target_link_libraries(blocks_client
   common
   entityx
   ${PANDA_LIBRARIES}
+  ${BULLET_LIBRARIES}
   ${Boost_LIBRARIES}
   ${LINUX_LIBS}
 )

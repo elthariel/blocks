@@ -39,6 +39,11 @@ add_definitions(-fpermissive)
 # add_definitions(-stdlib)
 #add_definitions(-O3)
 
+if (PROFILING)
+  add_definitions(-fprofile-instr-generate)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-instr-generate")
+endif (PROFILING)
+
 add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(server)

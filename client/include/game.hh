@@ -1,13 +1,12 @@
 #pragma once
 
+#include "TcpClient.hh"
+#include "TcpConnection.hh"
 #include "entity.hh"
-
+#include "map.hh"
 #include "meshing_task.hh"
 #include "meshing_thread.hh"
 #include "scene.hh"
-#include "TcpConnection.hh"
-#include "TcpClient.hh"
-#include "map.hh"
 #include "systems/debug.hh"
 
 #include <asyncTask.h>

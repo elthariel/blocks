@@ -46,6 +46,7 @@ else (PANDA_INCLUDE-NOTFOUND OR LIBPANDA-NOTFOUND)
     panda
     pandafx
     pandaexpress
+    pandabullet
     p3framework
     p3dtoolconfig
     p3dtool

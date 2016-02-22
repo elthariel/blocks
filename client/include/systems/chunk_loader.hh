@@ -21,7 +21,7 @@ namespace blocks
                   ex::EventManager &events,
                   ex::TimeDelta dt);
 
-      void fetch_meshed_chunks();
+      void fetch_meshed_chunks(ex::EntityManager &entities, ex::EventManager &em);
 
       void receive(const events::server_connected &e);
       void receive(const events::server_disconnected &e);

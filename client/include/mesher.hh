@@ -26,13 +26,13 @@ namespace blocks {
     auto &block_ids();
 
   protected:
-    uint16_t &flags_at(const common::cpos &p);
+    uint32_t &flags_at(const common::cpos &p);
     bool get_flag(const common::cpos &p, unsigned offset);
     void set_flag(const common::cpos &p, unsigned offset, bool set);
 
-    array3<uint16_t> _flags;
-    array3<int16_t> _vertices;
-    std::list<int16_t> _block_ids;
+    array3<uint32_t> _flags;
+    array3<int32_t> _vertices;
+    std::list<int32_t> _block_ids;
   };
 
   class GreedyMesher{
@@ -60,6 +60,7 @@ namespace blocks {
 
     // Panda Data
     size_t _vx_count = 0;
+    size_t _face_count = 0;
     PT(GeomVertexData) _vxd;
     PT(GeomTriangles) _mesh;
     GeomVertexWriter _vertex, _normal, _uvs;

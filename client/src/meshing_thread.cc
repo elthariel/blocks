@@ -37,7 +37,7 @@ namespace blocks {
     //      <<  string(chunk->id()) << endl;
 
     GreedyMesher mesher(chunk);
-    MeshingThread::result result(chunk->id(), mesher.mesh());
+    MeshingThread::result result(chunk->id(), mesher.mesh(), chunk);
 
     _output_pipe << result;
   }

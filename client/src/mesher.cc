@@ -47,7 +47,7 @@ namespace blocks {
     return set_flag(p, face + 6, meshed);
   }
 
-  uint16_t &MesherWorkBuffer::flags_at(const common::cpos &p) {
+  uint32_t &MesherWorkBuffer::flags_at(const common::cpos &p) {
     return _flags[p.x()][p.y()][p.z()];
   }
 
@@ -86,6 +86,12 @@ namespace blocks {
   : _chunk(c), _work(c->size())
   {
     compute_visible();
+    _vxd = new GeomVertexData(_chunk->id(), GeomVertexFormat::get_v3n3t2(), Geom::UH_static);
+    _vertex = GeomVertexWriter(_vxd, "vertex");
+    _normal = GeomVertexWriter(_vxd, "normal");
+    _uvs = GeomVertexWriter(_vxd, "texcoord");
+    _vx_count = 0;
+    _vxd->reserve_num_rows(_face_count);
   }
 
   void GreedyMesher::compute_visible()
@@ -105,6 +111,7 @@ namespace blocks {
             || _chunk->at(pos_nb).transparent())
         {
           _work.set_face_visible(pos, f, true);
+          _face_count++;
           visible_face = true;
           continue;
         }
@@ -118,14 +125,7 @@ namespace blocks {
 
   void GreedyMesher::start_mesh()
   {
-    _vxd = new GeomVertexData(_chunk->id(), GeomVertexFormat::get_v3n3t2(), Geom::UH_static);
-    _vertex = GeomVertexWriter(_vxd, "vertex");
-    _normal = GeomVertexWriter(_vxd, "normal");
-    _uvs = GeomVertexWriter(_vxd, "texcoord");
     _mesh = new GeomTriangles(Geom::UH_static);
-    _vx_count = 0;
-
-    _vxd->reserve_num_rows(1000);
   }
 
   void GreedyMesher::finish_mesh(PT(GeomNode) geom_node, uint16_t block_id)

@@ -3,6 +3,7 @@
 #include "components/basic.hh"
 #include "events/map.hh"
 #include "common/position.hh"
+#include "common/chunk.hh"
 
 #include <nodePathCollection.h>
 #include <texturePool.h>
@@ -67,18 +68,18 @@ namespace blocks
 
       entities.each<components::Player, components::Position>(loop);
 
-      fetch_meshed_chunks();
+      fetch_meshed_chunks(entities, events);
     }
 
-    void ChunkLoader::fetch_meshed_chunks()
+    void ChunkLoader::fetch_meshed_chunks(ex::EntityManager &entities, ex::EventManager &em)
     {
       // return;
       while (_pipe_from_mesher.size())
       {
         auto result = _pipe_from_mesher.dequeue();
-        auto nodepath = _scene.attach_new_node(result.second);
+        auto nodepath = _scene.attach_new_node(std::get<1>(result));
         common::cpos cp;
-        common::wpos wp(result.first, cp);
+        common::wpos wp(std::get<0>(result), cp);
 
         auto subnodes = nodepath.get_children();
         for(auto i = 0; i < subnodes.size(); i++)
@@ -97,6 +98,13 @@ namespace blocks
           node.set_texture(tex);
         }
         nodepath.set_pos(wp.x(), wp.y(), wp.z());
+
+        auto entity = entities.create();
+        entity.assign<NodePath>(nodepath);
+        entity.assign<common::wpos>(wp);
+        entity.assign<common::Chunk::ptr>(std::get<2>(result));
+
+        em.emit<events::chunk_loaded>(entity);
       }
     }
 

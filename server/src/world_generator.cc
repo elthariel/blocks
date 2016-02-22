@@ -8,7 +8,9 @@
 
 namespace blocks {
   WorldGenerator::WorldGenerator(const seed &_seed)
-  : _seed(_seed), _height_map(16, 16, 256, _seed.get_64(0))
+    : _seed(_seed), _height_map(consts::chunk_size,
+                                consts::chunk_size,
+                                256, _seed.get_64(0))
   {
   }
 

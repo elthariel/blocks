@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/position.hh"
+#include "entity.hh"
 
 #include <nodePath.h>
 
@@ -17,11 +18,10 @@ namespace blocks
 
     struct chunk_loaded
     {
-      common::cid id;
-      NodePath  node;
+      ex::Entity entity;
 
-      chunk_loaded(const common::cid &_id, const NodePath &_node)
-        : id(_id), node(_node) {}
+      chunk_loaded(const ex::Entity &_entity)
+        : entity(_entity) {}
     };
   }
 }

@@ -7,13 +7,14 @@
 #include <atomic>
 #include <utility>
 #include <memory>
+#include <tuple>
 #include "geomNode.h"
 
 namespace blocks {
   class MeshingThread
   {
   public:
-    typedef std::pair<common::cid, PT(GeomNode)> result;
+    typedef std::tuple<common::cid, PT(GeomNode), common::Chunk::ptr> result;
     typedef shared_ptr<MeshingThread> ptr;
 
     MeshingThread(Pipe<common::Chunk::ptr> &_input,

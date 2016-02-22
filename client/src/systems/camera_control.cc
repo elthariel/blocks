@@ -13,7 +13,7 @@ namespace blocks
     }
 
     float cam_sensitivity = 50.0;
-    float move_speed = 0.4;
+    float move_speed = 0.2;
     void CameraControl::update(ex::EntityManager &entities,
                                ex::EventManager &events,
                                ex::TimeDelta dt)

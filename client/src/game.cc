@@ -7,6 +7,7 @@
 #include "systems/camera_control.hh"
 #include "systems/network.hh"
 #include "systems/chunk_loader.hh"
+#include "systems/physics.hh"
 
 #include "components/basic.hh"
 
@@ -36,6 +37,7 @@ namespace blocks {
     systems.add<systems::CameraControl>();
     systems.add<systems::Network>("127.0.0.1", "3000", this);
     systems.add<systems::ChunkLoader>(_map, _scene->root());
+    systems.add<systems::Physics>();
 
     systems.configure();
   }
@@ -48,6 +50,7 @@ namespace blocks {
     systems.update<systems::CameraControl>(dt);
     systems.update<systems::Network>(dt);
     systems.update<systems::ChunkLoader>(dt);
+    systems.update<systems::Physics>(dt);
   }
 
   void Game::create_entities()

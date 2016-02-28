@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#define DEBUG(msg) std::cout << (msg) << std::endl
+#define DEBUG(msg) std::cout << msg << std::endl
 
 namespace blocks
 {

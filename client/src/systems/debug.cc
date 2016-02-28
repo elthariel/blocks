@@ -87,7 +87,8 @@ namespace blocks
 
     void Debug::receive(const events::chunk_requested &e)
     {
-      cout << "Requested : " << string(e.id) << endl;
+      if (getenv("DEBUG_CHUNK_LOADING"))
+        cout << "Requested : " << string(e.id) << endl;
     }
   }
 }

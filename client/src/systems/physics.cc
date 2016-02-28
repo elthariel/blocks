@@ -26,7 +26,7 @@ namespace blocks
 
     void Physics::receive(const events::chunk_loaded &e)
     {
-      std::cout << "Loaded chunk: " << e.entity << std::endl;
+      // std::cout << "Loaded chunk: " << e.entity << std::endl;
     }
   }
 }

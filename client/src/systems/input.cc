@@ -24,7 +24,6 @@ namespace blocks
       for(auto i = 0; i < _key_down.size(); ++i)
         _key_down[i] = false;
 
-      _mouse = DCAST(MouseWatcher, _window.get_mouse().node());
       register_mappings(framework);
     }
 
@@ -58,7 +57,7 @@ namespace blocks
       _incoming_events.push(e);
     }
 
-    void Input::process_key_events(ex::EventManager &event_manager)
+     void Input::process_key_events(ex::EventManager &event_manager)
     {
       for (auto i = 0; i < _key_down.size(); i++) {
         if (_key_down[i])
@@ -104,7 +103,7 @@ namespace blocks
 
     void Input::process_mouse(ex::EventManager &event_manager)
     {
-      if (_mouse->has_mouse())
+      if (DCAST(MouseWatcher, _window.get_mouse().node())->has_mouse())
       {
         auto gw = _window.get_graphics_window();
         auto w = gw->get_x_size();
@@ -119,6 +118,7 @@ namespace blocks
         mm.size.set_y(h);
         mm.position = pos;
         mm.offset = _diff;
+        DEBUG("has_mouse");
         event_manager.emit<events::mouse>(mm);
       }
     }

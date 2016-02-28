@@ -35,14 +35,15 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
 )
 
-add_definitions(-fpermissive)
+#add_definitions(-fpermissive)
+# add_definitions(-Wall)
 # add_definitions(-stdlib)
 #add_definitions(-O3)
 
-if (PROFILING)
+if (${PROFILING})
   add_definitions(-fprofile-instr-generate)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-instr-generate")
-endif (PROFILING)
+endif (${PROFILING})
 
 add_subdirectory(common)
 add_subdirectory(client)

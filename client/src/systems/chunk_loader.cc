@@ -74,12 +74,13 @@ namespace blocks
     void ChunkLoader::fetch_meshed_chunks(ex::EntityManager &entities, ex::EventManager &em)
     {
       // return;
-      while (_pipe_from_mesher.size())
+      if (_pipe_from_mesher.size())
       {
         auto result = _pipe_from_mesher.dequeue();
         auto nodepath = _scene.attach_new_node(std::get<1>(result));
+        common::cid cid(std::get<0>(result));
         common::cpos cp;
-        common::wpos wp(std::get<0>(result), cp);
+        common::wpos wp(cid, cp);
 
         auto subnodes = nodepath.get_children();
         for(auto i = 0; i < subnodes.size(); i++)
@@ -93,8 +94,8 @@ namespace blocks
           else if (bid == 2)
             tex = TexturePool::load_texture("../media/textures/blocks/diamond_ore.png");
 
-          tex->set_magfilter(Texture::FilterType::FT_nearest);
-          tex->set_minfilter(Texture::FilterType::FT_nearest);
+          tex->set_magfilter(Texture::FilterType::FT_nearest_mipmap_nearest);
+          tex->set_minfilter(Texture::FilterType::FT_nearest_mipmap_nearest);
           node.set_texture(tex);
         }
         nodepath.set_pos(wp.x(), wp.y(), wp.z());

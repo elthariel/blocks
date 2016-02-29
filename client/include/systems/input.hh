@@ -35,6 +35,7 @@ namespace blocks {
       void process_mouse(ex::EventManager &event_manager);
 
       WindowFramework &_window;
+      MouseWatcher *_mouse;
 
       std::queue<Event> _incoming_events;
       std::array<bool, events::key::kcode::COUNT> _key_down;

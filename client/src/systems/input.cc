@@ -103,24 +103,21 @@ namespace blocks
 
     void Input::process_mouse(ex::EventManager &event_manager)
     {
-      if (DCAST(MouseWatcher, _window.get_mouse().node())->has_mouse())
-      {
-        auto gw = _window.get_graphics_window();
-        auto w = gw->get_x_size();
-        auto h = gw->get_y_size();
+      auto pointer = _window.get_graphics_window()->get_pointer(0);
+      auto gw = _window.get_graphics_window();
+      auto w = gw->get_x_size();
+      auto h = gw->get_y_size();
+      LPoint2f pos(pointer.get_x(), -pointer.get_y());
 
-        const LPoint2f &pos = _mouse->get_mouse();
-        _diff = pos - _last_pos;
-        _last_pos = pos;
+      _diff = pos - _last_pos;
+      _last_pos = pos;
 
-        events::mouse mm;
-        mm.size.set_x(w);
-        mm.size.set_y(h);
-        mm.position = pos;
-        mm.offset = _diff;
-        DEBUG("has_mouse");
-        event_manager.emit<events::mouse>(mm);
-      }
+      events::mouse mm;
+      mm.size.set_x(w);
+      mm.size.set_y(h);
+      mm.position = pos;
+      mm.offset = _diff;
+      event_manager.emit<events::mouse>(mm);
     }
 
     void Input::configure(ex::EventManager &events)

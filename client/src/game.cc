@@ -8,25 +8,47 @@
 #include "systems/network.hh"
 #include "systems/chunk_loader.hh"
 #include "systems/physics.hh"
-
 #include "components/basic.hh"
+#include "session.hh"
+#include "textures.hh"
 
 // Test
 #include "chunk_generated.h"
 #include "TcpClient.hh"
 #include "Protocole.hh"
 
+#include <load_prc_file.h>
 #include <iostream>
 
 using namespace std;
 
+const std::string prc = R"PRC(
+show-frame-rate-meter  #t
+
+# Enable Antialising
+framebuffer-multisample 1
+multisamples 4
+
+# Enable group collision filter
+bullet-filter-algorithm groups-mask
+)PRC";
+
 namespace blocks {
   Game::Game(int ac, char **av)
   {
+    Session::instance();
+    Session::make<Textures>();
+
+    load_prc_file_data("blocks.prc", prc);
     _framework.open_framework(ac, av);
     _scene = make_shared<Scene>(_framework);
 
     create_systems();
+  }
+
+  Game::~Game()
+  {
+    Session::instance().destroy();
   }
 
   void Game::create_systems()

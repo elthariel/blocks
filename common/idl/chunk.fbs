@@ -7,12 +7,13 @@ enum Action:byte { INITIAL_POS = 0,
                    MOVE = 1,
                    ASK_CHUNK = 2,
                    CHUNK = 3,
-                   NEW_BLOCK = 4,
-                   DELETE_BLOCK = 5,
-                   PLAYER_CONNECT = 6,
-                   PLAYER_DISCONNECT = 7 }
+                   PLACE_BLOCK = 4,
+                   BREAK_BLOCK = 5,
+                   UPDATE_BLOCK = 6,
+                   PLAYER_CONNECT = 7,
+                   PLAYER_DISCONNECT = 8 }
 
-union AType { Player, Chunk, PosObj}
+union AType { Player, Chunk, PosObj, BlockPos }
 
 struct Pos {
   x:long;
@@ -25,6 +26,12 @@ struct Block {
   variant: ushort;
   air: bool;
   transparent: bool;
+  light: int;
+}
+
+table BlockPos {
+  block: Block;
+  pos: Pos;
 }
 
 table PosObj {

@@ -3,6 +3,7 @@
 
 #include <boost/timer/timer.hpp>
 #include <cmath>
+#include <ctime>
 #include <vector>
 #include <iostream>
 
@@ -12,6 +13,7 @@ namespace blocks {
                                 consts::chunk_size,
                                 256, _seed.get_64(0))
   {
+    std::srand(std::time(0));
   }
 
   common::Chunk::ptr WorldGenerator::generate(common::cid _id) {
@@ -27,8 +29,11 @@ namespace blocks {
           if (w.z() > _height_map(w.x(), w.y()) * 8 + 10) {
             if (w.z() > 0)
             {
+              auto random = std::rand() % 10;
               (*chunk)[c.to_idx()].id(0);
               (*chunk)[c.to_idx()].air(true);
+              if (!random)
+                (*chunk)[c.to_idx()].light(5);
             }
             else
               (*chunk)[c.to_idx()].id(2);
@@ -38,7 +43,6 @@ namespace blocks {
         }
       }
     }
-
     return chunk;
   }
 }

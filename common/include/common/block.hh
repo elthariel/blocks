@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include "chunk_generated.h"
+#include "position.hh"
 
 namespace blocks {
   class Block
@@ -9,15 +10,17 @@ namespace blocks {
     enum Flag : uint32_t
     {
       AIR            = 1 << 0,
-      TRANSPARENT    = 1 << 1
+      TRANSPARENT    = 1 << 1,
+      LIGHT          = 1 << 2
     };
 
   public:
     Block(uint16_t id = 0, uint16_t variant = 0, bool _air = false,
-          bool _transparent = false)
+          bool _transparent = false, int _light = 0)
       :_id(id), _variant(variant), _flags(0)
     {
       air(_air);
+      light(_light);
       transparent(_transparent);
     }
 
@@ -30,11 +33,24 @@ namespace blocks {
     bool air() const { return get_flag(AIR); }
     void air(bool set) { set_flag(AIR, set); }
 
+    bool light() const { return get_flag(LIGHT); }
+    void light(bool set) { set_flag(LIGHT, set); }
+
     bool transparent() const { return get_flag(TRANSPARENT); }
     void transparent(bool set) { set_flag(TRANSPARENT, set); }
 
+    template <class T>
+    void replace_by(T const *block)
+    {
+      id(block->id());
+      air(block->air());
+      light(block->light());
+      transparent(block->transparent());
+      variant(block->variant());
+    }
+
     blocks::fbs::Block serialize() const {
-      blocks::fbs::Block block(id(), variant(), air(), transparent());
+      blocks::fbs::Block block(id(), variant(), air(), transparent(), light());
       return block;
     }
 
@@ -51,5 +67,22 @@ namespace blocks {
         _flags &= ~f;
       }
     }
+  };
+
+  class BlockPos
+  {
+    public:
+      BlockPos(Block &block, common::wpos &wpos) : _block(block), _wpos(wpos) {}
+
+      flatbuffers::Offset<fbs::BlockPos> serialize(flatbuffers::FlatBufferBuilder &builder)
+      {
+        auto pos = fbs::Pos(_wpos.x(), _wpos.y(), _wpos.z());
+        auto block = _block.serialize();
+        return fbs::CreateBlockPos(builder, &block, &pos);
+      }
+
+    private:
+      Block &_block;
+      common::wpos &_wpos;
   };
 }

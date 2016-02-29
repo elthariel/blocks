@@ -26,6 +26,7 @@ namespace blocks
       void receive(const events::server_connected &e);
       void receive(const events::server_disconnected &e);
       void receive(const events::chunk_received &e);
+      void receive(const events::block_update &e);
 
     protected:
       Map &_map;

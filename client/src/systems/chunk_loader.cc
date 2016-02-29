@@ -35,6 +35,8 @@ namespace blocks
       events.subscribe<events::server_connected>(*this);
       events.subscribe<events::server_disconnected>(*this);
       events.subscribe<events::chunk_received>(*this);
+      events.subscribe<events::block_update>(*this);
+
     }
 
     static int load = 6;
@@ -120,9 +122,19 @@ namespace blocks
 
     void ChunkLoader::receive(const events::chunk_received &e)
     {
-      auto chunk = e.msg;
-      _pipe_to_mesher << blocks::common::Chunk::deserialize(chunk);
+      auto _chunk = e.msg;
+      _pipe_to_mesher << blocks::common::Chunk::deserialize(_chunk);
     }
 
+    void ChunkLoader::receive(const events::block_update &e)
+    {
+      auto bpos = e.msg;
+      auto _pos = bpos->pos();
+      common::wpos pos(_pos->x(), _pos->y(), _pos->z());
+      auto entity = _map.get(pos.cid());
+      auto chunk = std::shared_ptr<common::Chunk>(entity.component<common::Chunk::ptr>()->get());
+      chunk->at(pos.cpos()).replace_by<fbs::Block>(bpos->block());
+      _pipe_to_mesher << chunk;
+    }
   }
 }

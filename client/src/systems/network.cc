@@ -11,6 +11,11 @@ namespace blocks
     Network::Network(std::string host, std::string port, Game *game)
       : _client(*this, host, port), _last_pos(0, 0, 0), _game(game)
     {
+      _events_ptrs.insert(event_item(fbs::Action::Action_MOVE, new events::player_moved(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_INITIAL_POS, new events::player_initial_pos(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_PLAYER_CONNECT, new events::player_connected(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_CHUNK, new events::chunk_received(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_UPDATE_BLOCK, new events::block_update(nullptr)));
     }
 
     void Network::configure(ex::EventManager &em)
@@ -60,31 +65,17 @@ namespace blocks
 
     void Network::dispatch_events(ex::EntityManager &entities, ex::EventManager &em)
     {
-      fbs::Message *msg;
+      fbs::Message *msg = nullptr;
 
       while (_network_to_game_pipe.size())
       {
         _network_to_game_pipe >> msg;
         if (msg != nullptr)
         {
-          switch(msg->action())
-          {
-          case fbs::Action::Action_INITIAL_POS:
+          if (msg->action() == fbs::Action::Action_INITIAL_POS)
             em.emit<events::server_connected>();
-            emit<events::player_initial_pos>(em, msg);
-            break;
-          case fbs::Action::Action_MOVE:
-            emit<events::player_moved>(em, msg);
-            break;
-          case fbs::Action::Action_CHUNK:
-            emit<events::chunk_received>(em, msg);
-            break;
-          case fbs::Action::Action_PLAYER_CONNECT:
-            emit<events::player_connected>(em, msg);
-            break;
-          default:
-            break;
-          }
+
+          _events_ptrs[msg->action()]->emit(em, msg);
         }
       }
     }
@@ -98,7 +89,6 @@ namespace blocks
     void Network::receive(const events::player_initial_pos &e)
     {
       auto player = e.msg;
-      // initial pos event
       auto _pos = player->pos();
       common::wpos pos(_pos->x(), _pos->y(), _pos->z());
       _game->create_player(pos);
@@ -106,6 +96,7 @@ namespace blocks
 
     void Network::receive(const events::player_moved &e)
     {
+
       auto player = e.msg;
       auto entity = _characters.at(player->id());
       auto ppos = player->pos();

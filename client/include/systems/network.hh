@@ -18,6 +18,8 @@ namespace blocks
                      public ex::Receiver<Network>,
                      public nocopy
     {
+      typedef std::pair<fbs::Action, events::parent_network_event *> event_item;
+
       Network(std::string host, std::string port, Game *);
 
       // Entity setup things
@@ -58,7 +60,9 @@ namespace blocks
       // FIXME: hack
       common::wpos _last_pos;
       Game *_game;
+      std::map<fbs::Action, events::parent_network_event *> _events_ptrs;
       std::map<int, ex::Entity> _characters;
+
     };
 
   }

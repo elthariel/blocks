@@ -36,8 +36,13 @@ include_directories(
 add_definitions(-std=c++14)
 add_library(common STATIC
   ${COMMON_GENERATED_HEADERS} ${COMMON_HEADERS} ${COMMON_SOURCES}
-  )
+)
 target_link_libraries(common duktape)
+
+add_custom_command(
+  TARGET ${PROJECT_NAME} PRE_BUILD
+  COMMAND ln -sfh ${CMAKE_SOURCE_DIR}/ruby ${DIST_RB}/common
+)
 
 # Build tests !
 #set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")

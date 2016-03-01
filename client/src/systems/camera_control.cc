@@ -12,7 +12,7 @@ namespace blocks
       events.subscribe<events::mouse>(*this);
     }
 
-    float cam_sensitivity = 50.0;
+    float cam_sensitivity = 0.2;
     float move_speed = 0.2;
     void CameraControl::update(ex::EntityManager &entities,
                                ex::EventManager &events,

@@ -21,6 +21,7 @@ namespace blocks
     explicit Game(int ac, char **av);
     Game() = delete;
     Game(const Game &) = delete;
+    ~Game();
 
     // Entity system
     void create_systems();

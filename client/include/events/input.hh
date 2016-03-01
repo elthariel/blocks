@@ -33,7 +33,9 @@ namespace blocks
         SYS_EXIT,
         DEBUG_WIREFRAME,
         DEBUG_PHYSICS,
-        COUNT
+        COUNT,
+        USE,
+        MINE
       } code;
 
       key() : type(ktype::DOWN), code(kcode::INVALID) {}

@@ -29,6 +29,9 @@ namespace blocks
     void create_player(common::wpos &pos);
     ex::Entity create_character(common::wpos &pos);
 
+    // Getter
+    ex::Entity &player() { return _player; }
+
     // Panda 3D
     void start();
     AsyncTask::DoneStatus do_task();

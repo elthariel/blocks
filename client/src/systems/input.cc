@@ -46,6 +46,10 @@ namespace blocks
       _mappings["["] = events::key::kcode::DEBUG_WIREFRAME;
       _mappings["]"] = events::key::kcode::DEBUG_PHYSICS;
 
+      // Tests
+      _mappings["e"] = events::key::kcode::MINE;
+      _mappings["r"] = events::key::kcode::USE;
+
       for(auto &kv: _mappings)
       {
         framework.define_key(kv.first, "", event_callback, this);

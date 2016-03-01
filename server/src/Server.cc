@@ -46,7 +46,7 @@ namespace blocks {
     {
         auto pos = static_cast<const fbs::PosObj *>(message->body())->pos();
         common::cid _cid(pos->x(), pos->y(), pos->z());
-        
+
         auto chunk = _map.get(_cid);
         socket->write(Protocole::create_message(fbs::Action::Action_CHUNK, fbs::AType::AType_Chunk, chunk));
     }
@@ -79,6 +79,7 @@ namespace blocks {
 
     void Server::on_place_block(TcpConnection<Server, Player>::pointer socket, fbs::Message *message)
     {
+
         auto bpos = static_cast<const fbs::BlockPos *>(message->body());
         common::wpos _wpos(bpos->pos()->x(), bpos->pos()->y(), bpos->pos()->z());
         auto block = _map.get(_wpos.cid())->at(_wpos.cpos());
@@ -94,6 +95,7 @@ namespace blocks {
         }
 
         BlockPos new_bpos(block, _wpos);
+
         socket->write(Protocole::create_message(fbs::Action::Action_UPDATE_BLOCK, fbs::AType::AType_BlockPos, &new_bpos));
     }
 

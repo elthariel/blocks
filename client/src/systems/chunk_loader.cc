@@ -106,6 +106,7 @@ namespace blocks
         entity.assign<common::wpos>(wp);
         entity.assign<common::Chunk::ptr>(std::get<2>(result));
 
+        _map.set(wp.cid(), entity);
         em.emit<events::chunk_loaded>(entity);
       }
     }
@@ -128,13 +129,26 @@ namespace blocks
 
     void ChunkLoader::receive(const events::block_update &e)
     {
+      std::cout << "Update block received !" << std::endl;
       auto bpos = e.msg;
       auto _pos = bpos->pos();
       common::wpos pos(_pos->x(), _pos->y(), _pos->z());
       auto entity = _map.get(pos.cid());
-      auto chunk = std::shared_ptr<common::Chunk>(entity.component<common::Chunk::ptr>()->get());
-      chunk->at(pos.cpos()).replace_by<fbs::Block>(bpos->block());
-      _pipe_to_mesher << chunk;
+      if (entity.valid())
+      {
+        ex::ComponentHandle<common::Chunk::ptr> chunk = entity.component<common::Chunk::ptr>();//.get();
+        ex::ComponentHandle<NodePath> chunk_node = entity.component<NodePath>();//.get();
+        std::cout << "Lol1" << std::endl;
+        (*chunk.get())->at(pos.cpos()).replace_by<fbs::Block>(bpos->block());
+        std::cout << "Lol2" << std::endl;
+        // _map.remove(pos.cid());
+        std::cout << "Lol3" << std::endl;
+        chunk_node->remove_node();
+        std::cout << "Lol4" << std::endl;
+        _pipe_to_mesher << *chunk.get();
+        std::cout << "Lol5" << std::endl;
+        // entity.destroy();
+      }
     }
   }
 }

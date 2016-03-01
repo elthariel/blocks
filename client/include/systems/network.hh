@@ -6,6 +6,12 @@
 
 #include "events/map.hh"
 #include "events/network.hh"
+#include "systems/network.hh"
+#include "events/input.hh"
+#include "components/basic.hh"
+#include "Protocole.hh"
+#include "common/block.hh"
+
 
 namespace blocks
 {
@@ -46,6 +52,7 @@ namespace blocks
       void receive(const events::player_initial_pos &e);
       void receive(const events::player_moved &e);
       void receive(const events::player_connected &e);
+      void receive(const events::key &e);
 
     protected:
       // Game/Network thread communication

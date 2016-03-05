@@ -3,18 +3,25 @@
 #include "common/chunk.hh"
 #include "pipe.hh"
 
+#include <geomNode.h>
+#include <bulletShape.h>
+#include <bulletRigidBodyNode.h>
+
 #include <thread>
 #include <atomic>
 #include <utility>
 #include <memory>
 #include <tuple>
-#include "geomNode.h"
 
 namespace blocks {
+
   class MeshingThread
   {
   public:
-    typedef std::tuple<common::cid, PT(GeomNode), common::Chunk::ptr> result;
+    typedef std::tuple<common::cid,
+                       PT(GeomNode),
+                       PT(BulletRigidBodyNode),
+                       common::Chunk::ptr> result;
     typedef shared_ptr<MeshingThread> ptr;
 
     MeshingThread(Pipe<common::Chunk::ptr> &_input,

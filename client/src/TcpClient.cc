@@ -6,7 +6,7 @@
 namespace blocks {
 
   TcpClient::TcpClient(systems::Network &net, std::string ip, std::string port)
-  : _network(net)
+    : _network(net)
   {
     try
     {

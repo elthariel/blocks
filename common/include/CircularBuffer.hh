@@ -15,6 +15,6 @@ public:
   uint8_t 		  *get(size_t);
 
 private:
-  boost::circular_buffer<uint8_t> _cb;
-  boost::mutex    _mutex;
+  boost::circular_buffer<uint8_t>  _cb;
+  boost::mutex                     _mutex;
 };

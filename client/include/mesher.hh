@@ -3,13 +3,19 @@
 #include "common/chunk.hh"
 #include "multi_array.hh"
 
-#include <array>
-#include <list>
 #include <geomNode.h>
 #include <geomVertexData.h>
 #include <geomVertexWriter.h>
 #include <geomTriangles.h>
 #include <lvector3.h>
+#include <bulletShape.h>
+#include <bulletRigidBodyNode.h>
+#include <bulletTriangleMesh.h>
+#include <bulletTriangleMeshShape.h>
+
+#include <array>
+#include <list>
+#include <utility>
 
 namespace blocks {
   class MesherWorkBuffer {
@@ -41,7 +47,7 @@ namespace blocks {
     const static std::array<const common::cpos, 6> neighbors;
 
     GreedyMesher(common::Chunk::ptr);
-    PT(GeomNode) mesh();
+    std::pair<PT(GeomNode), PT(BulletRigidBodyNode)> mesh();
   protected:
     void compute_visible();
     bool need_mesh(const common::cpos &iter, int face_idx, uint16_t block_type);
@@ -53,7 +59,9 @@ namespace blocks {
                      int w, int h = 1);
 
     void start_mesh();
-    void finish_mesh(PT(GeomNode) geom_node, uint16_t block_type);
+    void finish_mesh(PT(GeomNode) geom_node,
+                     PT(BulletTriangleMesh) bt_triangles,
+                     uint16_t block_id);
 
     MesherWorkBuffer _work;
     common::Chunk::ptr _chunk;

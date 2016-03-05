@@ -1,3 +1,4 @@
+#pragma once
 
 #include "entity.hh"
 #include <utility>

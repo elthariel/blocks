@@ -2,6 +2,7 @@
 #include "mesher.hh"
 
 #include <geomVertexFormat.h>
+
 #include <iostream>
 
 using namespace std;
@@ -128,7 +129,9 @@ namespace blocks {
     _mesh = new GeomTriangles(Geom::UH_static);
   }
 
-  void GreedyMesher::finish_mesh(PT(GeomNode) geom_node, uint16_t block_id)
+  void GreedyMesher::finish_mesh(PT(GeomNode) geom_node,
+                                 PT(BulletTriangleMesh) bt_triangles,
+                                 uint16_t block_id)
   {
     auto name = std::string("blockid:") + std::to_string(block_id);
     PT(GeomNode) subnode = new GeomNode(name);
@@ -141,6 +144,9 @@ namespace blocks {
     subnode->set_tag("block_id", std::to_string(block_id));
 
     geom_node->add_child(subnode);
+
+    // Let's also add those vertices into bullet mesh
+    bt_triangles->add_geom(geom);
   }
 
   void GreedyMesher::create_quad(unsigned char face,
@@ -282,8 +288,11 @@ namespace blocks {
     }
   }
 
-  PT(GeomNode) GreedyMesher::mesh() {
+  std::pair<PT(GeomNode), PT(BulletRigidBodyNode)> GreedyMesher::mesh() {
     PT(GeomNode) node = new GeomNode(std::string("chunk:") + std::string(_chunk->id()));
+    PT(BulletRigidBodyNode) bt_rigid_node = new BulletRigidBodyNode("rigid_body");
+    PT(BulletTriangleMesh) bt_triangles = new BulletTriangleMesh();
+
     common::cpos iter;
 
     // Iterator over the list of different block ideas we found during the visibility tests
@@ -300,13 +309,15 @@ namespace blocks {
 
         // Then for each dimension, we iterate the front and back face
         for (auto front = 0; front < 2; ++front)
-        {
           mesh_face(iter, block_id, d, u, v, front);
-        }
       }
-      finish_mesh(node, block_id);
+      finish_mesh(node, bt_triangles, block_id);
     }
 
-    return node;
+    PT(BulletTriangleMeshShape) bt_shape =
+      new BulletTriangleMeshShape(bt_triangles, false);
+    bt_rigid_node->add_shape(bt_shape);
+
+    return make_pair(node, bt_rigid_node);
   }
 }

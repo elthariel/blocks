@@ -3,8 +3,6 @@
 #include "common/position.hh"
 #include "entity.hh"
 
-#include <nodePath.h>
-
 namespace blocks
 {
   namespace events

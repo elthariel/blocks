@@ -1,4 +1,3 @@
-
 #include "constants.hh"
 #include "scene.hh"
 #include "models/make.hh"
@@ -9,6 +8,7 @@
 #include <directionalLight.h>
 #include <ambientLight.h>
 #include <texturePool.h>
+#include <camera.h>
 
 #include <cstdlib>
 #include <iostream>
@@ -72,13 +72,13 @@ namespace blocks
 
     auto cam = dynamic_cast<Camera *>(_camera.find("camera").node());
     auto lens = cam->get_lens();
-    // lens->set_far(consts::chunk_size * 16);
+    lens->set_near(0.5);
+    lens->set_far(consts::chunk_size * 16);
     lens->set_fov(80);
   }
 
   void Scene::init_lights()
   {
-
     PT(DirectionalLight) sun = new DirectionalLight("light:sun");
     sun->set_direction(LVector3f(-0.5, 0, -1));
     _sun = _scene.attach_new_node(sun);
@@ -89,12 +89,8 @@ namespace blocks
     ambient->set_color(color);
     _ambient_light = _scene.attach_new_node(ambient);
 
-
     _scene.set_light(_sun);
     _scene.set_light(_ambient_light);
-
-    auto cube = _scene.attach_new_node(models::make<models::Box>("cube", 1, 2, 3));
-    cube.set_render_mode_wireframe();
   }
 
   NodePath Scene::make_character(common::wpos &pos)

@@ -43,7 +43,6 @@ namespace blocks {
     _framework.open_framework(ac, av);
     _scene = make_shared<Scene>(_framework);
 
-
     create_entities();
     create_systems();
   }

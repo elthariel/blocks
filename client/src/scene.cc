@@ -26,6 +26,7 @@ namespace blocks
     init_lights();
     init_skybox();
     _scene.ls();
+
   }
 
   Scene::~Scene()
@@ -129,7 +130,9 @@ namespace blocks
 
   void Scene::run()
   {
+
     _framework.main_loop();
     std::cout << "Exiting from main loop" << std::endl;
   }
+
 }

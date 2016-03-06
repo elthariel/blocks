@@ -1,12 +1,10 @@
-
 cmake_minimum_required(VERSION 3.0)
 if (UNIX)
   set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+  set(CMAKE_EXPORT_COMPILE_COMMANDS yes)
 endif()
 
-
 project (blocks)
-
 
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 set(THIRD_PARTY ${CMAKE_SOURCE_DIR}/third-party)

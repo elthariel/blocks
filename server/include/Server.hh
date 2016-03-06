@@ -6,7 +6,6 @@
 #include "Map.hh"
 #include "Protocole.hh"
 
-
 namespace blocks {
 
     class TcpServer;
@@ -14,7 +13,8 @@ namespace blocks {
     class Server
     {
     public:
-      typedef void (Server::*handler_ptr)(TcpConnection<Server, Player>::pointer, fbs::Message *);
+      typedef void (Server::*handler_ptr)(TcpConnection<Server, Player>::pointer,
+                                          fbs::Message *);
       Server();
 
       void on_connect_player(TcpConnection<Server, Player>::pointer);
@@ -33,5 +33,6 @@ namespace blocks {
       Map _map;
     };
 }
+
 #include "TcpServer.hh"
 #include "Player.hh"

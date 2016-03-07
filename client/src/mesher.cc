@@ -1,4 +1,3 @@
-
 #include "mesher.hh"
 
 #include <geomVertexFormat.h>
@@ -71,6 +70,7 @@ namespace blocks {
   //
   // Greedy Mesher !
   //
+  // clang-format off
   const std::array<LVector3f, 6> GreedyMesher::normals = {
     LVector3f(1.0, 0.0, 0.0), LVector3f(-1.0, 0.0, 0.0),
     LVector3f(0.0, 1.0, 0.0), LVector3f(0.0, -1.0, 0.0),
@@ -82,6 +82,7 @@ namespace blocks {
     common::cpos(0, 1, 0), common::cpos(0, -1, 0),
     common::cpos(0, 0, 1), common::cpos(0, 0, -1)
   };
+  // clang-format on
 
   GreedyMesher::GreedyMesher(common::Chunk::ptr c)
   : _chunk(c), _work(c->size())
@@ -155,12 +156,14 @@ namespace blocks {
                                  const common::cpos& du, const common::cpos& dv,
                                  int w, int h)
   {
+    // clang-format off
     int64_t quads[4][3] = {
       { base[0],             base[1],             base[2]             },
       { base[0]+du[0],       base[1]+du[1],       base[2]+du[2]       },
       { base[0]+du[0]+dv[0], base[1]+du[1]+dv[1], base[2]+du[2]+dv[2] },
       { base[0]+dv[0],       base[1]+dv[1],       base[2]+dv[2]       }
     };
+    // clang-format on
 
     // cout << "Creating quad: " << std::string(base) << " -- "
     //      << w << ":"  << h << ":"

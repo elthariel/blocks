@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
 
 using namespace std;
 
@@ -25,11 +26,16 @@ namespace blocks
       _world->set_group_collision_flag(0, 0, false);
       _world->set_group_collision_flag(0, 1, false);
       _world->set_group_collision_flag(0, 2, false);
+      _world->set_group_collision_flag(0, 3, false);
 
       _world->set_group_collision_flag(1, 1, false);
       _world->set_group_collision_flag(1, 2, true);
+      _world->set_group_collision_flag(1, 3, true);
 
       _world->set_group_collision_flag(2, 2, true);
+      _world->set_group_collision_flag(2, 3, false);
+
+      _world->set_group_collision_flag(3, 3, false);
     }
 
     static float height = 2.0;
@@ -45,7 +51,8 @@ namespace blocks
                     components::Node &node)
         {
           // Create our character node.
-          PT(BulletCapsuleShape) c_shape = new BulletCapsuleShape(radius, height -2 * radius);
+          PT(BulletCapsuleShape) c_shape = new BulletCapsuleShape(radius,
+                                                                  height -2 * radius);
           PT(BulletCharacterControllerNode) controller =
             new BulletCharacterControllerNode(c_shape, 0.4f, "player");
           _world->attach_character(controller);
@@ -74,6 +81,41 @@ namespace blocks
                          ex::TimeDelta dt)
     {
       _world->do_physics(10, 10, 1.0 / 180.0);
+
+      auto l = [&](ex::Entity ex,
+                   components::Player &player,
+                   components::Node &node)
+       {
+          auto cam = node.get_child(0);
+          auto forward = cam.get_quat().get_forward();
+          auto pos_from = node.get_pos() + cam.get_pos();
+          auto pos_to = pos_from + forward * 50;
+          auto hit = _world->ray_test_closest(pos_from, pos_to,
+                                              BitMask32::bit(3));
+
+          if (hit.has_hit())
+          {
+            auto hp = hit.get_hit_pos();
+            auto hn = hit.get_hit_normal();
+            common::wpos pos(std::floor(hp.get_x()),
+                             std::floor(hp.get_y()),
+                             std::floor(hp.get_z()));
+
+            if (hn.get_x() > 0) pos.x()--;
+            if (hn.get_y() > 0) pos.y()--;
+            if (hn.get_z() > 0) pos.z()--;
+
+            _scene->aim_cube().set_pos(pos.x(), pos.y(), pos.z());
+            //_scene->aim_cube().set_pos(hp);
+
+               // std::cout << "Picking something."
+               //           << "pos: " << hit.get_hit_pos()
+               //           << " normal: " << hit.get_hit_normal()
+               //           << std::endl;
+          }
+        };
+
+      entities.each<components::Player, components::Node>(l);
     }
 
     void Physics::receive(const events::key &e)

@@ -1,4 +1,3 @@
-
 #include "systems/camera_control.hh"
 #include "events/player.hh"
 

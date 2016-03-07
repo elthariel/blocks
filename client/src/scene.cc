@@ -9,6 +9,7 @@
 #include <ambientLight.h>
 #include <texturePool.h>
 #include <camera.h>
+#include <cardMaker.h>
 
 #include <cstdlib>
 #include <iostream>
@@ -25,6 +26,7 @@ namespace blocks
     init_camera();
     init_lights();
     init_skybox();
+    init_aim();
     _scene.ls();
 
   }
@@ -127,6 +129,31 @@ namespace blocks
     tex->set_minfilter(Texture::FilterType::FT_linear);
     _skybox.set_texture(tex);
   }
+
+  void Scene::init_aim()
+  {
+    // Create a small square on the 2d scene to render the aim pointer
+    auto tex = TexturePool::load_texture("../media/textures/aim.png");
+    auto render_2d = _window->get_render_2d();
+    auto win = _window->get_graphics_window();
+    float w = (0.03 * win->get_x_size()) / win->get_x_size();
+    float h = (0.03 * win->get_x_size()) / win->get_y_size();
+
+    auto cm = CardMaker("aim");
+    cm.set_frame(-w, w, -h, h);
+    cm.set_has_uvs(true);
+    _aim_pointer = render_2d.attach_new_node(cm.generate());
+    _aim_pointer.set_texture(tex);
+    _aim_pointer.set_transparency(TransparencyAttrib::M_alpha);
+
+
+    // Creates a cube representing the currently selected block
+    _aim_cube = _scene.attach_new_node(models::make<models::Box>("aim", 1.02));
+    _aim_cube.set_color(0, 0, 0, 1);
+    _aim_cube.set_render_mode_wireframe();
+    //_aim_cube.hide();
+  }
+
 
   void Scene::run()
   {

@@ -1,4 +1,3 @@
-
 #include "models/box.hh"
 
 #include <array>
@@ -46,6 +45,7 @@ namespace blocks
         dv[v] = whd[v];
 
         auto face = 2 * d;
+        // clang-format off
         _vertex.add_data3f(0,             0,             0);
         _vertex.add_data3f(du[0],         du[1],         du[2]);
         _vertex.add_data3f(du[0] + dv[0], du[1] + dv[1], du[2] + dv[2]);
@@ -54,32 +54,38 @@ namespace blocks
         _uvs.add_data2f(whd[u], 0);
         _uvs.add_data2f(whd[u], whd[v]);
         _uvs.add_data2f(0,      whd[v]);
+        // clang-format on
         for (auto i = 0; i < 4; i++)
           _normal.add_data3f(normals[face][0], normals[face][1], normals[face][2]);
 
 
         face++;
+        // clang-format off
         _vertex.add_data3f(0             + dd[0], 0             + dd[1], 0             + dd[2]);
         _vertex.add_data3f(du[0]         + dd[0], du[1]         + dd[1], du[2]         + dd[2]);
         _vertex.add_data3f(du[0] + dv[0] + dd[0], du[1] + dv[1] + dd[1], du[2] + dv[2] + dd[2]);
         _vertex.add_data3f(        dv[0] + dd[0],         dv[1] + dd[1],         dv[2] + dd[2]);
+        // clang-format on
         for (auto i = 0; i < 4; i++)
           _normal.add_data3f(normals[face][0], normals[face][1], normals[face][2]);
+        // clang-format off
         _uvs.add_data2f(0, 0);
         _uvs.add_data2f(whd[u], 0);
         _uvs.add_data2f(whd[u], whd[v]);
         _uvs.add_data2f(0,      whd[v]);
-
+        // clang-format on
 
         for(auto i = 0; i < 2; i++)
         {
           mesh = new GeomTriangles(Geom::UH_static);
+          // clang-format off
           mesh->add_vertices(d * 8 + 4 * i,
                              d * 8 + 4 * i + 2,
                              d * 8 + 4 * i + 1);
           mesh->add_vertices(d * 8 + 4 * i,
                              d * 8 + 4 * i + 3,
                              d * 8 + 4 * i + 2);
+          // clang-format off
           mesh->close_primitive();
           geom->add_primitive(mesh);
         }

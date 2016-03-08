@@ -89,7 +89,7 @@ namespace blocks
           auto cam = node.get_child(0);
           auto forward = cam.get_quat().get_forward();
           auto pos_from = node.get_pos() + cam.get_pos();
-          auto pos_to = pos_from + forward * 50;
+          auto pos_to = pos_from + forward * 15;
           auto hit = _world->ray_test_closest(pos_from, pos_to,
                                               BitMask32::bit(3));
 
@@ -105,14 +105,18 @@ namespace blocks
             if (hn.get_y() > 0) pos.y()--;
             if (hn.get_z() > 0) pos.z()--;
 
-            _scene->aim_cube().set_pos(pos.x(), pos.y(), pos.z());
-            //_scene->aim_cube().set_pos(hp);
+            _scene->aim_cube().show();
+            _scene->aim_cube().set_pos(pos.x() - 0.01,
+                                       pos.y() - 0.01,
+                                       pos.z() - 0.01);
 
-               // std::cout << "Picking something."
-               //           << "pos: " << hit.get_hit_pos()
-               //           << " normal: " << hit.get_hit_normal()
-               //           << std::endl;
+            // std::cout << "Picking something."
+            //           << "pos: " << hit.get_hit_pos()
+            //           << " normal: " << hit.get_hit_normal()
+            //           << std::endl;
           }
+          else
+            _scene->aim_cube().hide();
         };
 
       entities.each<components::Player, components::Node>(l);

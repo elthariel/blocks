@@ -1,12 +1,10 @@
-
 cmake_minimum_required(VERSION 3.0)
 if (UNIX)
   set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+  set(CMAKE_EXPORT_COMPILE_COMMANDS yes)
 endif()
 
-
 project (blocks)
-
 
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 set(THIRD_PARTY ${CMAKE_SOURCE_DIR}/third-party)
@@ -51,7 +49,7 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
 )
 
-#add_definitions(-fpermissive)
+add_definitions(-fpermissive)
 # add_definitions(-Wall)
 # add_definitions(-stdlib)
 #add_definitions(-O3)
@@ -59,6 +57,16 @@ include_directories(
 if (CMAKE_BUILD_TYPE STREQUAL "")
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif ()
+
+if (DEFINED SANITIZE)
+  message("-- Using Clang's sanitizer: ${SANITIZE}")
+  set(ASAN_FLAG -fsanitize=${SANITIZE})
+  add_definitions(${ASAN_FLAG})
+  add_definitions(-fno-omit-frame-pointer)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ASAN_FLAG}")
+else()
+  message("-- Not using Clang's sanitizer")
+endif()
 
 if (${PROFILING})
   add_definitions(-fprofile-instr-generate)

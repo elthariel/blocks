@@ -1,4 +1,3 @@
-
 #include "constants.hh"
 #include "scene.hh"
 #include "models/make.hh"
@@ -9,6 +8,8 @@
 #include <directionalLight.h>
 #include <ambientLight.h>
 #include <texturePool.h>
+#include <camera.h>
+#include <cardMaker.h>
 
 #include <cstdlib>
 #include <iostream>
@@ -25,7 +26,9 @@ namespace blocks
     init_camera();
     init_lights();
     init_skybox();
+    init_aim();
     _scene.ls();
+
   }
 
   Scene::~Scene()
@@ -72,13 +75,13 @@ namespace blocks
 
     auto cam = dynamic_cast<Camera *>(_camera.find("camera").node());
     auto lens = cam->get_lens();
-    // lens->set_far(consts::chunk_size * 16);
+    lens->set_near(0.5);
+    lens->set_far(consts::chunk_size * 16);
     lens->set_fov(80);
   }
 
   void Scene::init_lights()
   {
-
     PT(DirectionalLight) sun = new DirectionalLight("light:sun");
     sun->set_direction(LVector3f(-0.5, 0, -1));
     _sun = _scene.attach_new_node(sun);
@@ -89,12 +92,8 @@ namespace blocks
     ambient->set_color(color);
     _ambient_light = _scene.attach_new_node(ambient);
 
-
     _scene.set_light(_sun);
     _scene.set_light(_ambient_light);
-
-    auto cube = _scene.attach_new_node(models::make<models::Box>("cube", 1, 2, 3));
-    cube.set_render_mode_wireframe();
   }
 
   NodePath Scene::make_character(common::wpos &pos)
@@ -131,9 +130,41 @@ namespace blocks
     _skybox.set_texture(tex);
   }
 
+  void Scene::init_aim()
+  {
+    // Create a small square on the 2d scene to render the aim pointer
+    auto tex = TexturePool::load_texture("../media/textures/aim.png");
+    auto render_2d = _window->get_render_2d();
+    auto win = _window->get_graphics_window();
+    float w = (0.03 * win->get_x_size()) / win->get_x_size();
+    float h = (0.03 * win->get_x_size()) / win->get_y_size();
+
+    auto cm = CardMaker("aim");
+    cm.set_frame(-w, w, -h, h);
+    cm.set_has_uvs(true);
+    _aim_pointer = render_2d.attach_new_node(cm.generate());
+    _aim_pointer.set_texture(tex);
+    _aim_pointer.set_transparency(TransparencyAttrib::M_alpha);
+
+
+    // Creates a cube representing the currently selected block
+    tex = TexturePool::load_texture("../media/textures/aim_cube.png");
+    tex->set_wrap_u(Texture::WrapMode::WM_clamp);
+    tex->set_wrap_v(Texture::WrapMode::WM_clamp);
+
+    _aim_cube = _scene.attach_new_node(models::make<models::Box>("aim", 1.02));
+    _aim_cube.set_color(0, 0, 0, 1);
+    _aim_cube.set_texture(tex);
+    _aim_cube.set_transparency(TransparencyAttrib::M_alpha);
+    _aim_cube.hide();
+  }
+
+
   void Scene::run()
   {
+
     _framework.main_loop();
     std::cout << "Exiting from main loop" << std::endl;
   }
+
 }

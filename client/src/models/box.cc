@@ -1,4 +1,3 @@
-
 #include "models/box.hh"
 
 #include <array>
@@ -26,7 +25,7 @@ namespace blocks
     PT(Geom) Box::make_geom()
     {
       PT(Geom) geom = new Geom(_vxd);
-      PT(GeomTriangles) mesh;
+      PT(GeomTriangles) mesh = new GeomTriangles(Geom::UH_static);
       std::array<LVector3f, 6> normals = {
         LVector3f(-1.0, 0.0, 0.0), LVector3f(1.0, 0.0, 0.0),
         LVector3f(0.0, -1.0, 0.0), LVector3f(0.0, 1.0, 0.0),
@@ -45,45 +44,77 @@ namespace blocks
         du[u] = whd[u];
         dv[v] = whd[v];
 
+
+        //////////////
+        // Front face
         auto face = 2 * d;
+
+        // Add the 4 vertices
+        // clang-format off
         _vertex.add_data3f(0,             0,             0);
         _vertex.add_data3f(du[0],         du[1],         du[2]);
         _vertex.add_data3f(du[0] + dv[0], du[1] + dv[1], du[2] + dv[2]);
         _vertex.add_data3f(        dv[0],         dv[1],         dv[2]);
+
+        // Add the texture coordinates
         _uvs.add_data2f(0, 0);
         _uvs.add_data2f(whd[u], 0);
         _uvs.add_data2f(whd[u], whd[v]);
         _uvs.add_data2f(0,      whd[v]);
+        // clang-format on
+
+        // Add the normals
         for (auto i = 0; i < 4; i++)
-          _normal.add_data3f(normals[face][0], normals[face][1], normals[face][2]);
+          _normal.add_data3f(normals[face][0],
+                             normals[face][1],
+                             normals[face][2]);
+
+        // Add the 2 triangles to the mesh
+        mesh->add_vertices(d * 8,
+                           d * 8 + 2,
+                           d * 8 + 1);
+        mesh->add_vertices(d * 8,
+                           d * 8 + 3,
+                           d * 8 + 2);
 
 
+        /////////////
+        // Back face
         face++;
+
+        // Add the 4 vertices
+        // clang-format off
         _vertex.add_data3f(0             + dd[0], 0             + dd[1], 0             + dd[2]);
         _vertex.add_data3f(du[0]         + dd[0], du[1]         + dd[1], du[2]         + dd[2]);
         _vertex.add_data3f(du[0] + dv[0] + dd[0], du[1] + dv[1] + dd[1], du[2] + dv[2] + dd[2]);
         _vertex.add_data3f(        dv[0] + dd[0],         dv[1] + dd[1],         dv[2] + dd[2]);
-        for (auto i = 0; i < 4; i++)
-          _normal.add_data3f(normals[face][0], normals[face][1], normals[face][2]);
+
+        // Add the texture coordinates
         _uvs.add_data2f(0, 0);
         _uvs.add_data2f(whd[u], 0);
         _uvs.add_data2f(whd[u], whd[v]);
         _uvs.add_data2f(0,      whd[v]);
+        // clang-format on
 
+        // Add the normals
+        for (auto i = 0; i < 4; i++)
+          _normal.add_data3f(normals[face][0],
+                             normals[face][1],
+                             normals[face][2]);
 
-        for(auto i = 0; i < 2; i++)
-        {
-          mesh = new GeomTriangles(Geom::UH_static);
-          mesh->add_vertices(d * 8 + 4 * i,
-                             d * 8 + 4 * i + 2,
-                             d * 8 + 4 * i + 1);
-          mesh->add_vertices(d * 8 + 4 * i,
-                             d * 8 + 4 * i + 3,
-                             d * 8 + 4 * i + 2);
-          mesh->close_primitive();
-          geom->add_primitive(mesh);
-        }
+        // Add the 2 triangles to the mesh
+        mesh->add_vertices(d * 8 + 4,
+                           d * 8 + 4 + 1,
+                           d * 8 + 4 + 2);
+        mesh->add_vertices(d * 8 + 4,
+                           d * 8 + 4 + 2,
+                           d * 8 + 4 + 3);
+
       }
+
+      // Adding the primitive to the geom and leaving
+      mesh->close_primitive();
+      geom->add_primitive(mesh);
 
       return geom;
     }

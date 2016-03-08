@@ -23,9 +23,10 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
 )
 
+
 add_definitions(-std=c++14)
+
 add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
-compile_livescript(blocks_client)
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_client

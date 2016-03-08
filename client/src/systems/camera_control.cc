@@ -1,6 +1,7 @@
-
 #include "systems/camera_control.hh"
 #include "events/player.hh"
+
+#include <bulletCharacterControllerNode.h>
 
 namespace blocks
 {
@@ -20,10 +21,10 @@ namespace blocks
     {
       auto lambda = [&](ex::Entity entity,
                         components::Player &player,
-                        components::Position &position,
-                        components::Direction &direction,
-                        components::Camera &cam)
+                        components::Node &node)
       {
+        auto c_node = dynamic_cast<BulletCharacterControllerNode *>(node.node());
+        auto cam = node.get_child(0);
         LVecBase3 hpr = cam.get_hpr();
 
         hpr.add_x(mouse_offset.get_x() * cam_sensitivity * -1.0);
@@ -31,7 +32,7 @@ namespace blocks
 
         cam.set_hpr(hpr);
 
-        LPoint3 _pos = cam.get_pos();
+        LPoint3 _pos = node.get_pos();
         LPoint3 offset(0);
         auto forward = cam.get_quat().get_forward();
         auto right = cam.get_quat().get_right();
@@ -41,16 +42,11 @@ namespace blocks
         offset += move_absolute * move_speed;
 
         auto final_pos = _pos + offset;
-        cam.set_fluid_pos(final_pos);
-
-        position = cam.get_pos();
-        direction = cam.get_quat().get_forward();
+        node.set_fluid_pos(final_pos);
       };
 
       entities.each<components::Player,
-                    components::Position,
-                    components::Direction,
-                    components::Camera>(lambda);
+                    components::Node>(lambda);
 
       mouse_offset.set(0, 0);
       move.set(0, 0, 0);
@@ -76,7 +72,7 @@ namespace blocks
           move.add_y(-1);
           break;
         case events::key::kcode::MOVE_JUMP:
-          move_absolute.add_z(1);
+          move_absolute.add_z(10);
           break;
         default:
           break;

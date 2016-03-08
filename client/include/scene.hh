@@ -25,11 +25,13 @@ namespace blocks {
     void init_scene();
     void init_camera();
     void init_lights();
-    NodePath make_character(common::wpos &);
     void init_skybox();
+    void init_aim();
+    NodePath make_character(common::wpos &);
     void run();
 
     NodePath root() { return _scene; }
+    NodePath aim_cube() { return _aim_cube; }
 
   protected:
     PandaFramework &_framework;
@@ -39,5 +41,7 @@ namespace blocks {
     NodePath _skybox;
     NodePath _sun;
     NodePath _ambient_light;
+    NodePath _aim_pointer;
+    NodePath _aim_cube;
   };
 }

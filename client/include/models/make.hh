@@ -2,7 +2,6 @@
 
 // blocks::models::make<Cube>(sdf, sdf, sdf);
 
-#include <pointerTo.h>
 #include <geomNode.h>
 
 #include <string>

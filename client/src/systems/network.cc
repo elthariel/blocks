@@ -7,11 +7,16 @@ namespace blocks
     Network::Network(std::string host, std::string port, Game *game)
       : _client(*this, host, port), _last_pos(0, 0, 0), _game(game)
     {
-      _events_ptrs.insert(event_item(fbs::Action::Action_MOVE, new events::player_moved(nullptr)));
-      _events_ptrs.insert(event_item(fbs::Action::Action_INITIAL_POS, new events::player_initial_pos(nullptr)));
-      _events_ptrs.insert(event_item(fbs::Action::Action_PLAYER_CONNECT, new events::player_connected(nullptr)));
-      _events_ptrs.insert(event_item(fbs::Action::Action_CHUNK, new events::chunk_received(nullptr)));
-      _events_ptrs.insert(event_item(fbs::Action::Action_UPDATE_BLOCK, new events::block_update(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_MOVE,
+                                     new events::player_moved(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_INITIAL_POS,
+                                     new events::player_initial_pos(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_PLAYER_CONNECT,
+                                     new events::player_connected(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_CHUNK,
+                                     new events::chunk_received(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_UPDATE_BLOCK,
+                                     new events::block_update(nullptr)));
     }
 
     void Network::configure(ex::EventManager &em)
@@ -31,9 +36,11 @@ namespace blocks
 
       auto lambda = [=](ex::Entity entity,
                         components::Player &player,
-                        components::Position &position)
+                        components::Node &node)
       {
-        common::wpos pos(position.get_x(), position.get_y(), position.get_z());
+        auto node_pos = node.get_pos();
+        common::wpos pos(node_pos.get_x(), node_pos.get_y(), node_pos.get_z());
+
         if (pos != _last_pos && _passed > 0.01)
         {
             _passed = 0;
@@ -45,7 +52,7 @@ namespace blocks
       };
 
       entities.each<components::Player,
-                    components::Position>(lambda);
+                    components::Node>(lambda);
 
       dispatch_events(entities, events);
     }
@@ -88,7 +95,7 @@ namespace blocks
       auto player = e.msg;
       auto _pos = player->pos();
       common::wpos pos(_pos->x(), _pos->y(), _pos->z());
-      _game->create_player(pos);
+      // XXX:  _game->create_player(pos);
     }
 
     void Network::receive(const events::player_moved &e)
@@ -97,8 +104,8 @@ namespace blocks
       auto player = e.msg;
       auto entity = _characters.at(player->id());
       auto ppos = player->pos();
-      auto pos = entity.component<components::Position>();
-      pos.get()->set(ppos->x(), ppos->y(), ppos->z());
+      auto pos = entity.component<components::Node>();
+      pos->set_pos(ppos->x(), ppos->y(), ppos->z());
       std::cout << "Move" << ppos->x() << ":" <<  ppos->y() << ":" <<  ppos->z() << std::endl;
     }
 

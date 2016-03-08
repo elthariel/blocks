@@ -15,7 +15,7 @@ namespace blocks
 {
   class Game : public ex::EntityX, public AsyncTask
   {
-    friend class systems::Debug;
+    friend struct systems::Debug;
 
   public:
     explicit Game(int ac, char **av);
@@ -38,13 +38,13 @@ namespace blocks
     AsyncTask::DoneStatus do_task();
 
   protected:
-    PandaFramework    _framework;
+    PandaFramework _framework;
 
-    MeshingTask::ptr  _meshing_task;
-    Scene::ptr        _scene;
+    MeshingTask::ptr _meshing_task;
+    Scene::ptr _scene;
 
     // Entities and stuff like that
-    ex::Entity        _player;
-    Map               _map;
+    ex::Entity _player;
+    Map _map;
   };
 }

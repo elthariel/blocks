@@ -1,9 +1,10 @@
 
 #include "systems/chunk_loader.hh"
 #include "components/basic.hh"
-#include "events/map.hh"
 #include "common/position.hh"
 #include "common/chunk.hh"
+#include "events/map.hh"
+#include "events/physics.hh"
 
 #include <nodePathCollection.h>
 #include <texturePool.h>
@@ -20,7 +21,7 @@ namespace blocks
       : _map(map), _scene(scene)
     {
       auto cores = std::thread::hardware_concurrency();
-      auto threads = cores / 2;
+      auto threads = cores - 2;
       if (threads < 1)
         threads = 1;
 
@@ -39,7 +40,7 @@ namespace blocks
 
     }
 
-    static int load = 6;
+    static int load = 3;
     static int load_height = 2;
     void ChunkLoader::update(ex::EntityManager &entities,
                              ex::EventManager &events,
@@ -50,9 +51,10 @@ namespace blocks
 
       auto loop = [&](ex::Entity entity,
                      components::Player &player,
-                     components::Position &position)
+                     components::Node &node)
         {
-          common::wpos w(position.get_x(), position.get_y(), position.get_z());
+          auto node_pos = node.get_pos();
+          common::wpos w(node_pos.get_x(), node_pos.get_y(), node_pos.get_z());
           common::cid current_id = w.cid();
 
           for (auto i = -load; i <= load; ++i)
@@ -68,7 +70,7 @@ namespace blocks
               }
         };
 
-      entities.each<components::Player, components::Position>(loop);
+      entities.each<components::Player, components::Node>(loop);
 
       fetch_meshed_chunks(entities, events);
     }
@@ -100,12 +102,17 @@ namespace blocks
           tex->set_minfilter(Texture::FilterType::FT_nearest_mipmap_nearest);
           node.set_texture(tex);
         }
+
         nodepath.set_pos(wp.x(), wp.y(), wp.z());
+
+        auto body = std::get<2>(result);
+        nodepath.attach_new_node(body);
+        body->set_transform_dirty();
 
         auto entity = entities.create();
         entity.assign<NodePath>(nodepath);
         entity.assign<common::wpos>(wp);
-        entity.assign<common::Chunk::ptr>(std::get<2>(result));
+        entity.assign<common::Chunk::ptr>(std::get<3>(result));
 
         auto old_chunk_entity = _map.get(wp.cid());
         if (old_chunk_entity.valid())
@@ -116,6 +123,7 @@ namespace blocks
         }
         _map.set(wp.cid(), entity);
         em.emit<events::chunk_loaded>(entity);
+        em.emit<events::bullet_attach>(body);
       }
     }
 

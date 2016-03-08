@@ -1,4 +1,3 @@
-
 #include "game.hh"
 
 #include "systems/debug.hh"
@@ -18,6 +17,7 @@
 #include "Protocole.hh"
 
 #include <load_prc_file.h>
+#include <asyncTask.h>
 #include <iostream>
 
 using namespace std;
@@ -43,6 +43,7 @@ namespace blocks {
     _framework.open_framework(ac, av);
     _scene = make_shared<Scene>(_framework);
 
+    create_entities();
     create_systems();
   }
 
@@ -59,9 +60,7 @@ namespace blocks {
     systems.add<systems::CameraControl>();
     systems.add<systems::Network>("127.0.0.1", "3000", this);
     systems.add<systems::ChunkLoader>(_map, _scene->root());
-    systems.add<systems::Physics>();
-
-    systems.configure();
+    systems.add<systems::Physics>(_scene);
   }
 
   void Game::update_systems(ex::TimeDelta dt)
@@ -77,27 +76,29 @@ namespace blocks {
 
   void Game::create_entities()
   {
-    // create_player();
+    common::wpos pos(0, 0, 30);
+    create_player(pos);
   }
 
   void Game::create_player(common::wpos &pos)
   {
     _player = entities.create();
     _player.assign<components::Player>();
-    _player.assign<components::Position>(pos.x(), pos.y(), pos.z());
-    _player.assign<components::Direction>(0, 1, 0);
+
     auto camera = _scene->window().get_camera_group();
     camera.set_fluid_pos(LPoint3(pos.x(), pos.y(), pos.z()));
-    _player.assign<components::Camera>(camera);
+    _player.assign<components::Node>(camera);
   }
 
   ex::Entity Game::create_character(common::wpos &pos)
   {
     auto character = entities.create();
 
-    character.assign<components::Character>();
-    character.assign<components::Position>(pos.x(), pos.y(), pos.y());
-    character.assign<components::Model>(_scene->make_character(pos));
+    auto node = _scene->make_character(pos);
+    node.set_pos(pos.x(), pos.y(), pos.z());
+
+    character.assign<components::Node>(node);
+    character.assign<components::Model>();
 
     return character;
   }
@@ -106,9 +107,9 @@ namespace blocks {
   {
     cout << "Starting Game !" << endl;
 
-    // create_entities();
     AsyncTaskManager::get_global_ptr()->add(this);
 
+    systems.configure();
     _scene->run();
   }
 

@@ -90,6 +90,9 @@ namespace blocks {
 
     public:
       wpos(const blocks::common::cid &_cid, const blocks::common::cpos &_cpos);
+      template <class T>
+      wpos(const T &p)
+        : wpos(p.get_x(), p.get_y(), p.get_z()) {}
 
       cid cid() const;
       cpos cpos() const;

@@ -34,20 +34,17 @@ namespace blocks
     {
       _passed += dt;
 
-      auto lambda = [=](ex::Entity entity,
-                        components::Player &player,
-                        components::Node &node)
+      auto lambda = [=](
+        ex::Entity entity, components::Player &player, components::Node &node)
       {
         auto node_pos = node.get_pos();
         common::wpos pos(node_pos.get_x(), node_pos.get_y(), node_pos.get_z());
 
-        if (pos != _last_pos && _passed > 0.01)
-        {
-            _passed = 0;
-            _last_pos = pos;
-            _socket->write(Protocole::create_message(fbs::Action::Action_MOVE,
-                                                     fbs::AType::AType_PosObj,
-                                                     &pos));
+        if (pos != _last_pos && _passed > 0.01) {
+          _passed   = 0;
+          _last_pos = pos;
+          _socket->write(Protocole::create_message(
+            fbs::Action::Action_MOVE, fbs::AType::AType_PosObj, &pos));
         }
       };
 
@@ -122,7 +119,8 @@ namespace blocks
       if (e.code == events::key::kcode::USE && e.type == events::key::ktype::DOWN)
       {
         auto entity = _game->player();
-        auto pos = entity.component<components::Position>().get()->to_wpos();
+        auto node = entity.component<NodePath>();
+        common::wpos pos(node->get_pos());
 
         Block block(1);
         BlockPos bpos(block, pos);
@@ -133,7 +131,8 @@ namespace blocks
       else if (e.code == events::key::kcode::MINE && e.type == events::key::ktype::DOWN)
       {
         auto entity = _game->player();
-        auto pos = entity.component<components::Position>().get()->to_wpos();
+        auto node = entity.component<NodePath>();
+        common::wpos pos(node->get_pos());
 
         _socket->write(Protocole::create_message(fbs::Action::Action_BREAK_BLOCK,
                                                  fbs::AType::AType_PosObj, &pos));

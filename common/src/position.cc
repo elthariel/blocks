@@ -1,4 +1,3 @@
-
 #include "common/position.hh"
 #include "constants.hh"
 
@@ -12,6 +11,7 @@ namespace blocks {
         _cid.y() * consts::chunk_size + _cpos.y(),
         _cid.z() * consts::chunk_size + _cpos.z()
       ) { }
+
 
       cid wpos::cid() const {
         return blocks::common::cid(

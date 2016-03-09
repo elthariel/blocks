@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.0)
 
 project(common)
@@ -31,6 +30,7 @@ endforeach(FBS_FILE)
 include_directories(
   ${FLATBUFFERS_INCLUDE_DIRS}
   ${THIRD_PARTY}/duktape
+  ${THIRD_PARTY}/rabbitmq/librabbitmq
   )
 
 add_definitions(-std=c++14)

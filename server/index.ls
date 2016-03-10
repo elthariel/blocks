@@ -1,69 +1,25 @@
 global import require \prelude-ls
 require! {
-  \rabbit.js : rabbit
-  events: {EventEmitter}
-  \../../flatbuffers/js/flatbuffers : {flatbuffers}
-  \./blocks_generated : {{fbs}:blocks}
-  \./common
+  \./common : {Events, PosObj, Pos, Player, Block, Chunk}
 }
 
+block = new Block id: 1 variant: 0, air: true, transparent: true, light: 0
 
-class Socket extends EventEmitter
-  (@eventQueue = \events) ->
-    @waitingSubs = []
-    @ready = false
-    @inited = false
-    @drain = false
-    @context = rabbit.createContext 'amqp://localhost'
-    @context.on \ready @~Init
-    @_emit = EventEmitter::emit
-    @On = EventEmitter::on
+socket = new Events
+  ..subscribe \foo
 
-  Init: ->
-    @pub = @context.socket \PUB routing: \topic
-    @sub = @context.socket \SUB routing: \topic
+  ..on Events.MOVE, (player) ->
+    console.log 'MOVE' player
 
-    @sub.on \data ~>
-      msg = common.Message.Deserialize it
-      @_emit msg.action, msg.body
-      #emit event
-
-    @On \drain ~>
-      @pub.connect @eventQueue, ~>
-        @ready = true
-        @_emit \ready
-
-    @inited = true
-    @_emit \inited
-
-  @_Wait = (event, cb) ->
-    (...args) ->
-      if not @[event] then @once event, ~> cb.apply @, args
-      else cb.apply @, args
-
-  Subscribe: @_Wait \inited (topic) ->
-    @drain = false
-    @waitingSubs.push topic
-    @sub.connect @eventQueue, topic, ~>
-      @waitingSubs.splice (find-index (is topic), @waitingSubs)
-      if not @waitingSubs.length
-        @drain = true
-        @_emit \drain
-
-  Emit: @_Wait \ready @_Wait \drain (topic, event, obj) ->
-    msg = common.Message.Create event, obj
-    serie = msg.Serialize!
-    @pub.publish topic, serie
-
-socket = new Socket
-  # ..On        \data -> console.log it.toString!
-  ..Subscribe \foo
-  ..On fbs.Action.MOVE, (pos) ->
-    console.log 'MOOVE' pos
-  ..On fbs.Action.INITIAL_POS, (pos) ->
+  ..on Events.INITIAL_POS, (pos) ->
     console.log 'INITIAL_POS' pos
-  ..Emit      \foo fbs.Action.MOVE, new common.PosObj pos: new common.Pos x: 1 y: 2 z: 3
-  ..Emit      \foo fbs.Action.INITIAL_POS, new common.PosObj pos: new common.Pos x: 1 y: 2 z: 3
+
+  ..on Events.CHUNK, (chunk) ->
+    console.log 'CHUNK' chunk
+
+  # ..emit      \foo Events.MOVE, new Chunk version: 0, size: 16, blocks: [block], cid: new Pos x: 1 y: 2 z: 3
+  ..emit      \foo Events.MOVE, new Player id: 42, pos: new Pos x: 1 y: 2 z: 3
+  ..emit      \foo Events.INITIAL_POS, new PosObj pos: new Pos x: 1 y: 2 z: 3
 
 # world.players
 # world.players.[ID]
@@ -79,33 +35,3 @@ socket = new Socket
 # client subscribe  world.chunks.[XYZ]
 # client receive    world.chunks.[XYZ]  PLAYER_MOVE      [...]
 # client receive    world.chunks.[XYZ]  UPDATE_BLOCK     [...]
-#
-# global import prelude-ls
-#
-# # class BiDirect
-# #   () ->
-# #
-# # class BiDirectClient extends BiDirect
-# # class BiDirectServer extends BiDirect
-# #
-# # Client
-# clientSocketEmit = new thrift.Client \localhost 9001
-# clientEmitter = new thrift.Emitter Server, clientSocketEmit, (client) ->
-#   client.auth \test \test (err, res) -> console.log err, res
-#
-# # Server
-# serverSocketRecv = new thrift.Server 9001
-#
-# users = [
-#   login: \test password: \test
-# ]
-#
-# handler =
-#   auth: (login, pass, done) ->
-#     user = find (.login is login), users
-#     if user? and pass is user.password
-#       return done null, true
-#
-#     done null, false
-#
-# serverReceiver = new thrift.Receiver Server, serverSocketRecv, handler

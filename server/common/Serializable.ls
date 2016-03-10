@@ -1,6 +1,6 @@
 require! {
   \../../../flatbuffers/js/flatbuffers : {flatbuffers}
-  \../blocks_generated : {{fbs}:blocks}
+  \../../common/generated_include/chunk_generated : {{fbs}:blocks}
 }
 
 module.exports = Serializable = (name, options) ->
@@ -15,8 +15,11 @@ module.exports = Serializable = (name, options) ->
 
   types = {0: void, 1: fbs.Player, 2: fbs.Chunk, 3: fbs.PosObj, 4: fbs.BlockPos}
 
-
   class _Serializable
+
+    @_fbs_type = type
+    _fbs_type: type
+
     (args) ->
       if fbs.AType[name]?
         types[fbs.AType[name]] = @
@@ -27,18 +30,20 @@ module.exports = Serializable = (name, options) ->
       if type is \table
         res = props
           |> map ~>
-            switch
-            | @[it].Serialize? => [it, @[it].Serialize builder]
+            | @[it].Serialize? and @[it]._fbs_type is \table => [it, @[it].Serialize builder]
+            | @[it].Serialize? and @[it]._fbs_type is \struct => [it, @[it]~Serialize]
             | _               =>  [it, @[it]]
 
         fbsObj[\start + name] it
         for prop in res
+          if is-type \Function prop.1
+            prop.1 = prop.1 it
           fbsObj[\add + capitalize prop.0] it, prop.1
-        return fbsObj[\end + name] it
+        fbsObj[\end + name] it
       else if type is \struct
         args = props |> map ~> @[it]
         args.unshift it
-        return fbsObj[\create + name].apply fbsObj, args
+        fbsObj[\create + name].apply fbsObj, args
 
     @Deserialize = (obj) ->
       serie = {}

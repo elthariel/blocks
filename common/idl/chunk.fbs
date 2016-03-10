@@ -16,9 +16,9 @@ enum Action:byte { INITIAL_POS = 0,
 union AType { Player, Chunk, PosObj, BlockPos }
 
 struct Pos {
-  x:long;
-  y:long;
-  z:long;
+  x:int;
+  y:int;
+  z:int;
 }
 
 struct Block {
@@ -46,7 +46,7 @@ table Chunk {
 }
 
 table Player {
-  id:long;
+  id:int;
   pos:Pos;
 }
 

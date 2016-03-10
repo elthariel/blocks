@@ -23,8 +23,9 @@ export class Events extends EventEmitter
     @sub = @context.socket \SUB routing: \topic
 
     @sub.on \data ~>
-      msg = common.Message.Deserialize it
-      @_emit msg.action, msg.body
+      @_emit \data it
+      # msg = common.Message.Deserialize it
+      # @_emit msg.action, msg.body
 
     @on \drain ~>
       @pub.connect @eventQueue, ~>
@@ -52,3 +53,6 @@ export class Events extends EventEmitter
     msg = common.Message.Create event, obj
     serie = msg.Serialize!
     @pub.publish topic, serie
+
+  emit2: @_Wait \ready @_Wait \drain (topic, msg) ->
+    @pub.publish topic, msg

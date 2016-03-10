@@ -1,6 +1,6 @@
 require! {
   \./Serializable
-  \../../../flatbuffers/js/flatbuffers : {flatbuffers}
+  \flatbuffers/src/flatbuffers : {flatbuffers}
   \../../common/generated_include/chunk_generated : {{fbs}:blocks}
 }
 
@@ -9,8 +9,8 @@ export Events.Events
 export class Pos extends Serializable \Pos
 export class PosObj extends Serializable \PosObj classes: pos: Pos
 export class Block extends Serializable \Block
-export class BlockPos extends Serializable \BlockPos classes: pos: Pos, block: Block
-export class Chunk extends Serializable \Chunk classes: cid: Pos
+export class BlockPos extends Serializable \BlockPos classes: pos: Pos
+export class Chunk extends Serializable \Chunk vectors: {blocks: Block}, classes: cid: Pos
 export class Player extends Serializable \Player classes: pos: Pos
 
 export class Message extends Serializable \Message, union: \body

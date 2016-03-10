@@ -1,5 +1,5 @@
 require! {
-  \../../../flatbuffers/js/flatbuffers : {flatbuffers}
+  \flatbuffers/src/flatbuffers : {flatbuffers}
   \../../common/generated_include/chunk_generated : {{fbs}:blocks}
 }
 
@@ -19,6 +19,7 @@ module.exports = Serializable = (name, options) ->
 
     @_fbs_type = type
     _fbs_type: type
+    _type: name
 
     (args) ->
       if fbs.AType[name]?
@@ -29,10 +30,15 @@ module.exports = Serializable = (name, options) ->
       it = builder
       if type is \table
         res = props
+          |> filter ~> @[it]?
           |> map ~>
+            | is-type \Array @[it] =>
+              a = (@[it] |> map (.Serialize builder))
+              o = fbsObj[\create + capitalize(it) + \Vector] builder, a
+              [it, o]
             | @[it].Serialize? and @[it]._fbs_type is \table => [it, @[it].Serialize builder]
             | @[it].Serialize? and @[it]._fbs_type is \struct => [it, @[it]~Serialize]
-            | _               =>  [it, @[it]]
+            | _                                               =>  [it, @[it]]
 
         fbsObj[\start + name] it
         for prop in res
@@ -54,6 +60,12 @@ module.exports = Serializable = (name, options) ->
           serie[it] = options.classes[it].Deserialize obj[it]!
         else
           serie[it] = obj[it]!
+
+        if obj[it + \Length]?
+          len = obj[it + \Length]!
+          serie[it] = []
+          for i from 0 til len
+            serie[it].push options.vectors[it].Deserialize obj[it] i
 
       new @ serie
 

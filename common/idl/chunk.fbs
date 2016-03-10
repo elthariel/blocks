@@ -21,7 +21,7 @@ struct Pos {
   z:int;
 }
 
-struct Block {
+table Block {
   id: ushort;
   variant: ushort;
   air: bool;

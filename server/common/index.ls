@@ -22,7 +22,6 @@ export class Message extends Serializable \Message, union: \body
     (fbs.AType.PosObj): PosObj
 
   Serialize: ->
-    console.log 'Serialize' @body.pos.x
     builder = new flatbuffers.Builder 0
     res = super builder
     builder.finish res
@@ -32,11 +31,7 @@ export class Message extends Serializable \Message, union: \body
     arr = new Uint8Array buffer
     buf = new flatbuffers.ByteBuffer arr
     msg = fbs.Message.getRootAsMessage buf
-    console.log 'TOTO' msg.body(new fbs.PosObj).pos!x!
     msg = super msg
-    # console.log msg
-    # msg.body = @types_classes[msg.bodyType].Deserialize msg.body
-    # msg
 
   @Create = (action, body) ->
     bodyType = @types_actions[action]

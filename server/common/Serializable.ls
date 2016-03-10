@@ -33,29 +33,21 @@ module.exports = Serializable = (name, options) ->
 
         fbsObj[\start + name] it
         for prop in res
-          console.log (\add + capitalize prop.0), prop.1
           fbsObj[\add + capitalize prop.0] it, prop.1
         return fbsObj[\end + name] it
       else if type is \struct
         args = props |> map ~> @[it]
         args.unshift it
-        # console.log (\create + name), args
         return fbsObj[\create + name].apply fbsObj, args
 
     @Deserialize = (obj) ->
-      console.log "Deserialize"
       serie = {}
       props |> each ->
-        console.log 'options?' options
         if it is options?.union
-          console.log 'UNION !' common.Message.types_classes[obj[it + \Type]!]#, obj[it] types[obj[it + \Type]!]
           serie[it] = common.Message.types_classes[obj[it + \Type]!].Deserialize obj[it] new types[obj[it + \Type]!]
-          # serie[it] =  obj[it] types[obj[it + \Type]!]
         else if options?.classes?[it]?
-          console.log 'Classes !' options.classes[it]
           serie[it] = options.classes[it].Deserialize obj[it]!
         else
-          console.log 'normal' obj[it]
           serie[it] = obj[it]!
 
       new @ serie

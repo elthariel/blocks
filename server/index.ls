@@ -60,7 +60,10 @@ socket = new Socket
   ..Subscribe \foo
   ..On fbs.Action.MOVE, (pos) ->
     console.log 'MOOVE' pos
+  ..On fbs.Action.INITIAL_POS, (pos) ->
+    console.log 'INITIAL_POS' pos
   ..Emit      \foo fbs.Action.MOVE, new common.PosObj pos: new common.Pos x: 1 y: 2 z: 3
+  ..Emit      \foo fbs.Action.INITIAL_POS, new common.PosObj pos: new common.Pos x: 1 y: 2 z: 3
 
 # world.players
 # world.players.[ID]

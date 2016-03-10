@@ -15,6 +15,57 @@
 
 using namespace std;
 
+#define epsilon (std::numeric_limits<float>::epsilon())
+
+// static int64_t floor_to_int(double f, int64_t precision = 100000)
+// {
+//   f *= precision;
+//   int64_t tmp = f >= 0 ? (int64_t)(f+0.5) : (int64_t)(f-0.5);
+//   int64_t result = tmp / precision;
+//   if (f < -epsilon && tmp % precision)
+//     --result;
+//   std::cout << "Float -> int : " << f
+//             << " -> " << tmp
+//             << " -> " << result
+//             << std::endl;
+//   return result;
+// }
+
+static int64_t floor_to_int(double d, double margin = 100.0)
+{
+  double floored = std::floor(d);
+  int64_t result;
+
+  if (d < epsilon * margin && d > -epsilon * margin)
+    {
+      std::cout << "zero" << std::endl;
+      floored = 0.0;
+      result = 0;
+    }
+  else
+    {
+      if (1.0 - std::fabs(floored - d) <= margin * epsilon)
+        if (d > 0)
+          floored = d + margin * epsilon;
+        else
+          floored = d + margin * epsilon - 1;
+
+
+      // if (d > 0.0)
+      result = floored;
+      // else
+      //   result = ((int64_t)floored - margin * epsilon) - 1;
+    }
+
+    std::cout << "Float -> int : " << d
+              << " -> " << floored
+              << " -> " << result
+              << std::endl;
+
+    return result;
+}
+
+
 namespace blocks
 {
   namespace systems
@@ -97,21 +148,30 @@ namespace blocks
           {
             auto hp = hit.get_hit_pos();
             auto hn = hit.get_hit_normal();
-            common::wpos pos(hp.get_x(), hp.get_y(), hp.get_z());
+            common::wpos pos(floor_to_int(hp.get_x()),
+                             floor_to_int(hp.get_y()),
+                             floor_to_int(hp.get_z()));
 
-            if (hn.get_x() > 0) pos.x()--;
-            if (hn.get_y() > 0) pos.y()--;
-            if (hn.get_z() > 0) pos.z()--;
+
+            // If the normal is positive, I'm on the 'outside' face. Then i
+            // subtract one to get the actual wpos;
+            if (hn.get_x() > 0.0) pos.x()--;
+            if (hn.get_y() > 0.0) pos.y()--;
+            if (hn.get_z() > 0.0) pos.z()--;
+
 
             _scene->aim_cube().show();
-            _scene->aim_cube().set_pos(pos.x() - 0.002,
-                                       pos.y() - 0.002,
-                                       pos.z() - 0.002);
+            _scene->aim_cube().set_pos(pos.x() - 0.002f,
+                                       pos.y() - 0.002f,
+                                       pos.z() - 0.002f);
 
             // std::cout << "Picking something."
-            //           << "pos: " << hit.get_hit_pos()
-            //           << " normal: " << hit.get_hit_normal()
+            //           << " fpos: " << hit.get_hit_pos()
+            //           << " | ipos: " << pos.x() << ':' << pos.y() << ":" << pos.z()
+            //           << " | aimpos: "
+            //           << _scene->aim_cube().get_pos()
             //           << std::endl;
+
           }
           else
             _scene->aim_cube().hide();

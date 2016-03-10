@@ -7,7 +7,9 @@
 #include <mruby/compile.h>
 #include <mruby/array.h>
 #include <mruby/hash.h>
+
 #include <string>
+#include <functional>
 
 #undef mrb_int
 

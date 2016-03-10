@@ -119,25 +119,25 @@ namespace blocks
 
     void Network::receive(const events::key &e)
     {
-      if (e.code == events::key::kcode::USE && e.type == events::key::ktype::DOWN)
-      {
-        auto entity = _game->player();
-        auto pos = entity.component<components::Position>().get()->to_wpos();
+      // if (e.code == events::key::kcode::USE && e.type == events::key::ktype::DOWN)
+      // {
+      //   auto entity = _game->player();
+      //   auto pos = entity.component<components::Position>().get()->to_wpos();
 
-        Block block(1);
-        BlockPos bpos(block, pos);
+      //   Block block(1);
+      //   BlockPos bpos(block, pos);
 
-        _socket->write(Protocole::create_message(fbs::Action::Action_PLACE_BLOCK,
-                                                 fbs::AType::AType_BlockPos, &bpos));
-      }
-      else if (e.code == events::key::kcode::MINE && e.type == events::key::ktype::DOWN)
-      {
-        auto entity = _game->player();
-        auto pos = entity.component<components::Position>().get()->to_wpos();
+      //   _socket->write(Protocole::create_message(fbs::Action::Action_PLACE_BLOCK,
+      //                                            fbs::AType::AType_BlockPos, &bpos));
+      // }
+      // else if (e.code == events::key::kcode::MINE && e.type == events::key::ktype::DOWN)
+      // {
+      //   auto entity = _game->player();
+      //   auto pos = entity.component<components::Position>().get()->to_wpos();
 
-        _socket->write(Protocole::create_message(fbs::Action::Action_BREAK_BLOCK,
-                                                 fbs::AType::AType_PosObj, &pos));
-      }
+      //   _socket->write(Protocole::create_message(fbs::Action::Action_BREAK_BLOCK,
+      //                                            fbs::AType::AType_PosObj, &pos));
+      // }
     }
   }
 }

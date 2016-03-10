@@ -28,14 +28,15 @@ namespace blocks
         MOVE_LEFT,
         MOVE_RIGHT,
         MOVE_JUMP,
+        MOVE_FLY,
         SYS_GRAB_MOUSE,
         SYS_FULLSCREEN,
         SYS_EXIT,
         DEBUG_WIREFRAME,
         DEBUG_PHYSICS,
-        COUNT,
         USE,
-        MINE
+        MINE,
+        COUNT
       } code;
 
       key() : type(ktype::DOWN), code(kcode::INVALID) {}

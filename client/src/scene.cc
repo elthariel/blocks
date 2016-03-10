@@ -152,7 +152,7 @@ namespace blocks
     tex->set_wrap_u(Texture::WrapMode::WM_clamp);
     tex->set_wrap_v(Texture::WrapMode::WM_clamp);
 
-    _aim_cube = _scene.attach_new_node(models::make<models::Box>("aim", 1.02));
+    _aim_cube = _scene.attach_new_node(models::make<models::Box>("aim", 1.004));
     _aim_cube.set_color(0, 0, 0, 1);
     _aim_cube.set_texture(tex);
     _aim_cube.set_transparency(TransparencyAttrib::M_alpha);

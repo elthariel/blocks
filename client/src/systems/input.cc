@@ -1,4 +1,3 @@
-
 #include "systems/input.hh"
 
 #include "pandaFramework.h"
@@ -34,6 +33,7 @@ namespace blocks
       _mappings["s"] = events::key::kcode::MOVE_BACKWARD;
       _mappings["a"] = events::key::kcode::MOVE_LEFT;
       _mappings["d"] = events::key::kcode::MOVE_RIGHT;
+      _mappings["f"] = events::key::kcode::MOVE_FLY;
       _mappings["space"] = events::key::kcode::MOVE_JUMP;
 
       // System keys

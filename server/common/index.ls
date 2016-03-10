@@ -1,7 +1,7 @@
 require! {
   \./Serializable
   \../../../flatbuffers/js/flatbuffers : {flatbuffers}
-  \../../blocks_generated : {{fbs}:blocks}
+  \../blocks_generated : {{fbs}:blocks}
 }
 
 export class Pos extends Serializable \Pos

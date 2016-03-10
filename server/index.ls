@@ -1,11 +1,12 @@
+global import require \prelude-ls
 require! {
-  \prelude-ls
   \rabbit.js : rabbit
   events: {EventEmitter}
-  \../flatbuffers/js/flatbuffers : {flatbuffers}
+  \../../flatbuffers/js/flatbuffers : {flatbuffers}
   \./blocks_generated : {{fbs}:blocks}
-  \./server/common
+  \./common
 }
+
 
 class Socket extends EventEmitter
   (@eventQueue = \events) ->

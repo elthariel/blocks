@@ -1,6 +1,6 @@
 require! {
   \../../../flatbuffers/js/flatbuffers : {flatbuffers}
-  \../../blocks_generated : {{fbs}:blocks}
+  \../blocks_generated : {{fbs}:blocks}
 }
 
 module.exports = Serializable = (name, options) ->

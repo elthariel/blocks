@@ -41,7 +41,7 @@ target_link_libraries(common duktape)
 
 add_custom_command(
   TARGET ${PROJECT_NAME} PRE_BUILD
-  COMMAND ln -sfh ${CMAKE_SOURCE_DIR}/ruby ${DIST_RB}/common
+  COMMAND ln -sfT ${CMAKE_SOURCE_DIR}/ruby ${DIST_RB}/common
 )
 
 # Build tests !

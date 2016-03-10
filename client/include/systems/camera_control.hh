@@ -18,9 +18,11 @@ namespace blocks
       void receive(const events::key &e);
       void receive(const events::mouse &e);
     protected:
-      LPoint2f  mouse_offset;
-      LVector3f move;
-      LVector3f move_absolute;
+      bool _do_fly = false;
+      bool _do_jump = false;
+      LPoint2f  _mouse_offset;
+      LVector3f _move;
+      LVector3f _move_absolute;
     };
   }
 }

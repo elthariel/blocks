@@ -31,7 +31,7 @@ set(BLOCKS_COMMON_GENERATED_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/common/generated_i
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 set(Boost_USE_MULTITHREADED YES)
-find_package(Boost 1.58 REQUIRED
+find_package(Boost 1.55 REQUIRED
   COMPONENTS
   system
   timer

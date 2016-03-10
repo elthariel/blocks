@@ -21,6 +21,7 @@ namespace blocks {
         std::get<1>(*this) = 0;
         std::get<2>(*this) = 0;
       }
+      pos(float x, float y, float z);
 
       inline int64_t &x() { return std::get<0>(*this); }
       inline int64_t &y() { return std::get<1>(*this); }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/thread.hh"
 #include "common/chunk.hh"
 #include "pipe.hh"
 
@@ -7,15 +8,13 @@
 #include <bulletShape.h>
 #include <bulletRigidBodyNode.h>
 
-#include <thread>
-#include <atomic>
 #include <utility>
 #include <memory>
 #include <tuple>
 
 namespace blocks {
 
-  class MeshingThread
+  class MeshingThread : public Thread
   {
   public:
     typedef std::tuple<common::cid,
@@ -28,14 +27,9 @@ namespace blocks {
                   Pipe<MeshingThread::result> &_output);
     ~MeshingThread();
 
-    void stop();
-
   protected:
-    void thread_loop();
+    void main_loop();
     void process_chunk(common::Chunk::ptr chunk);
-
-    std::thread _thread;
-    std::atomic_bool _running;
 
     Pipe<common::Chunk::ptr> &_input_pipe;
     Pipe<MeshingThread::result> &_output_pipe;

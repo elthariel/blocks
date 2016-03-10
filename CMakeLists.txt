@@ -9,6 +9,7 @@ project (blocks)
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 set(THIRD_PARTY ${CMAKE_SOURCE_DIR}/third-party)
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+set(DEPS_DIR ${CMAKE_SOURCE_DIR}/deps)
 
 set(DIST ${CMAKE_BINARY_DIR}/dist)
 set(DIST_BIN ${CMAKE_BINARY_DIR}/dist/bin)

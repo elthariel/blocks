@@ -1,9 +1,10 @@
-
 #include "game.hh"
 #include "mruby.hh"
+#include "proton.hh"
 
 #include <iostream>
 #include <string>
+#include <chrono>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -28,8 +29,15 @@ int main(int ac, char **av)
 
   chdir_to_bin(av[0]);
 
-  blocks::Game game(ac, av);
-  game.start();
+  Proton p("ampq:://127.0.0.1:5672/examples");
+  p.start();
+
+  this_thread::sleep_for (chrono::seconds(5));
+  p.join();
+
+
+  // blocks::Game game(ac, av);
+  // game.start();
 
   // ruby::mruby mrb("../ruby/");
   // auto v = mrb.run("client/textures.rb");

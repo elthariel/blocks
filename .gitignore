@@ -40,6 +40,7 @@ GPATH
 # Cmake build directory
 build
 dist
+deps
 
 # Generated stuff
 common/generated_include

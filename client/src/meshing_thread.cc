@@ -1,4 +1,3 @@
-
 #include "meshing_thread.hh"
 #include "mesher.hh"
 
@@ -12,22 +11,14 @@ using namespace std;
 namespace blocks {
   MeshingThread::MeshingThread(Pipe<common::Chunk::ptr> &_input,
                                Pipe<MeshingThread::result> &_output)
-  : _running(true),
-    _thread([=] { thread_loop(); }),
-    _input_pipe(_input), _output_pipe(_output)
+    : Thread(true),
+      _input_pipe(_input),
+      _output_pipe(_output)
   {
   }
 
   MeshingThread::~MeshingThread()
   {
-    stop();
-    _thread.join();
-  }
-
-  void MeshingThread::stop()
-  {
-    // cout << "Stopping meshing thread." << endl;
-    _running = false;
   }
 
   void MeshingThread::process_chunk(common::Chunk::ptr chunk)
@@ -44,17 +35,10 @@ namespace blocks {
                                           chunk);
   }
 
-  void MeshingThread::thread_loop()
+  void MeshingThread::main_loop()
   {
-    cout << "Started meshing thread." << endl;
-
-    while(_running) {
-      common::Chunk::ptr chunk = _input_pipe.wait_for_data(500, _running);
-      if (chunk)
-        process_chunk(chunk);
-    }
-
-    cout << "Meshing thread exiting" << endl;
+    common::Chunk::ptr chunk = _input_pipe.wait_for_data(500, _running);
+    if (chunk)
+      process_chunk(chunk);
   }
-
 }

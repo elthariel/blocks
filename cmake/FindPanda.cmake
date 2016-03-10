@@ -5,6 +5,7 @@
 find_path(PANDA_INCLUDE
   panda.h
   HINTS
+  ${DEPS_DIR}/deps/panda3d/include
   ${CMAKE_SOURCE_DIR}/../panda3d/built/include
   ENV PANDA_INCLUDE
   NO_CMAKE_SYSTEM_PATH
@@ -13,6 +14,7 @@ find_path(PANDA_INCLUDE
 find_library(LIBPANDA
   panda
   HINTS
+  ${DEPS_DIR}/deps/panda3d/lib
   ${CMAKE_SOURCE_DIR}/../panda3d/built/lib
   ENV LIBPANDA
   NO_CMAKE_SYSTEM_PATH

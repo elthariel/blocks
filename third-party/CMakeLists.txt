@@ -1,4 +1,3 @@
-
 add_subdirectory(duktape)
 
 set(ENTITYX_BUILD_SHARED 0)

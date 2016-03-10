@@ -30,14 +30,13 @@ endforeach(FBS_FILE)
 include_directories(
   ${FLATBUFFERS_INCLUDE_DIRS}
   ${THIRD_PARTY}/duktape
-  ${THIRD_PARTY}/rabbitmq/librabbitmq
   )
 
 add_definitions(-std=c++14)
 add_library(common STATIC
   ${COMMON_GENERATED_HEADERS} ${COMMON_HEADERS} ${COMMON_SOURCES}
 )
-target_link_libraries(common duktape)
+target_link_libraries(common duktape rabbitmq)
 
 add_custom_command(
   TARGET ${PROJECT_NAME} PRE_BUILD

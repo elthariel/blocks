@@ -47,6 +47,7 @@ include_directories(
   ${BLOCKS_COMMON_INCLUDE_DIR}
   ${BLOCKS_COMMON_GENERATED_INCLUDE_DIR}
   ${Boost_INCLUDE_DIRS}
+  ${THIRD_PARTY}/rabbitmq/librabbitmq
 )
 
 add_definitions(-fpermissive)

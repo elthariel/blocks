@@ -1,6 +1,6 @@
-
 #include "game.hh"
 #include "mruby.hh"
+#include "bunny.hh"
 
 #include <iostream>
 #include <string>
@@ -28,8 +28,19 @@ int main(int ac, char **av)
 
   chdir_to_bin(av[0]);
 
-  blocks::Game game(ac, av);
-  game.start();
+  BunnyServer server;
+  server.connect("localhost", 5672, "guest", "guest");
+  auto chan = server.channel(1);
+
+  std::string msg = "hello world !";
+  BunnyProperties props;
+  amqp_bytes_t bytes;
+  props.content_type("text/plain");
+
+  chan->publish("", "", props, (void *)msg.c_str(), msg.size());
+
+  // blocks::Game game(ac, av);
+  // game.start();
 
   // ruby::mruby mrb("../ruby/");
   // auto v = mrb.run("client/textures.rb");
@@ -42,15 +53,3 @@ int main(int ac, char **av)
 
   return 0;
 }
-
-// #include "Client.hh"
-// int			   main(int ac, char **av)
-// {
-//   if (ac != 3)
-//   {
-//     std::cerr << "Usage : ./client IP PORT" << std::endl;
-//     return (0);
-//   }
-//   Client client(av[1], av[2]);
-//   return (0);
-// }

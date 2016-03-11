@@ -13,7 +13,7 @@ enum Action:byte { MOVE = 0,
                    PLAYER_DISCONNECT,
                    AUTH}
 
-union AType { Player, PlayerAuth, Chunk, PosObj, BlockPos, BoolAnswer}
+union AType { Player, PlayerAuth, Chunk, PosObj, BlockPos, BoolAnswer, Error}
 
 struct Pos {
   x:int;
@@ -21,7 +21,7 @@ struct Pos {
   z:int;
 }
 
-struct Block {
+table Block {
   id: ushort;
   variant: ushort;
   air: bool;
@@ -62,5 +62,13 @@ table BoolAnswer {
 
 table Message {
   action:Action;
+  body:AType;
+}
+
+table Error {
+  err: string;
+}
+
+table RPC {
   body:AType;
 }

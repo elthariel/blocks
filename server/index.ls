@@ -1,38 +1,42 @@
 global import require \prelude-ls
 require! {
-  \./common : {Events, RPCReceiver, RPCEmitter, PosObj, Pos, Player, Block, Chunk, PlayerAuth}
+  \./common : {Events, RPCReceiver, RPCEmitter, PosObj, Pos, Player, Block, Chunk, PlayerAuth, BoolAnswer, Error}
   nodulator: N
 }
 
 NPlayer = N \player
+  ..Create login: \test pass: \test #pos: JSON.stringify x: 1 y: 2 z: 3
 
 class Auth
   ->
-    @rpc = new RPCReceiver do
-      (RPCReceiver.AUTH): @~Auth
+    @rpc = new RPCReceiver @
 
-  Auth: (player, done) ->
-    NPlayer.Fetch login: player.login
+  (PlayerAuth._atype): (playerAuth, done) ->
+    console.log 'Auth rpc !' playerAuth
+    NPlayer.Fetch login: playerAuth.login
       .Then ~>
-        if it.pass is player.pass
-          return done null true
-        done null false
+        console.log 'THEN' it
+        if it.pass is playerAuth.pass
+          it <<< pos: new Pos x: 1 y: 2 z: 3
+          return done null new Player it
+        done null new BoolAnswer answer: false
       .Catch ~>
-        done null false
+        console.log 'AUTH: USER NOT FOUND' it
+        done null new Error err: it.status
 
 class Game
   ->
-    @socket = new Events
+    # @socket = new Events
 
 class Client
   ->
     @socket = new Events
     @rpc = new RPCEmitter
-    @rpc.ask RPCEmitter.AUTH, new PlayerAuth(login: \test pass: \test), (err, res) ~>
+    @rpc.ask new PlayerAuth(login: \test pass: \test), (err, res) ~>
       console.log "Client AUTH answer" err, res
 
 new Auth
-new Game
+# new Game
 new Client
 
 # block = new Block id: 1 variant: 0, air: true, transparent: true, light: 0

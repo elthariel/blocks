@@ -1,5 +1,5 @@
 require! {
-  \../../../flatbuffers/js/flatbuffers : {flatbuffers}
+  \flatbuffers/src/flatbuffers : {flatbuffers}
   \../../common/generated_include/chunk_generated : {{fbs}:blocks}
 }
 
@@ -13,12 +13,18 @@ module.exports = Serializable = (name, options) ->
 
   props = keys fbsObj:: .[1 to]
 
-  types = {0: void, 1: fbs.Player, 2: fbs.Chunk, 3: fbs.PosObj, 4: fbs.BlockPos}
-
+  types = map (fbs.), (keys fbs.AType)
   class _Serializable
 
     @_fbs_type = type
+    @_type_name = name
+    @_type = fbs[name]
+    @_atype = fbs.AType[name]
+
     _fbs_type: type
+    _type_name: name
+    _type: fbs[name]
+    _atype: fbs.AType[name]
 
     (args) ->
       if fbs.AType[name]?
@@ -29,10 +35,16 @@ module.exports = Serializable = (name, options) ->
       it = builder
       if type is \table
         res = props
+          |> filter ~> @[it]?
           |> map ~>
+            | is-type \String @[it] => [it, builder.createString @[it]]
+            | is-type \Array @[it] =>
+              a = (@[it] |> map (.Serialize builder))
+              o = fbsObj[\create + capitalize(it) + \Vector] builder, a
+              [it, o]
             | @[it].Serialize? and @[it]._fbs_type is \table => [it, @[it].Serialize builder]
             | @[it].Serialize? and @[it]._fbs_type is \struct => [it, @[it]~Serialize]
-            | _               =>  [it, @[it]]
+            | _                                               =>  [it, @[it]]
 
         fbsObj[\start + name] it
         for prop in res
@@ -47,13 +59,22 @@ module.exports = Serializable = (name, options) ->
 
     @Deserialize = (obj) ->
       serie = {}
+      console.log 'Deserialize' name
       props |> each ->
         if it is options?.union
+          console.log it, obj[it + \Type]!
           serie[it] = common.Message.types_classes[obj[it + \Type]!].Deserialize obj[it] new types[obj[it + \Type]!]
         else if options?.classes?[it]?
           serie[it] = options.classes[it].Deserialize obj[it]!
         else
           serie[it] = obj[it]!
+
+        if obj[it + \Length]?
+          len = obj[it + \Length]!
+          serie[it] = []
+          for i from 0 til len
+            serie[it].push options.vectors[it].Deserialize obj[it] i
+        console.log serie[it]
 
       new @ serie
 

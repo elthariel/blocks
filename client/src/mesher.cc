@@ -169,10 +169,15 @@ namespace blocks {
     //      << w << ":"  << h << ":"
     //      << endl;
 
+    float e = 0.001;
     for(auto i = 0; i < 4; ++i)
     {
-      _vertex.add_data3f(quads[i][0], quads[i][1], quads[i][2]);
-      _normal.add_data3f(normals[face][0], normals[face][1], normals[face][2]);
+      _vertex.add_data3f(quads[i][0] + e,
+                         quads[i][1] + e,
+                         quads[i][2] + e);
+      _normal.add_data3f(normals[face][0],
+                         normals[face][1],
+                         normals[face][2]);
     }
 
     _uvs.add_data2f(0, 0);

@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.0)
 
 project(common)
@@ -39,10 +38,15 @@ add_library(common STATIC
 )
 target_link_libraries(common duktape)
 
-add_custom_command(
-  TARGET ${PROJECT_NAME} PRE_BUILD
-  COMMAND ln -sfT ${CMAKE_SOURCE_DIR}/ruby ${DIST_RB}/common
-)
+if (UNIX)
+  add_custom_command(
+    TARGET ${PROJECT_NAME} PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_SOURCE_DIR}/common/ruby
+        ${DIST_RB}/common
+    )
+endif()
+
 
 # Build tests !
 #set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")

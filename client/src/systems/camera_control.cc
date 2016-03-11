@@ -13,7 +13,7 @@ namespace blocks
       events.subscribe<events::mouse>(*this);
     }
 
-    float cam_sensitivity = 0.2;
+    float cam_sensitivity = 0.01;
     float _move_speed = 0.2;
     void CameraControl::update(ex::EntityManager &entities,
                                ex::EventManager &events,
@@ -27,7 +27,7 @@ namespace blocks
         auto cam = node.get_child(0);
         LVecBase3 hpr = cam.get_hpr();
 
-        if(_do_fly)
+        if (_do_fly)
           {
             _do_fly = false;
             if (c_node->get_gravity() > 0.1)

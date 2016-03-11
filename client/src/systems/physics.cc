@@ -12,12 +12,11 @@
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
+#include <cfenv>
 
 using namespace std;
 
-#define epsilon (std::numeric_limits<float>::epsilon())
-
-// static int64_t floor_to_int(double f, int64_t precision = 100000)
+// static int64_t floor_to_int(double f, int64_t precision = 1000)
 // {
 //   f *= precision;
 //   int64_t tmp = f >= 0 ? (int64_t)(f+0.5) : (int64_t)(f-0.5);
@@ -50,20 +49,39 @@ static int64_t floor_to_int(double d, double margin = 100.0)
         else
           floored = d + margin * epsilon - 1;
 
-
-      // if (d > 0.0)
       result = floored;
-      // else
-      //   result = ((int64_t)floored - margin * epsilon) - 1;
     }
 
-    std::cout << "Float -> int : " << d
-              << " -> " << floored
-              << " -> " << result
-              << std::endl;
+    // std::cout << "Float -> int : " << d
+    //           << " -> " << floored
+    //           << " -> " << result
+    //           << std::endl;
 
     return result;
 }
+
+static blocks::common::wpos point_to_wpos(LPoint3 p)
+{
+  return blocks::common::wpos(floor_to_int(p.get_x()),
+                              floor_to_int(p.get_y()),
+                              floor_to_int(p.get_z()));
+}
+
+// #pragma STDC FENV_ACCESS ON
+// static int64_t floor_to_int(float f)
+// {
+//   int64_t result;
+//   int rounding_mode = std::fegetround();
+
+//   if (std::fesetround(FE_DOWNWARD))
+//     std::cout << "Unable to change float rounding mode" << std::endl;
+
+//   result = llrintf(f);
+
+//   std::fesetround(rounding_mode);
+
+//   return result;
+// }
 
 
 namespace blocks
@@ -141,29 +159,29 @@ namespace blocks
           auto forward = cam.get_quat().get_forward();
           auto pos_from = node.get_pos() + cam.get_pos();
           auto pos_to = pos_from + forward * 10;
-          auto hit = _world->ray_test_closest(pos_from, pos_to,
-                                              BitMask32::bit(3));
+          auto mask = BitMask32::bit(3);
+          auto hit = _world->ray_test_closest(pos_from, pos_to, mask);
 
           if (hit.has_hit())
           {
             auto hp = hit.get_hit_pos();
             auto hn = hit.get_hit_normal();
-            common::wpos pos(floor_to_int(hp.get_x()),
-                             floor_to_int(hp.get_y()),
-                             floor_to_int(hp.get_z()));
+            common::wpos pos(point_to_wpos(hp));
 
-
-            // If the normal is positive, I'm on the 'outside' face. Then i
-            // subtract one to get the actual wpos;
-            if (hn.get_x() > 0.0) pos.x()--;
-            if (hn.get_y() > 0.0) pos.y()--;
-            if (hn.get_z() > 0.0) pos.z()--;
-
-
-            _scene->aim_cube().show();
-            _scene->aim_cube().set_pos(pos.x() - 0.002f,
-                                       pos.y() - 0.002f,
-                                       pos.z() - 0.002f);
+            auto pos_to2 = hp + LPoint3(0.001) + forward;
+            auto hit2 = _world->ray_test_closest(pos_from, pos_to2, mask);
+            if (hit2.has_hit())
+              if (common::wpos(point_to_wpos(hit2.get_hit_pos())) == pos)
+                {
+                  // If the normal is positive, I'm on the 'outside' face. Then i
+                  // subtract one to get the actual wpos;
+                  if (hn.get_x() > 0.0) pos.x()--;
+                  if (hn.get_y() > 0.0) pos.y()--;
+                  if (hn.get_z() > 0.0) pos.z()--;
+                  _scene->aim_cube().set_pos(pos.x() - 0.002f,
+                                             pos.y() - 0.002f,
+                                             pos.z() - 0.002f);
+                }
 
             // std::cout << "Picking something."
             //           << " fpos: " << hit.get_hit_pos()
@@ -172,6 +190,7 @@ namespace blocks
             //           << _scene->aim_cube().get_pos()
             //           << std::endl;
 
+            _scene->aim_cube().show();
           }
           else
             _scene->aim_cube().hide();

@@ -41,6 +41,10 @@ target_link_libraries(blocks_client
 
 add_custom_command(
   TARGET ${PROJECT_NAME} PRE_BUILD
-  COMMAND ln -sfT ${CMAKE_SOURCE_DIR}/media ${DIST}/media
-  COMMAND ln -sfT ${CMAKE_SOURCE_DIR}/client/ruby ${DIST_RB}/client
+  COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_SOURCE_DIR}/client/ruby
+        ${DIST_RB}/client
+  COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_SOURCE_DIR}/media
+        ${DIST}/media
 )

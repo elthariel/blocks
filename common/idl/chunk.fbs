@@ -3,17 +3,17 @@ namespace blocks.fbs;
 
 // Not used anymore but kept for reference and later use in the protocol, maybe ?
 
-enum Action:byte { INITIAL_POS = 0,
-                   MOVE = 1,
-                   ASK_CHUNK = 2,
-                   CHUNK = 3,
-                   PLACE_BLOCK = 4,
-                   BREAK_BLOCK = 5,
-                   UPDATE_BLOCK = 6,
-                   PLAYER_CONNECT = 7,
-                   PLAYER_DISCONNECT = 8 }
+enum Action:byte { MOVE = 0,
+                   ASK_CHUNK,
+                   CHUNK,
+                   PLACE_BLOCK,
+                   BREAK_BLOCK,
+                   UPDATE_BLOCK,
+                   PLAYER_CONNECT,
+                   PLAYER_DISCONNECT,
+                   AUTH}
 
-union AType { Player, Chunk, PosObj, BlockPos }
+union AType { Player, PlayerAuth, Chunk, PosObj, BlockPos, BoolAnswer}
 
 struct Pos {
   x:int;
@@ -47,7 +47,17 @@ table Chunk {
 
 table Player {
   id:int;
+  login: string;
   pos:Pos;
+}
+
+table PlayerAuth {
+  login: string;
+  pass: string;
+}
+
+table BoolAnswer {
+  answer: bool;
 }
 
 table Message {

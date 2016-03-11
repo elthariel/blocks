@@ -62,7 +62,7 @@ namespace blocks {
     flags_at(p) &= ~(1L << offset);
   }
 
-  auto &MesherWorkBuffer::block_ids()
+  std::list<int32_t> &MesherWorkBuffer::block_ids()
   {
     return _block_ids;
   }

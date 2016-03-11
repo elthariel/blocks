@@ -29,7 +29,7 @@ namespace blocks {
     void set_face_visible(const common::cpos &p, unsigned face, bool visible);
     bool get_face_meshed(const common::cpos &p, unsigned face);
     void set_face_meshed(const common::cpos &p, unsigned face, bool meshed);
-    auto &block_ids();
+    std::list<int32_t> &block_ids();
 
   protected:
     uint32_t &flags_at(const common::cpos &p);

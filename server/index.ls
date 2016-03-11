@@ -1,25 +1,57 @@
 global import require \prelude-ls
 require! {
-  \./common : {Events, PosObj, Pos, Player, Block, Chunk}
+  \./common : {Events, RPCReceiver, RPCEmitter, PosObj, Pos, Player, Block, Chunk, PlayerAuth}
+  nodulator: N
 }
 
-block = new Block id: 1 variant: 0, air: true, transparent: true, light: 0
+NPlayer = N \player
 
-socket = new Events
-  ..subscribe \foo
+class Auth
+  ->
+    @rpc = new RPCReceiver do
+      (RPCReceiver.AUTH): @~Auth
 
-  ..on Events.MOVE, (player) ->
-    console.log 'MOVE' player
+  Auth: (player, done) ->
+    NPlayer.Fetch login: player.login
+      .Then ~>
+        if it.pass is player.pass
+          return done null true
+        done null false
+      .Catch ~>
+        done null false
 
-  ..on Events.INITIAL_POS, (pos) ->
-    console.log 'INITIAL_POS' pos
+class Game
+  ->
+    @socket = new Events
 
-  ..on Events.CHUNK, (chunk) ->
-    console.log 'CHUNK' chunk
+class Client
+  ->
+    @socket = new Events
+    @rpc = new RPCEmitter
+    @rpc.ask RPCEmitter.AUTH, new PlayerAuth(login: \test pass: \test), (err, res) ~>
+      console.log "Client AUTH answer" err, res
 
-  # ..emit      \foo Events.MOVE, new Chunk version: 0, size: 16, blocks: [block], cid: new Pos x: 1 y: 2 z: 3
-  ..emit      \foo Events.MOVE, new Player id: 42, pos: new Pos x: 1 y: 2 z: 3
-  ..emit      \foo Events.INITIAL_POS, new PosObj pos: new Pos x: 1 y: 2 z: 3
+new Auth
+new Game
+new Client
+
+# block = new Block id: 1 variant: 0, air: true, transparent: true, light: 0
+#
+# socket = new Events
+#   ..subscribe \foo
+#
+#   ..on Events.MOVE, (player) ->
+#     console.log 'MOVE' player
+#
+#   ..on Events.INITIAL_POS, (pos) ->
+#     console.log 'INITIAL_POS' pos
+#
+#   ..on Events.CHUNK, (chunk) ->
+#     console.log 'CHUNK' chunk
+#
+#   # ..emit      \foo Events.MOVE, new Chunk version: 0, size: 16, blocks: [block], cid: new Pos x: 1 y: 2 z: 3
+#   ..emit      \foo Events.MOVE, new Player id: 42, pos: new Pos x: 1 y: 2 z: 3
+#   ..emit      \foo Events.INITIAL_POS, new PosObj pos: new Pos x: 1 y: 2 z: 3
 
 # world.players
 # world.players.[ID]

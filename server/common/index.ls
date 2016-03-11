@@ -6,12 +6,15 @@ require! {
 
 Events = require \./Events
 export Events.Events
+export Events.RPCReceiver
+export Events.RPCEmitter
 export class Pos extends Serializable \Pos
 export class PosObj extends Serializable \PosObj classes: pos: Pos
 export class Block extends Serializable \Block
 export class BlockPos extends Serializable \BlockPos classes: pos: Pos, block: Block
 export class Chunk extends Serializable \Chunk classes: cid: Pos
 export class Player extends Serializable \Player classes: pos: Pos
+export class PlayerAuth extends Serializable \PlayerAuth
 
 export class Message extends Serializable \Message, union: \body
 
@@ -25,7 +28,7 @@ export class Message extends Serializable \Message, union: \body
     (fbs.Action.UPDATE_BLOCK): fbs.AType.BlockPos
     (fbs.Action.PLAYER_CONNECT): fbs.AType.Player
     (fbs.Action.PLAYER_DISCONNECT): fbs.AType.Player
-
+    (fbs.Action.AUTH): fbs.AType.Player
 
   @types_classes =
     (fbs.AType.PosObj): PosObj

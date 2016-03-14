@@ -76,11 +76,11 @@ namespace blocks {
 
         flatbuffers::Offset<fbs::Chunk> serialize(flatbuffers::FlatBufferBuilder &builder)
         {
-            std::vector<fbs::Block> blocks_vector;
+            std::vector<flatbuffers::Offset<fbs::Block>> blocks_vector;
             for (auto block: _blocks)
-              blocks_vector.push_back(block.serialize());
+              blocks_vector.push_back(block.serialize(builder));
 
-            auto blocks = builder.CreateVectorOfStructs(blocks_vector);
+            auto blocks = builder.CreateVector(blocks_vector);
             auto pos = fbs::Pos(_id.x(), _id.y(), _id.z());
             return fbs::CreateChunk(builder, 0, 8, &pos, blocks);
         }

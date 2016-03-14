@@ -9,6 +9,7 @@
 
 namespace blocks {
   namespace common {
+    // struct wpos;
     //template <>
     //using base_position = std::tuple<int64_t, int64_t, int64_t>;
     typedef std::tuple<int64_t, int64_t, int64_t> base_position;
@@ -21,6 +22,7 @@ namespace blocks {
         std::get<1>(*this) = 0;
         std::get<2>(*this) = 0;
       }
+      pos(float x, float y, float z);
 
       inline int64_t &x() { return std::get<0>(*this); }
       inline int64_t &y() { return std::get<1>(*this); }
@@ -59,6 +61,19 @@ namespace blocks {
         return T(x() + other.x(),
                  y() + other.y(),
                  z() + other.z());
+      }
+
+      template <class T>
+      static T deserialize(const fbs::PosObj *p_)
+      {
+        auto p = p_->pos();
+        return (T(p->x(), p->y(), p->z()));
+      }
+
+      template <class T>
+      static T deserialize(const fbs::Pos *p)
+      {
+        return (T(p->x(), p->y(), p->z()));
       }
 
       flatbuffers::Offset<fbs::PosObj> serialize(flatbuffers::FlatBufferBuilder &builder) const

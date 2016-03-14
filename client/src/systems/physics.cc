@@ -89,7 +89,7 @@ namespace blocks
           auto cam = node.get_child(0);
           auto forward = cam.get_quat().get_forward();
           auto pos_from = node.get_pos() + cam.get_pos();
-          auto pos_to = pos_from + forward * 15;
+          auto pos_to = pos_from + forward * 10;
           auto hit = _world->ray_test_closest(pos_from, pos_to,
                                               BitMask32::bit(3));
 
@@ -97,18 +97,16 @@ namespace blocks
           {
             auto hp = hit.get_hit_pos();
             auto hn = hit.get_hit_normal();
-            common::wpos pos(std::floor(hp.get_x()),
-                             std::floor(hp.get_y()),
-                             std::floor(hp.get_z()));
+            common::wpos pos(hp.get_x(), hp.get_y(), hp.get_z());
 
             if (hn.get_x() > 0) pos.x()--;
             if (hn.get_y() > 0) pos.y()--;
             if (hn.get_z() > 0) pos.z()--;
 
             _scene->aim_cube().show();
-            _scene->aim_cube().set_pos(pos.x() - 0.01,
-                                       pos.y() - 0.01,
-                                       pos.z() - 0.01);
+            _scene->aim_cube().set_pos(pos.x() - 0.002,
+                                       pos.y() - 0.002,
+                                       pos.z() - 0.002);
 
             // std::cout << "Picking something."
             //           << "pos: " << hit.get_hit_pos()

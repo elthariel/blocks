@@ -1,22 +1,43 @@
 #include "systems/network.hh"
+#include "common/player.hh"
+
 
 namespace blocks
 {
+  //TMP
+
   namespace systems
   {
+
     Network::Network(std::string host, std::string port, Game *game)
-      : _client(*this, host, port), _last_pos(0, 0, 0), _game(game)
+      : _bus(host, atoi(port.c_str()), "events", this), _last_pos(0, 0, 0), _game(game)
     {
+      common::PlayerAuth pauth("test", "test");
+      // common::wpos pos(1, 2, 3);
+      _bus.rpc(Protocole::create_rpc(fbs::AType::AType_PlayerAuth, &pauth),
+               [&](fbs::RPC *rpc)
+        {
+          auto player = common::Player::deserialize(static_cast<const fbs::Player *>(rpc->body()));
+          std::cout << "AUTH ANSWER " << player->id() << " " << player->login() << std::endl;
+        },
+               [&](fbs::Error *error)
+        {
+
+        });
+      // ---
+
       _events_ptrs.insert(event_item(fbs::Action::Action_MOVE,
                                      new events::player_moved(nullptr)));
-      _events_ptrs.insert(event_item(fbs::Action::Action_INITIAL_POS,
-                                     new events::player_initial_pos(nullptr)));
+      // _events_ptrs.insert(event_item(fbs::Action::Action_INITIAL_POS,
+      //                                new events::player_initial_pos(nullptr)));
       _events_ptrs.insert(event_item(fbs::Action::Action_PLAYER_CONNECT,
                                      new events::player_connected(nullptr)));
       _events_ptrs.insert(event_item(fbs::Action::Action_CHUNK,
                                      new events::chunk_received(nullptr)));
       _events_ptrs.insert(event_item(fbs::Action::Action_UPDATE_BLOCK,
                                      new events::block_update(nullptr)));
+      _events_ptrs.insert(event_item(fbs::Action::Action_AUTH,
+                                     new events::auth(nullptr)));
     }
 
     void Network::configure(ex::EventManager &em)
@@ -24,8 +45,9 @@ namespace blocks
       em.subscribe<events::chunk_requested>(*this);
       em.subscribe<events::player_moved>(*this);
       em.subscribe<events::player_connected>(*this);
-      em.subscribe<events::player_initial_pos>(*this);
+      // em.subscribe<events::player_initial_pos>(*this);
       em.subscribe<events::key>(*this);
+      em.subscribe<events::auth>(*this);
     }
 
     void Network::update(ex::EntityManager &entities,
@@ -45,9 +67,9 @@ namespace blocks
         {
             _passed = 0;
             _last_pos = pos;
-            _socket->write(Protocole::create_message(fbs::Action::Action_MOVE,
-                                                     fbs::AType::AType_PosObj,
-                                                     &pos));
+            _bus.emit("world.chunks", Protocole::create_message(fbs::Action::Action_MOVE,
+                                                fbs::AType::AType_PosObj,
+                                                &pos));
         }
       };
 
@@ -57,14 +79,16 @@ namespace blocks
       dispatch_events(entities, events);
     }
 
-    void Network::dispatch(TcpClient::connection::pointer socket, uint8_t *buffer)
+
+    void Network::dispatch(uint8_t *buffer)
     {
+      std::cout << "Network Dispatch " << std::hex << setw(8) << this << std::endl;
       auto message = flatbuffers::GetMutableRoot<blocks::fbs::Message>(buffer);
       if (message != nullptr)
         _network_to_game_pipe << message;
 
-      if (_socket == nullptr)
-        _socket = socket;
+      // if (_socket == nullptr)
+      //   _socket = socket;
     }
 
     void Network::dispatch_events(ex::EntityManager &entities, ex::EventManager &em)
@@ -73,11 +97,12 @@ namespace blocks
 
       while (_network_to_game_pipe.size())
       {
+        std::cout << "Network Dispatch Events depop" << std::endl;
         _network_to_game_pipe >> msg;
         if (msg != nullptr)
         {
-          if (msg->action() == fbs::Action::Action_INITIAL_POS)
-            em.emit<events::server_connected>();
+          // if (msg->action() == fbs::Action::Action_INITIAL_POS)
+          //   em.emit<events::server_connected>();
 
           _events_ptrs[msg->action()]->emit(em, msg);
         }
@@ -86,17 +111,25 @@ namespace blocks
 
     void Network::receive(const events::chunk_requested &e)
     {
-      _socket->write(Protocole::create_message(fbs::Action::Action_ASK_CHUNK,
+      _bus.emit("world.chunks", Protocole::create_message(fbs::Action::Action_ASK_CHUNK,
                                                fbs::AType::AType_PosObj, &e.id));
     }
 
-    void Network::receive(const events::player_initial_pos &e)
+    void Network::receive(const events::auth &e)
     {
-      auto player = e.msg;
-      auto _pos = player->pos();
-      common::wpos pos(_pos->x(), _pos->y(), _pos->z());
-      // XXX:  _game->create_player(pos);
+      // auto msg = e.msg;
+      // bool answer = msg->answer();
+      std::cout << "Auth result " << std::endl;
+
     }
+
+    // void Network::receive(const events::player_initial_pos &e)
+    // {
+    //   auto player = e.msg;
+    //   auto _pos = player->pos();
+    //   common::wpos pos(_pos->x(), _pos->y(), _pos->z());
+    //   // XXX:  _game->create_player(pos);
+    // }
 
     void Network::receive(const events::player_moved &e)
     {
@@ -128,7 +161,7 @@ namespace blocks
         // Block block(1);
         // BlockPos bpos(block, pos);
 
-        // _socket->write(Protocole::create_message(fbs::Action::Action_PLACE_BLOCK,
+        // _bus.emit(Protocole::create_message(fbs::Action::Action_PLACE_BLOCK,
         //                                          fbs::AType::AType_BlockPos, &bpos));
       }
       else if (e.code == events::key::kcode::MINE && e.type == events::key::ktype::DOWN)
@@ -136,7 +169,7 @@ namespace blocks
         // auto entity = _game->player();
         // auto pos = entity.component<components::Position>().get()->to_wpos();
 
-        // _socket->write(Protocole::create_message(fbs::Action::Action_BREAK_BLOCK,
+        // _bus.emit(Protocole::create_message(fbs::Action::Action_BREAK_BLOCK,
         //                                          fbs::AType::AType_PosObj, &pos));
       }
     }

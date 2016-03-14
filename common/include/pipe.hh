@@ -34,15 +34,15 @@ namespace blocks
 
     size_t enqueue(T value)
     {
-      size_t size;
+      size_t size_;
       {
         lock_guard guard(_mutex);
         _queue.push(value);
-        size = _queue.size();
+        size_ = _queue.size();
       }
       notify();
 
-      return size;
+      return size_;
     }
 
     Pipe<T> &operator<<(T value)

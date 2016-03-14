@@ -1,6 +1,6 @@
 #include "game.hh"
 #include "mruby.hh"
-#include "proton.hh"
+// #include "proton.hh"
 
 #include <iostream>
 #include <string>
@@ -8,6 +8,8 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
+
+// #include "Bus.hh"
 
 using namespace std;
 using namespace blocks;
@@ -19,8 +21,26 @@ static void chdir_to_bin(char *name)
   boost::filesystem::current_path(bin_folder);
 }
 
+// class Test
+// {
+// public:
+//   void dispatch(uint8_t *message)
+//   {
+//     std::cout << "Message!" << std::endl;
+//   }
+// };
+
 int main(int ac, char **av)
 {
+  // Test test;
+  // Bus<Test> bus("localhost", 5672, "trololo", &test);
+  //
+  // bus.subscribe("test");
+  //
+  // common::wpos pos(1, 2, 3);
+  // bus.emit("test", Protocole::create_message(fbs::Action::Action_ASK_CHUNK,
+  //                                          fbs::AType::AType_PosObj, &pos));
+
   if (ac != 3)
   {
     std::cerr << "Usage : ./client IP PORT" << std::endl;
@@ -28,16 +48,9 @@ int main(int ac, char **av)
   }
 
   chdir_to_bin(av[0]);
-
-  Proton p("ampq:://127.0.0.1:5672/examples");
-  p.start();
-
-  this_thread::sleep_for (chrono::seconds(5));
-  p.join();
-
-
-  // blocks::Game game(ac, av);
-  // game.start();
+  //
+  blocks::Game game(ac, av);
+  game.start();
 
   // ruby::mruby mrb("../ruby/");
   // auto v = mrb.run("client/textures.rb");
@@ -50,15 +63,3 @@ int main(int ac, char **av)
 
   return 0;
 }
-
-// #include "Client.hh"
-// int			   main(int ac, char **av)
-// {
-//   if (ac != 3)
-//   {
-//     std::cerr << "Usage : ./client IP PORT" << std::endl;
-//     return (0);
-//   }
-//   Client client(av[1], av[2]);
-//   return (0);
-// }

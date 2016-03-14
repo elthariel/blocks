@@ -45,9 +45,10 @@ namespace blocks
     };
 
     typedef network_event<fbs::Action::Action_MOVE, fbs::Player> player_moved;
-    typedef network_event<fbs::Action::Action_INITIAL_POS, fbs::Player> player_initial_pos;
+    // typedef network_event<fbs::Action::Action_INITIAL_POS, fbs::Player> player_initial_pos;
     typedef network_event<fbs::Action::Action_PLAYER_CONNECT, fbs::Player> player_connected;
     typedef network_event<fbs::Action::Action_CHUNK, fbs::Chunk> chunk_received;
     typedef network_event<fbs::Action::Action_UPDATE_BLOCK, fbs::BlockPos> block_update;
+    typedef network_event<fbs::Action::Action_AUTH, fbs::BoolAnswer> auth;
   }
 }

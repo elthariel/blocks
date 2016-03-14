@@ -38,5 +38,7 @@ namespace blocks
 
     proton::url _url;
     proton::connection _conn;
+    uint64_t _sent = 0;
+    uint64_t _received = 0;
   };
 }

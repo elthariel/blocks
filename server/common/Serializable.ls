@@ -13,13 +13,18 @@ module.exports = Serializable = (name, options) ->
 
   props = keys fbsObj:: .[1 to]
 
-  types = {0: void, 1: fbs.Player, 2: fbs.Chunk, 3: fbs.PosObj, 4: fbs.BlockPos}
-
+  types = map (fbs.), (keys fbs.AType)
   class _Serializable
 
     @_fbs_type = type
+    @_type_name = name
+    @_type = fbs[name]
+    @_atype = fbs.AType[name]
+
     _fbs_type: type
-    _type: name
+    _type_name: name
+    _type: fbs[name]
+    _atype: fbs.AType[name]
 
     (args) ->
       if fbs.AType[name]?
@@ -32,6 +37,7 @@ module.exports = Serializable = (name, options) ->
         res = props
           |> filter ~> @[it]?
           |> map ~>
+            | is-type \String @[it] => [it, builder.createString @[it]]
             | is-type \Array @[it] =>
               a = (@[it] |> map (.Serialize builder))
               o = fbsObj[\create + capitalize(it) + \Vector] builder, a

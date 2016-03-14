@@ -49,9 +49,8 @@ namespace blocks {
       variant(block->variant());
     }
 
-    blocks::fbs::Block serialize() const {
-      blocks::fbs::Block block(id(), variant(), air(), transparent(), light());
-      return block;
+    flatbuffers::Offset<fbs::Block>  serialize(flatbuffers::FlatBufferBuilder &builder) const {
+      return blocks::fbs::CreateBlock(builder, id(), variant(), air(), transparent(), light());
     }
 
   protected:
@@ -77,8 +76,8 @@ namespace blocks {
       flatbuffers::Offset<fbs::BlockPos> serialize(flatbuffers::FlatBufferBuilder &builder)
       {
         auto pos = fbs::Pos(_wpos.x(), _wpos.y(), _wpos.z());
-        auto block = _block.serialize();
-        return fbs::CreateBlockPos(builder, &block, &pos);
+        auto block = _block.serialize(builder);
+        return fbs::CreateBlockPos(builder, block, &pos);
       }
 
     private:

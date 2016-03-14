@@ -1,7 +1,5 @@
 #pragma once
 
-#include "TcpClient.hh"
-#include "TcpConnection.hh"
 #include "entity.hh"
 #include "map.hh"
 #include "meshing_task.hh"
@@ -24,7 +22,7 @@ namespace blocks
     ~Game();
 
     // Entity system
-    void create_systems();
+    void create_systems(int, char **);
     void update_systems(ex::TimeDelta dt);
     void create_entities();
     void create_player(common::wpos &pos);

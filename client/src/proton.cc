@@ -31,16 +31,42 @@ namespace blocks
   {
     _conn = e.container().connect(_url);
     _conn.open_receiver(_url.path());
-    _conn.open_sender(_url.path());
+    // _conn.open_sender(_url.path());
   }
 
   void Proton::on_sendable(proton::event &e)
   {
     // Fetch stuff from queue
+    // if (_sent)
+    //   return ;
+    // std::cout << "Is sendable !" << std::endl;
+    // proton::sender sender = e.sender();
+    //
+    // proton::message msg;
+    // // std::map<std::string, int> m;
+    // std::string lol("Test");
+    //
+    // msg.id(_sent);
+    // msg.body(lol);
+    // sender.send(msg);
+    // _sent++;
   }
 
   void Proton::on_message(proton::event &e)
   {
+    // std::cout << "Message !" << e.content() << std::endl;
+    proton::message& msg = e.message();
+
+  //  if (msg.id().get<uint64_t>() < _received) {
+  //      return; // Ignore duplicate
+  //  }
+
+    std::cout << "Message" << msg.body() << std::endl;
+  //  _received++;
+
+  //  e.receiver().close();
+  //  e.connection().close();
+  //  }
     // Puts the message back in the queue
   }
 

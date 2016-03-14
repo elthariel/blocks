@@ -13,7 +13,6 @@
 
 // Test
 #include "chunk_generated.h"
-#include "TcpClient.hh"
 #include "Protocole.hh"
 
 #include <load_prc_file.h>
@@ -44,7 +43,7 @@ namespace blocks {
     _scene = make_shared<Scene>(_framework);
 
     create_entities();
-    create_systems();
+    create_systems(ac, av);
   }
 
   Game::~Game()
@@ -52,13 +51,13 @@ namespace blocks {
     Session::instance().destroy();
   }
 
-  void Game::create_systems()
+  void Game::create_systems(int ac, char **av)
   {
     systems.add<systems::Debug>(*this);
     systems.add<systems::Input>(_framework, _scene->window());
     systems.add<systems::WindowManager>(_scene->window());
     systems.add<systems::CameraControl>();
-    systems.add<systems::Network>("127.0.0.1", "3000", this);
+    systems.add<systems::Network>(av[1], av[2], this);
     systems.add<systems::ChunkLoader>(_map, _scene->root());
     systems.add<systems::Physics>(_scene);
   }

@@ -76,5 +76,5 @@ endif (${PROFILING})
 
 add_subdirectory(common)
 add_subdirectory(client)
-add_subdirectory(server_old)
+# add_subdirectory(server_old)
 add_subdirectory(third-party)

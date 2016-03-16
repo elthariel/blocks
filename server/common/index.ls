@@ -52,9 +52,9 @@ export class Message extends Serializable \Message, union: \body
     msg = fbs.Message.getRootAsMessage buf
     msg = super msg
 
-  @Create = (action, body) ->
+  @Create = (sender, action, body) ->
     bodyType = @types_actions[action]
-    new Message {action, bodyType, body}
+    new Message {sender, action, bodyType, body}
 
 export class RPC extends Serializable \RPC, union: \body
 

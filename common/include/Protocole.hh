@@ -10,18 +10,19 @@ namespace blocks
         typedef std::tuple<uint8_t *, size_t> Message;
 
         template <class T>
-        static Message create_message(fbs::Action action,
+        static Message create_message(std::string sender, fbs::Action action,
                                       fbs::AType type,
                                       T body)
         {
           flatbuffers::FlatBufferBuilder *builder = new flatbuffers::FlatBufferBuilder();
-
+          // auto sender_id = builder->CreateString(sender);
           auto message = fbs::CreateMessage(*builder,
+                                            atoi(sender.c_str()),
                                             action,
                                             type,
                                             body->serialize(*builder).Union());
 
-          std::cout << "Create message " << action << " " << type << std::endl;
+          std::cout << "Create message " << atoi(sender.c_str()) << " " << action << " " << type << std::endl;
           builder->Finish(message);
           return std::make_tuple(builder->GetBufferPointer(), builder->GetSize());
         }

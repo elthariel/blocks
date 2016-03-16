@@ -8,15 +8,13 @@ file(GLOB_RECURSE CLIENT_SOURCES ./src/ *.cc)
 set(ENV{PKG_CONFIG_PATH} "$ENV{HOME}/usr/local/lib64/pkgconfig/:$ENV{PKG_CONFIG_PATH}")
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(BULLET bullet REQUIRED)
-pkg_check_modules(PROTON libqpid-proton-cpp REQUIRED)
-# pkg_check_modules(AMQPCPP libamqpcpp REQUIRED)
 
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${PANDA_INCLUDE_DIRS}
   ${BULLET_INCLUDE_DIRS}
-  ${PROTON_INCLUDE_DIRS}
+  # ${PROTON_INCLUDE_DIRS}
   ${AMQPCPP_INCLUDE_DIRS}
   ~/prog/AMQP-CPP
   ${THIRD_PARTY}/entityx
@@ -26,7 +24,7 @@ include_directories(
 link_directories(
   ${PANDA_LIBRARY_DIRS}
   ${BULLET_LIBRARY_DIRS}
-  ${PROTON_LIBRARY_DIRS}
+  # ${PROTON_LIBRARY_DIRS}
   ${AMQPCPP_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS}
 )
@@ -43,7 +41,7 @@ target_link_libraries(blocks_client
   amqpcpp
   ${PANDA_LIBRARIES}
   ${BULLET_LIBRARIES}
-  ${PROTON_LIBRARIES}
+  # ${PROTON_LIBRARIES}
   ${AMQPCPP_LIBRARIES}
   ${Boost_LIBRARIES}
   ${LINUX_LIBS}

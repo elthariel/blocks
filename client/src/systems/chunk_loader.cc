@@ -129,6 +129,7 @@ namespace blocks
 
     void ChunkLoader::receive(const events::server_connected &e)
     {
+      std::cout << "CHUNK LOADER receiver server connected" <<std::endl;
       _connected = true;
     }
 
@@ -139,6 +140,7 @@ namespace blocks
 
     void ChunkLoader::receive(const events::chunk_received &e)
     {
+      std::cout << "Chunk received" << std::endl;
       auto _chunk = e.msg;
       _pipe_to_mesher << blocks::common::Chunk::deserialize(_chunk);
     }

@@ -127,10 +127,10 @@ export class Events extends EventEmitter
         @_emit \drain
 
   emit: @_Wait \ready (topic, event, obj) ->
-    console.log \EMIT event, obj
+    # console.log \EMIT event, obj
     msg = topic
     if @mode isnt \string
-      msg = common.Message.Create event, obj
+      msg = common.Message.Create "0", event, obj
       msg = msg.Serialize!
     else if event?
       msg = event

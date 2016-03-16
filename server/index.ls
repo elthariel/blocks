@@ -26,13 +26,26 @@ class Game
   ->
     # @socket = new Events
 
+block = new Block id: 1 variant: 0, air: true, transparent: true, light: 0
+blocks = []
+for i from 0 to 16 * 16 * 16
+  blocks.push block
 class ServerTest
   ->
     @socket = new Events
-      ..subscribe \auth
-      ..on Events.AUTH, ~>
-        console.log \AUTH it
-        @socket.emit \world.players.1, Events.AUTH, new BoolAnswer answer: true
+      # ..subscribe \world.chunks
+      ..subscribe \world.chunks
+      ..subscribe \world.players.1
+      # ..on \data console.log
+      ..on Events.CHUNK, ~>
+        console.log \CHUNK
+      # ..on Events.MOVE, ~>
+      #   console.log \MOVE
+      ..on Events.ASK_CHUNK, ~>
+        console.log \ASK_CHUNK it
+        # @socket.emit \world.players.1 Events.CHUNK, new Chunk version: 0, size: 16, blocks: blocks, cid: new Pos x: 1 y: 2 z: 3
+        # @socket.emit \world.players.1 Events.MOVE, new Player id: 42, login: \tonton pos: new Pos x: 1 y: 2 z: 3
+        # @socket.emit \world.players.1, Events.AUTH, new BoolAnswer answer: true
 
       # ..emit      \test Events.MOVE, new Player id: 42, login: \tonton pos: new Pos x: 1 y: 2 z: 3
 
@@ -42,7 +55,7 @@ class ServerTest
 
 new Auth
 # new Game
-new ServerTest
+# new ServerTest
 
 # block = new Block id: 1 variant: 0, air: true, transparent: true, light: 0
 #

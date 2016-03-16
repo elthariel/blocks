@@ -20,7 +20,6 @@ namespace blocks
       {
         try
         {
-          std::cout << "DISPATCHER" << dispatcher <<  std::endl;
           _handler.connect(host, port);
 
           _connection = new AMQP::Connection(&_handler, AMQP::Login("guest", "guest"), "/");
@@ -100,8 +99,13 @@ namespace blocks
                            uint64_t deliveryTag,
                            bool redelivered)
         {
+          // std::cout << "Received from bus " << message.correlationID() << std::endl;
+          //TMP : copy buffer to test if it isnt erased
+          auto size = message.message().size();
+          uint8_t *tmp = new uint8_t[size];
+          memcpy(tmp, message.message().c_str(), size);
           if (message.correlationID()[0] != '1')
-            _dispatcher->dispatch((uint8_t *)message.message().c_str());
+            _dispatcher->dispatch(tmp);
           else
             rpc_answer(message);
         };
@@ -129,11 +133,12 @@ namespace blocks
 
       void emit(std::string dest, Protocole::Message msg)
       {
-        if (!_private_queue.c_str()[0])
-        {
-          _emit_queue.push_back(std::pair<std::string, Protocole::Message>(dest, msg));
-          return ;
-        }
+        // if (!_private_queue.c_str()[0])
+        // {
+        //   _emit_queue.push_back(std::pair<std::string, Protocole::Message>(dest, msg));
+        //   return ;
+        // }
+        // std::cout << "EMIT " << dest << std::endl;
         _channel->publish(_exchange, dest, (const char *)std::get<0>(msg), std::get<1>(msg));
       }
 

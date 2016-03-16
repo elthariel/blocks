@@ -70,7 +70,9 @@ namespace blocks
       Game *_game;
       std::map<fbs::Action, events::parent_network_event *> _events_ptrs;
       std::map<int, ex::Entity> _characters;
-
+      bool _connected = false;
+      bool _serv_connect_sent = false;
+      char _player_id[8];
     };
 
   }

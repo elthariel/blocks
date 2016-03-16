@@ -8,7 +8,7 @@ namespace blocks
       : _id(id), _login(login), _pos(pos)
     {
     }
-\
+    
     flatbuffers::Offset<fbs::Player> Player::serialize(flatbuffers::FlatBufferBuilder &builder)
     {
       auto login = builder.CreateString(_login);

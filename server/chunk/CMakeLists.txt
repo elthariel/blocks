@@ -8,6 +8,8 @@ file(GLOB SERVER_SOURCES ./src/*.cc)
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${PANDA_INCLUDE_DIRS}
+  ~/prog/AMQP-CPP
+
 )
 
 link_directories(
@@ -25,4 +27,5 @@ target_link_libraries(blocks_server
   ${PANDA_LIBRARIES}
   ${Boost_LIBRARIES}
   ${LINUX_LIBS}
+  amqpcpp
 )

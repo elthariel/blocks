@@ -43,7 +43,7 @@ private:
 
 public:
 
-    static constexpr size_t ASIO_INPUT_BUFFER_SIZE = 4*1024; //4kb
+    static constexpr size_t ASIO_INPUT_BUFFER_SIZE = 128*1024; //128kb
 
     AsioHandler(boost::asio::io_service& ioService);
 
@@ -56,4 +56,3 @@ public:
 
     bool connected()const;
 };
-

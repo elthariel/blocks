@@ -68,8 +68,9 @@ namespace blocks {
 
             for (int i = 0; i < size; i++)
             {
+                // std::cout << "DESERIALIZE ITERATE " << i << std::endl;
                 auto block = blocks->Get(i);
-                res->at(i) = Block(block->id(), block->variant(), block->air(), block->transparent());
+                res->at(i) = Block(block->id(), block->variant(), block->air(), block->transparent(), block->light());
             }
             return res;
         }

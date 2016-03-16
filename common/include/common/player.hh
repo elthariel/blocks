@@ -38,7 +38,7 @@ namespace blocks {
 
         std::string login()          { return _login; }
 
-        common::wpos pos()          { return _pos; }
+        common::wpos &pos()          { return _pos; }
         void pos(common::wpos &pos) { _pos = pos; }
 
         static Player *deserialize(const fbs::Player *player)

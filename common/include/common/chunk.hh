@@ -86,6 +86,8 @@ namespace blocks {
             return fbs::CreateChunk(builder, 0, 8, &pos, blocks);
         }
 
+        inline fbs::AType atype() { return fbs::AType::AType_Chunk; }
+
       protected:
         cid _id;
         Block _blocks[_flat_size];

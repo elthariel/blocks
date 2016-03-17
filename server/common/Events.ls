@@ -5,9 +5,28 @@ require! {
   \./ : common
 }
 
+export class RPCProxy extends EventEmitter
+
+  @ <<< fbs.Action
+  @actions = fbs.Action
+
+  (@clientQueue = \rpc_queue, @serverQueue = \rpc_queue_server) ->
+
+    @context = rabbit.createContext 'amqp://localhost'
+    @req = @context.socket \REQ
+    @rep = @context.socket \REP
+    @context.on \ready @~_init
+    @_emit = EventEmitter::emit
+
+  _init: ->
+    @rep.connect @clientQueue, ~>
+      @req.connect @serverQueue, ~>
+        # @req.pipe @rep
+
 export class RPCEmitter extends EventEmitter
 
   @ <<< fbs.Action
+  @actions = fbs.Action
 
   (@eventQueue = \rpc_queue) ->
     @cbs = []
@@ -43,6 +62,7 @@ export class RPCEmitter extends EventEmitter
 export class RPCReceiver
 
   @ <<< fbs.Action
+  @actions = fbs.Action
 
   (@handler, @eventQueue = \rpc_queue) ->
     @res = []
@@ -76,9 +96,11 @@ export class RPCReceiver
       i++
     @res = @res[i to]
 
+
 export class Events extends EventEmitter
 
   @ <<< fbs.Action
+  @actions = fbs.Action
 
   (@mode = \events, @eventQueue = \events, @options = {routing: \topic}) ->
     @waitingSubs = []
@@ -121,6 +143,7 @@ export class Events extends EventEmitter
     @drain = false
     @waitingSubs.push topic
     @sub.connect @eventQueue, topic, ~>
+      @pub.sender = @sub.queue if not @pub.sender?
       @waitingSubs.splice (find-index (is topic), @waitingSubs)
       if not @waitingSubs.length
         @drain = true
@@ -130,7 +153,7 @@ export class Events extends EventEmitter
     # console.log \EMIT event, obj
     msg = topic
     if @mode isnt \string
-      msg = common.Message.Create "0", event, obj
+      msg = common.Message.Create topic, event, obj
       msg = msg.Serialize!
     else if event?
       msg = event

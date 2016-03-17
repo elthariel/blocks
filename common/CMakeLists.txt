@@ -23,14 +23,7 @@ foreach(FBS_FILE ${COMMON_FBS})
    add_custom_command(
      PRE_BUILD
      OUTPUT ${OUT_NAME_CPP}
-     COMMAND ${FLATBUFFERS_COMPILER} -b -c --gen-mutable --raw-binary -o ${CMAKE_CURRENT_SOURCE_DIR}/generated_include/ ${CMAKE_CURRENT_SOURCE_DIR}/${FBS_FILE}
-     DEPENDS ${FBS_FILE}
-     COMMENT "Compiling ${FBS_FILE}"
-   )
-   add_custom_command(
-     PRE_BUILD
-     OUTPUT ${OUT_NAME_JS}
-     COMMAND ${FLATBUFFERS_COMPILER} -b -s --gen-mutable --raw-binary -o ${CMAKE_CURRENT_SOURCE_DIR}/generated_include/ ${CMAKE_CURRENT_SOURCE_DIR}/${FBS_FILE}
+     COMMAND ${FLATBUFFERS_COMPILER} -b -c -s --gen-mutable --raw-binary -o ${CMAKE_CURRENT_SOURCE_DIR}/generated_include/ ${CMAKE_CURRENT_SOURCE_DIR}/${FBS_FILE}
      DEPENDS ${FBS_FILE}
      COMMENT "Compiling ${FBS_FILE}"
    )

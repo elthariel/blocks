@@ -23,6 +23,8 @@ namespace blocks {
           return fbs::CreatePlayerAuth(builder, login, pass);
         }
 
+        inline fbs::AType atype() { return fbs::AType::AType_PlayerAuth; }
+
       private:
         std::string _login;
         std::string _pass;
@@ -43,11 +45,13 @@ namespace blocks {
 
         static Player *deserialize(const fbs::Player *player)
         {
-          auto pos = common::wpos::deserialize<common::wpos>(player->pos());
+          auto pos = common::wpos(player->pos());
           return new Player(player->id(), player->login()->str(), pos);
         }
 
         flatbuffers::Offset<fbs::Player> serialize(flatbuffers::FlatBufferBuilder &builder);
+
+        inline fbs::AType atype() { return fbs::AType::AType_Player; }
 
       private:
         int _id;

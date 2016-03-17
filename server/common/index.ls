@@ -8,6 +8,7 @@ Events = require \./Events
 export Events.Events
 export Events.RPCReceiver
 export Events.RPCEmitter
+export Events.RPCProxy
 export class Pos extends Serializable \Pos
 export class PosObj extends Serializable \PosObj classes: pos: Pos
 export class Block extends Serializable \Block
@@ -52,9 +53,9 @@ export class Message extends Serializable \Message, union: \body
     msg = fbs.Message.getRootAsMessage buf
     msg = super msg
 
-  @Create = (sender, action, body) ->
+  @Create = (routing, action, body) ->
     bodyType = @types_actions[action]
-    new Message {sender, action, bodyType, body}
+    new Message {routing, action, bodyType, body}
 
 export class RPC extends Serializable \RPC, union: \body
 

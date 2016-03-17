@@ -1,6 +1,7 @@
 global import require \prelude-ls
 require! {
-  \./common : {Events, RPCReceiver, RPCEmitter, PosObj, Pos, Player, Block, Chunk, PlayerAuth, BoolAnswer, Error}
+  \../common/generated_include/chunk_generated : {{fbs}:blocks}
+  \./common : {Events, RPCReceiver, RPCEmitter, RPCProxy, PosObj, Pos, Player, Block, Chunk, PlayerAuth, BoolAnswer, Error, RPC, Message}
   nodulator: N
 }
 
@@ -9,7 +10,7 @@ NPlayer = N \player
 
 class Auth
   ->
-    @rpc = new RPCReceiver @
+    @rpc = new RPCReceiver @, \rpc_queue_server
 
   (PlayerAuth._atype): (playerAuth, done) ->
     console.log 'Auth rpc !' playerAuth
@@ -53,6 +54,42 @@ class ServerTest
     # @rpc.ask new PlayerAuth(login: \test pass: \test), (err, res) ~>
     #   console.log "Client AUTH answer" err, res
 
+class Proxy
+  ->
+    @waitingLogin = {}
+    @logged = {}
+    @clients = new Events \string
+    @servers = new Events \string \events_server
+    @rpcProxy = new RPCProxy
+    @rpcProxy.req.on \data ~>
+      msg = RPC.Deserialize it
+      if msg.bodyType is fbs.AType.Player
+        @logged[@waitingLogin[msg.body.login]] = msg.body
+        console.log 'Logged: ' msg.body.login, @waitingLogin[msg.body.login]
+        delete @waitingLogin[msg.body.login]
+      @rpcProxy.rep.write it
+
+    @rpcProxy.rep.on \data ~>
+      msg = RPC.Deserialize it
+      sender = @rpcProxy.rep.requests.0.properties.replyTo
+
+      if msg.bodyType is fbs.AType.PlayerAuth
+        @waitingLogin[msg.body.login] = sender
+        @rpcProxy.req.write it
+      else if @logged[sender]?
+        @rpcProxy.req.write it
+
+    @servers.subscribe \world.players.*
+    @servers.on \data ~>
+      msg = Message.Deserialize it
+      @clients.emit msg.routing, it
+
+    @clients.subscribe \world.chunks
+    @clients.on \data ~>
+      msg = Message.Deserialize it
+      @servers.emit msg.routing, it
+
+new Proxy
 new Auth
 # new Game
 # new ServerTest

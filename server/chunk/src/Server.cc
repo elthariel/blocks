@@ -3,9 +3,10 @@
 namespace blocks {
 
     Server::Server()
-      : _bus("localhost", 5672, "events", this)
+      : _bus("localhost", 5672, "events_server", this, true)
     {
       init_handler_ptrs();
+      init_handler_rpc_ptrs();
       _bus.subscribe("world.chunks");
     }
 
@@ -14,8 +15,7 @@ namespace blocks {
       // _handler_ptrs.insert(std::pair<fbs::Action, handler_ptr>(fbs::Action::Action_MOVE,
       //                                                          &Server::on_move));
 
-      _handler_ptrs.insert(std::pair<fbs::Action, handler_ptr>(fbs::Action::Action_ASK_CHUNK,
-                                                               &Server::on_ask_chunk));
+      // _handler_ptrs.insert(std::make_tuple(fbs::Action::Action_ASK_CHUNK, &Server::on_ask_chunk));
 
       // _handler_ptrs.insert(std::pair<fbs::Action, handler_ptr>(fbs::Action::Action_BREAK_BLOCK,
       //                                                          &Server::on_break_block));
@@ -24,32 +24,20 @@ namespace blocks {
       //                                                          &Server::on_place_block));
     }
 
-    // void Server::on_connect_player(TcpConnection<Server, Player>::pointer socket)
-    // {
-    //   auto player = new Player(socket);
-    //   _players.insert(std::pair<int, Player *>(player->id(), player));
-    //   _tcp_server->send_all_except(socket, Protocole::create_message(fbs::Action::Action_PLAYER_CONNECT,
-    //                                                                  fbs::AType::AType_Player,
-    //                                                                  player));
-    //   socket->read();
-    // }
-
-    void Server::on_ask_chunk(fbs::Message *message)
+    void Server::init_handler_rpc_ptrs()
     {
-        auto pos = static_cast<const fbs::PosObj *>(message->body())->pos();
-        common::cid _cid(pos->x(), pos->y(), pos->z());
-
-        auto chunk = _map.get(_cid);
-
-        char sender[8];
-        sprintf(sender, "%d", message->sender());
-        auto dest = std::string("world.players.") + sender;
-        // std::cout << "Ask chunk" << dest << std::endl; 
-        _bus.emit(dest, Protocole::create_message(sender,
-                                                  fbs::Action::Action_CHUNK,
-                                                  fbs::AType::AType_Chunk,
-                                                  chunk));
+      _handler_rpc_ptrs.insert(std::make_pair(fbs::AType::AType_PosObj, &Server::on_ask_chunk));
     }
+
+    // void Server::on_ask_chunk(fbs::Message *message)
+    // {
+    //     auto pos = static_cast<const fbs::PosObj *>(message->body())->pos();
+    //     common::cid _cid(pos->x(), pos->y(), pos->z());
+    //
+    //     auto chunk = _map.get(_cid);
+    //
+    //     _bus.emit("world.players.*", fbs::Action::Action_CHUNK, chunk);
+    // }
 
     void Server::on_move(fbs::Message *message)
     {
@@ -74,7 +62,7 @@ namespace blocks {
         block.transparent(true);
 
         BlockPos bpos(block, _wpos);
-        _bus.emit("world.players.*", Protocole::create_message("0", fbs::Action::Action_UPDATE_BLOCK, fbs::AType::AType_BlockPos, &bpos));
+        _bus.emit("world.players.*", fbs::Action::Action_UPDATE_BLOCK, &bpos);
     }
 
     void Server::on_place_block(fbs::Message *message)
@@ -96,20 +84,39 @@ namespace blocks {
 
         BlockPos new_bpos(block, _wpos);
 
-        _bus.emit("world.players.*", Protocole::create_message("0", fbs::Action::Action_UPDATE_BLOCK, fbs::AType::AType_BlockPos, &new_bpos));
+        _bus.emit("world.players.*", fbs::Action::Action_UPDATE_BLOCK, &new_bpos);
     }
 
-    void Server::dispatch(uint8_t *buffer)
+    void Server::dispatch(fbs::Message *message)
     {
-        // std::cout << "DISPATCH" << std::endl;
-        auto message = flatbuffers::GetMutableRoot<fbs::Message>(buffer);
         std::map<fbs::Action, handler_ptr>::iterator it;
         it = _handler_ptrs.find(message->action());
 
-        std::cout << "Action " << message->action() << std::endl;
         if (it != _handler_ptrs.end())
-        {
           (*this.*(_handler_ptrs[message->action()]))(message);
-        }
+    }
+
+    void Server::on_ask_chunk(fbs::RPC *message, Bus<Server>::DoneCallback done)
+    {
+      std::cout << "ASK CHUNK" << std::endl;
+      auto pos = static_cast<const fbs::PosObj *>(message->body())->pos();
+      common::cid _cid(pos->x(), pos->y(), pos->z());
+
+      auto chunk = _map.get(_cid);
+
+      // auto msg = Protocole::create_rpc(res);
+      done(NULL, Protocole::create_rpc(chunk));
+
+      // _bus.emit("world.players.*", fbs::Action::Action_CHUNK, chunk);
+    }
+
+    void Server::dispatch_rpc(fbs::RPC *message, Bus<Server>::DoneCallback done)
+    {
+      std::map<fbs::AType, handler_rpc_ptr>::iterator it;
+      it = _handler_rpc_ptrs.find(message->body_type());
+
+      if (it != _handler_rpc_ptrs.end())
+        (*this.*(_handler_rpc_ptrs[message->body_type()]))(message, done);
+
     }
 }

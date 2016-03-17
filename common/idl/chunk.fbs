@@ -61,7 +61,7 @@ table BoolAnswer {
 }
 
 table Message {
-  sender: int;
+  routing: string;
   action:Action;
   body:AType;
 }

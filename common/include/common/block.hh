@@ -80,6 +80,8 @@ namespace blocks {
         return fbs::CreateBlockPos(builder, block, &pos);
       }
 
+      inline fbs::AType atype() { return fbs::AType::AType_BlockPos; }
+
     private:
       Block &_block;
       common::wpos &_wpos;

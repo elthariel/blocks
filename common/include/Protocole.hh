@@ -10,29 +10,28 @@ namespace blocks
         typedef std::tuple<uint8_t *, size_t> Message;
 
         template <class T>
-        static Message create_message(std::string sender, fbs::Action action,
-                                      fbs::AType type,
-                                      T body)
+        static Message create_message(std::string routing, fbs::Action action, T body)
         {
           flatbuffers::FlatBufferBuilder *builder = new flatbuffers::FlatBufferBuilder();
-          // auto sender_id = builder->CreateString(sender);
+          auto type = body->atype();
+          auto routing_ = builder->CreateString(routing);
           auto message = fbs::CreateMessage(*builder,
-                                            atoi(sender.c_str()),
+                                            routing_,
                                             action,
                                             type,
                                             body->serialize(*builder).Union());
 
-          std::cout << "Create message " << atoi(sender.c_str()) << " " << action << " " << type << std::endl;
+          // std::cout << "Create message " << routing << " " << type << " " << type << std::endl;
           builder->Finish(message);
           return std::make_tuple(builder->GetBufferPointer(), builder->GetSize());
         }
 
         template <class T>
-        static Message create_rpc(fbs::AType type,
-                                  T body)
+        static Message create_rpc(T body)
         {
           flatbuffers::FlatBufferBuilder *builder = new flatbuffers::FlatBufferBuilder();
 
+          auto type = body->atype();
           auto message = fbs::CreateRPC(*builder,
                                         type,
                                         body->serialize(*builder).Union());

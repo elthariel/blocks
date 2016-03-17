@@ -24,6 +24,7 @@ namespace blocks
                      public nocopy
     {
       typedef std::pair<fbs::Action, events::parent_network_event *> event_item;
+      typedef std::pair<fbs::AType, events::parent_network_event *> rpc_item;
 
       Network(std::string host, std::string port, Game *);
 
@@ -34,7 +35,8 @@ namespace blocks
                   ex::TimeDelta dt);
 
       // Network in network thread
-      void dispatch(uint8_t *);
+      void dispatch(fbs::Message *);
+      void dispatch_rpc(fbs::RPC *, Bus<Network>::DoneCallback);
 
       // Network events dispatch
       void dispatch_events(ex::EntityManager &entities, ex::EventManager &em);
@@ -57,6 +59,7 @@ namespace blocks
     protected:
       // Game/Network thread communication
       Pipe<fbs::Message *> _network_to_game_pipe;
+      Pipe<fbs::RPC *> _network_rpc_to_game_pipe;
       // Pipe<fbs::Message *> _game_to_network_pipe;
 
       // Network
@@ -69,6 +72,7 @@ namespace blocks
       common::wpos _last_pos;
       Game *_game;
       std::map<fbs::Action, events::parent_network_event *> _events_ptrs;
+      std::map<fbs::AType, events::parent_network_event *> _rpc_ptrs;
       std::map<int, ex::Entity> _characters;
       bool _connected = false;
       bool _serv_connect_sent = false;

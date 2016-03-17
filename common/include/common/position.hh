@@ -14,6 +14,9 @@ namespace blocks {
     //using base_position = std::tuple<int64_t, int64_t, int64_t>;
     typedef std::tuple<int64_t, int64_t, int64_t> base_position;
 
+    struct pos;
+    struct wpos;
+
     struct pos : public base_position {
       using base_position::base_position;
       //base_position() = delete;
@@ -24,12 +27,15 @@ namespace blocks {
       }
       pos(float x, float y, float z);
 
+
       inline int64_t &x() { return std::get<0>(*this); }
       inline int64_t &y() { return std::get<1>(*this); }
       inline int64_t &z() { return std::get<2>(*this); }
       inline const int64_t &x() const { return std::get<0>(*this); }
       inline const int64_t &y() const { return std::get<1>(*this); }
       inline const int64_t &z() const { return std::get<2>(*this); }
+
+      inline fbs::AType atype() const { return fbs::AType::AType_PosObj; }
 
       int64_t &operator[](size_t idx) {
         if (idx == 0)
@@ -63,18 +69,6 @@ namespace blocks {
                  z() + other.z());
       }
 
-      template <class T>
-      static T deserialize(const fbs::PosObj *p_)
-      {
-        auto p = p_->pos();
-        return (T(p->x(), p->y(), p->z()));
-      }
-
-      template <class T>
-      static T deserialize(const fbs::Pos *p)
-      {
-        return (T(p->x(), p->y(), p->z()));
-      }
 
       flatbuffers::Offset<fbs::PosObj> serialize(flatbuffers::FlatBufferBuilder &builder) const
       {
@@ -105,6 +99,25 @@ namespace blocks {
 
     public:
       wpos(const blocks::common::cid &_cid, const blocks::common::cpos &_cpos);
+
+      template <class T>
+      wpos(T p) { deserialize(p); }
+
+      template <class T>
+      static wpos deserialize(const T *p)
+      {
+        return (wpos(p->x(), p->y(), p->z()));
+      }
+
+      static wpos deserialize(const fbs::PosObj *p)
+      {
+        return (deserialize(p->pos()));
+      }
+
+      static wpos deserialize(const fbs::Pos *p)
+      {
+        return (wpos(p->x(), p->y(), p->z()));
+      }
 
       cid cid() const;
       cpos cpos() const;

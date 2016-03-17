@@ -25,6 +25,7 @@ namespace blocks
     struct parent_network_event
     {
       virtual void emit(ex::EventManager &, fbs::Message *) = 0;
+      virtual void emit(ex::EventManager &, fbs::RPC *) = 0;
     };
 
     template <fbs::Action _action, typename T>
@@ -37,6 +38,12 @@ namespace blocks
       message_type *msg;
 
       virtual void emit(ex::EventManager &em, fbs::Message *msg)
+      {
+        auto tmp = static_cast<message_type *>(msg->body());
+        self_type e(tmp);
+        em.emit<self_type>(e);
+      }
+      virtual void emit(ex::EventManager &em, fbs::RPC *msg)
       {
         auto tmp = static_cast<message_type *>(msg->body());
         self_type e(tmp);

@@ -10,7 +10,7 @@ namespace blocks
   {
 
     Network::Network(std::string host, std::string port, Game *game)
-      : _bus(host, atoi(port.c_str()), "events", this), _last_pos(0, 0, 0), _game(game)
+      : _bus(host, atoi(port.c_str()), "events", this, false), _last_pos(0, 0, 0), _game(game)
     {
       // ---
         // sprintf(_player_id, "%d", 1);
@@ -22,8 +22,8 @@ namespace blocks
       //                                new events::player_moved(nullptr)));
       // _events_ptrs.insert(event_item(fbs::Action::Action_PLAYER_CONNECT,
       //                                new events::player_connected(nullptr)));
-      _events_ptrs.insert(event_item(fbs::Action::Action_CHUNK,
-                                     new events::chunk_received(nullptr)));
+      _rpc_ptrs.insert(std::make_pair(fbs::AType::AType_Chunk,
+                                       new events::chunk_received(nullptr)));
       // _events_ptrs.insert(event_item(fbs::Action::Action_UPDATE_BLOCK,
       //                                new events::block_update(nullptr)));
       // _events_ptrs.insert(event_item(fbs::Action::Action_AUTH,
@@ -40,21 +40,20 @@ namespace blocks
       // _bus.subscribe("world.players.1");
       // _connected = true;
       // sprintf(_player_id, "%d", 1);
-      _bus.rpc(Protocole::create_rpc(fbs::AType::AType_PlayerAuth, &pauth),
-      [&](fbs::RPC *rpc)
-      {
-        auto player = common::Player::deserialize(static_cast<const fbs::Player *>(rpc->body()));
-        std::cout << "AUTH ANSWER " << player->id() << " " << player->login() << std::endl;
-        sprintf(_player_id, "%d", player->id());
-        std::cout << "TA RACE: " << std::string("world.players.") + _player_id << std::endl;
-        _bus.subscribe(std::string("world.players.") + _player_id);
-        _game->create_player(player->pos());
-        _connected = true;
-      },
-      [&](fbs::Error *error)
-      {
+      _bus.rpc(&pauth,
+        [&](fbs::RPC *rpc)
+        {
+          auto player = common::Player::deserialize(static_cast<const fbs::Player *>(rpc->body()));
+          std::cout << "AUTH ANSWER " << player->id() << " " << player->login() << std::endl;
+          sprintf(_player_id, "%d", player->id());
+          _bus.subscribe(std::string("world.players.") + _player_id);
+          _game->create_player(player->pos());
+          _connected = true;
+        },
+        [&](fbs::Error *error)
+        {
 
-      });
+        });
     }
 
     void Network::configure(ex::EventManager &em)
@@ -64,7 +63,7 @@ namespace blocks
       em.subscribe<events::player_connected>(*this);
       // em.subscribe<events::player_initial_pos>(*this);
       em.subscribe<events::key>(*this);
-      em.subscribe<events::auth>(*this);
+      // em.subscribe<events::auth>(*this);
     }
 
     void Network::update(ex::EntityManager &entities,
@@ -85,9 +84,7 @@ namespace blocks
             _passed = 0;
             _last_pos = pos;
             // std::cout << "MOVE" << std::endl;
-            // _bus.emit("world.chunks", Protocole::create_message(_player_id, fbs::Action::Action_MOVE,
-            //                                     fbs::AType::AType_PosObj,
-            //                                     &pos));
+            // _bus.emit("world.chunks", fbs::Action::Action_MOVE, &pos);
         }
       };
 
@@ -98,20 +95,22 @@ namespace blocks
     }
 
 
-    void Network::dispatch(uint8_t *buffer)
+    void Network::dispatch(fbs::Message *message)
     {
-      std::cout << "Network Dispatch " << std::endl;
-      auto message = flatbuffers::GetMutableRoot<blocks::fbs::Message>(buffer);
       if (message != nullptr)
         _network_to_game_pipe << message;
 
-      // if (_socket == nullptr)
-      //   _socket = socket;
+    }
+
+    void Network::dispatch_rpc(fbs::RPC *message, Bus<Network>::DoneCallback done)
+    {
+
     }
 
     void Network::dispatch_events(ex::EntityManager &entities, ex::EventManager &em)
     {
       fbs::Message *msg = nullptr;
+      fbs::RPC *rpc = nullptr;
 
       if (_connected && !_serv_connect_sent)
       {
@@ -121,49 +120,46 @@ namespace blocks
 
       while (_network_to_game_pipe.size())
       {
-        std::cout << "Network Dispatch Events depop" << std::endl;
         _network_to_game_pipe >> msg;
         if (msg != nullptr)
         {
-          // if (msg->action() == fbs::Action::Action_INITIAL_POS)
           std::map<fbs::Action, events::parent_network_event *>::iterator it;
           it = _events_ptrs.find(msg->action());
-          std::cout << "Action " << msg->action() << std::endl;
           if (it != _events_ptrs.end())
-          {
             _events_ptrs[msg->action()]->emit(em, msg);
-          }
+        }
+      }
+
+      while (_network_rpc_to_game_pipe.size())
+      {
+        _network_rpc_to_game_pipe >> rpc;
+        if (rpc != nullptr)
+        {
+          std::map<fbs::AType, events::parent_network_event *>::iterator it;
+          it = _rpc_ptrs.find(rpc->body_type());
+          if (it != _rpc_ptrs.end())
+            _rpc_ptrs[rpc->body_type()]->emit(em, rpc);
         }
       }
     }
 
     void Network::receive(const events::chunk_requested &e)
     {
-      std::cout << "Ask chunk" << std::endl;
-      _bus.emit("world.chunks", Protocole::create_message(_player_id, fbs::Action::Action_ASK_CHUNK,
-                                               fbs::AType::AType_PosObj, &e.id));
+      // std::cout << "Ask chunk" << std::endl;
+      _bus.rpc(&e.id,
+        [&](fbs::RPC *msg)
+        {
+          _network_rpc_to_game_pipe << msg;
+        },
+        [&](fbs::Error *error)
+        {
+
+        });
+      // _bus.emit("world.chunks", fbs::Action::Action_ASK_CHUNK, &e.id);
     }
-
-    void Network::receive(const events::auth &e)
-    {
-      // auto msg = e.msg;
-      // bool answer = msg->answer();
-      std::cout << "Auth result " << std::endl;
-
-    }
-
-    // void Network::receive(const events::player_initial_pos &e)
-    // {
-    //   auto player = e.msg;
-    //   auto _pos = player->pos();
-    //   common::wpos pos(_pos->x(), _pos->y(), _pos->z());
-    //   // XXX:  _game->create_player(pos);
-    // }
 
     void Network::receive(const events::player_moved &e)
     {
-      std::cout << "MOVE" << std::endl;
-      return ;
       auto player = e.msg;
       auto entity = _characters.at(player->id());
       auto ppos = player->pos();
@@ -176,7 +172,7 @@ namespace blocks
     {
       auto player = e.msg;
       auto _pos = player->pos();
-      common::wpos pos(_pos->x(), _pos->y(), _pos->z());
+      auto pos = common::wpos(_pos);
       _characters.insert(std::pair<int, ex::Entity>(player->id(),
                                                     _game->create_character(pos)));
     }

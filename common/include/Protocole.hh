@@ -10,13 +10,11 @@ namespace blocks
         typedef std::tuple<uint8_t *, size_t> Message;
 
         template <class T>
-        static Message create_message(std::string routing, fbs::Action action, T body)
+        static Message create_message(fbs::Action action, T body)
         {
           flatbuffers::FlatBufferBuilder *builder = new flatbuffers::FlatBufferBuilder();
           auto type = body->atype();
-          auto routing_ = builder->CreateString(routing);
           auto message = fbs::CreateMessage(*builder,
-                                            routing_,
                                             action,
                                             type,
                                             body->serialize(*builder).Union());

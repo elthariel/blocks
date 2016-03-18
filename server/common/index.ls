@@ -4,11 +4,8 @@ require! {
   \../../common/generated_include/chunk_generated : {{fbs}:blocks}
 }
 
-Events = require \./Events
-export Events.Events
-export Events.RPCReceiver
-export Events.RPCEmitter
-export Events.RPCProxy
+Bus = require \./Bus
+export Bus.Bus
 export class Pos extends Serializable \Pos
 export class PosObj extends Serializable \PosObj classes: pos: Pos
 export class Block extends Serializable \Block
@@ -53,9 +50,9 @@ export class Message extends Serializable \Message, union: \body
     msg = fbs.Message.getRootAsMessage buf
     msg = super msg
 
-  @Create = (routing, action, body) ->
+  @Create = (action, body) ->
     bodyType = @types_actions[action]
-    new Message {routing, action, bodyType, body}
+    new Message {action, bodyType, body}
 
 export class RPC extends Serializable \RPC, union: \body
 

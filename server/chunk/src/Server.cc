@@ -3,11 +3,12 @@
 namespace blocks {
 
     Server::Server()
-      : _bus("localhost", 5672, "events_server", this, true)
+      : _bus("localhost", 5672, "events", this, true)
     {
       init_handler_ptrs();
       init_handler_rpc_ptrs();
-      _bus.subscribe("world.chunks");
+      // _bus.subscribe_events("world.chunks");
+      _bus.subscribe_rpc("chunks");
     }
 
     void Server::init_handler_ptrs()

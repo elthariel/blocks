@@ -28,25 +28,15 @@ namespace blocks
       //                                new events::block_update(nullptr)));
       // _events_ptrs.insert(event_item(fbs::Action::Action_AUTH,
       //                                new events::auth(nullptr)));
+
       common::PlayerAuth pauth("test", "test");
-      // common::wpos pos(1, 2, 3);
-
-      // _bus.subscribe("world.chunks");
-      // _bus.emit("tamere42", Protocole::create_message(fbs::Action::Action_MOVE,
-      //                                                 fbs::AType::AType_PlayerAuth))
-
-      // _bus.rpc
-
-      // _bus.subscribe("world.players.1");
-      // _connected = true;
-      // sprintf(_player_id, "%d", 1);
-      _bus.rpc(&pauth,
+      _bus.rpc("auth", &pauth,
         [&](fbs::RPC *rpc)
         {
           auto player = common::Player::deserialize(static_cast<const fbs::Player *>(rpc->body()));
           std::cout << "AUTH ANSWER " << player->id() << " " << player->login() << std::endl;
           sprintf(_player_id, "%d", player->id());
-          _bus.subscribe(std::string("world.players.") + _player_id);
+          _bus.subscribe_events(std::string("world.players.") + _player_id);
           _game->create_player(player->pos());
           _connected = true;
         },
@@ -146,7 +136,7 @@ namespace blocks
     void Network::receive(const events::chunk_requested &e)
     {
       // std::cout << "Ask chunk" << std::endl;
-      _bus.rpc(&e.id,
+      _bus.rpc("chunks", &e.id,
         [&](fbs::RPC *msg)
         {
           _network_rpc_to_game_pipe << msg;

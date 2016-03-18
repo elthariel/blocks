@@ -16,6 +16,7 @@
     "url": "https://github.com/elthariel/blocks/issues"
   },
   "dependencies": {
+    "amqplib": "^0.4.1",
     "flatbuffers": "^0.1.0",
     "prelude-ls": "^1.1.2",
     "rabbit.js": "^0.4.4"

@@ -46,3 +46,4 @@ common/generated_include
 
 # Until we've out stuff
 media/textures
+deps/*

@@ -1,17 +1,18 @@
 #! /bin/bash
 
-if [ -z $1 ]; then
-  echo "usage: $0 /path/to/minecraft.jar"
-  exit 1
-fi
-
+uri="https://launcher.mojang.com/mc/game/1.7.10/client/e80d9b3bf5085002218d4be59e668bac718abbc6/client.jar"
 dest="./media/"
 dir="/tmp/lol"
+jar="$dir/mc.jar"
 
 echo "Work dir: $dir"
+mkdir -p $dir
+
+echo "Downloading $uri"
+wget -O $jar $uri
 
 echo "Unzipping jar"
-unzip -d $dir -q $1
+unzip -d $dir -q $jar
 
 echo "Creating $dest"
 mkdir -p $dest

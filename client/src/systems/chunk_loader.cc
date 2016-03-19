@@ -139,7 +139,6 @@ namespace blocks
 
     void ChunkLoader::receive(const events::chunk_received &e)
     {
-      std::cout << "CHUNK RECEIVED" << std::endl;
       auto _chunk = e.msg;
       _pipe_to_mesher << blocks::common::Chunk::deserialize(_chunk);
     }

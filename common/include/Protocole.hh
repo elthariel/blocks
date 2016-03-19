@@ -34,7 +34,7 @@ namespace blocks
                                         type,
                                         body->serialize(*builder).Union());
 
-          std::cout << "Create RPC " << type << std::endl;
+          // std::cout << "Create RPC " << type << std::endl;
           builder->Finish(message);
           return std::make_tuple(builder->GetBufferPointer(), builder->GetSize());
         }

@@ -108,13 +108,11 @@ namespace blocks
                            uint64_t deliveryTag,
                            bool redelivered)
         {
-          // std::cout << "Received from bus " << message.correlationID() << std::endl;
           //FIXME: free that buffer
           auto size = message.message().size();
           uint8_t *tmp = new uint8_t[size];
           memcpy(tmp, message.message().c_str(), size);
 
-          std::cout << "Receive ! " << message.correlationID() << std::endl;
           if (!message.correlationID()[0])
           {
             auto msg = flatbuffers::GetMutableRoot<fbs::Message>((void *)tmp);
@@ -182,8 +180,6 @@ namespace blocks
                                                                   uint64_t deliveryTag,
                                                                   bool redelivered)
           {
-            std::cout << "RPC Receive" << std::endl;
-
             auto msg = flatbuffers::GetMutableRoot<fbs::RPC>((void *)message.message().c_str());
             auto done = [&](fbs::Error *error, Protocole::Message ret)
             {
@@ -230,7 +226,6 @@ namespace blocks
           return;
         }
 
-        std::cout << "Bind" << _private_rpc_queue << std::endl;
         _rpc_channel->bindQueue("rpc_queue", _private_rpc_queue, topic);
       }
 
@@ -280,7 +275,6 @@ namespace blocks
 
       void rpc_answer(const AMQP::Message &msg, uint8_t *buffer)
       {
-        std::cout << "RPC Answer" << std::endl;
         auto callbacks = _rpc_waiting[msg.correlationID()];
         auto it = _rpc_waiting.find(msg.correlationID());
         _rpc_waiting.erase(it);

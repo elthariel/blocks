@@ -59,20 +59,14 @@ module.exports = Serializable = (name, options) ->
 
     @Deserialize = (obj) ->
       serie = {}
-      console.log 'Deserialize'
       props |> each ~>
-        console.log 'Prop' it
         if it is options?.union
-          console.log 'lol1'
           if not obj[it + \Type]? or not common.Message.types_classes[obj[it + \Type]!]?
-            console.log 'CURRENTLY DESERIALIZING' @_fbs_type, @_type_name, @_type, @_atype
             throw new Error "Non existing classe for union type '#{obj[it + \type ]?!}''"
           serie[it] = common.Message.types_classes[obj[it + \Type]!].Deserialize obj[it] new types[obj[it + \Type]!]
         else if options?.classes?[it]?
-          console.log 'lol2'
           serie[it] = options.classes[it].Deserialize obj[it]!
         else
-          console.log 'lol3'
           serie[it] = obj[it]!
 
         if obj[it + \Length]?
@@ -81,7 +75,6 @@ module.exports = Serializable = (name, options) ->
           for i from 0 til len
             serie[it].push options.vectors[it].Deserialize obj[it] i
 
-        console.log 'lol4' serie[it]
       new @ serie
 
 require! {\./ : common}

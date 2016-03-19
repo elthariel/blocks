@@ -12,12 +12,6 @@ namespace blocks
     Network::Network(std::string host, std::string port, Game *game)
       : _bus(host, atoi(port.c_str()), "events", this, false), _last_pos(0, 0, 0), _game(game)
     {
-      // ---
-        // sprintf(_player_id, "%d", 1);
-        // _bus.subscribe("world.players.1");
-        // _game->create_player(_last_pos);
-        // _connected = true;
-
       // _events_ptrs.insert(event_item(fbs::Action::Action_MOVE,
       //                                new events::player_moved(nullptr)));
       // _events_ptrs.insert(event_item(fbs::Action::Action_PLAYER_CONNECT,
@@ -34,7 +28,6 @@ namespace blocks
         [&](fbs::RPC *rpc)
         {
           auto player = common::Player::deserialize(static_cast<const fbs::Player *>(rpc->body()));
-          std::cout << "AUTH ANSWER " << player->id() << " " << player->login() << std::endl;
           sprintf(_player_id, "%d", player->id());
           _bus.subscribe_events(std::string("world.players.") + _player_id);
           _game->create_player(player->pos());
@@ -51,7 +44,6 @@ namespace blocks
       em.subscribe<events::chunk_requested>(*this);
       em.subscribe<events::player_moved>(*this);
       em.subscribe<events::player_connected>(*this);
-      // em.subscribe<events::player_initial_pos>(*this);
       em.subscribe<events::key>(*this);
       // em.subscribe<events::auth>(*this);
     }

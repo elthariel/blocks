@@ -6,6 +6,7 @@ require! {
 
 Bus = require \./Bus
 export Bus.Bus
+export Bus.BusProxy
 export class Pos extends Serializable \Pos
 export class PosObj extends Serializable \PosObj classes: pos: Pos
 export class Block extends Serializable \Block

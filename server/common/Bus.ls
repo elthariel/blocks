@@ -9,14 +9,14 @@ export class Bus extends EventEmitter
 
   (@eventQueue = \events, @rpcQueue = \rpc_queue, @rpcHandler) ->
     @rpcAnswers = {}
-    @correlationID = 0
+    @correlationId = 0
     @eventReady = false
     @rpcReady = false
     @_emit = EventEmitter::emit
     amqp.connect!
       .then (conn) ~>
         conn.createChannel!then (@eventChannel) ~> @_declare_event!
-        if @rpcHandler
+        if @rpcHandler?
           conn.createChannel!then (@rpcChannel) ~> @_declare_rpc!
 
   _declare_event: ->
@@ -38,24 +38,25 @@ export class Bus extends EventEmitter
         @rpcChannel.consume @rpcPrivateQueue, @~_receive_rpc, {noAck: true}
 
   _receive_event: ->
-    msg = common.Message.Deserialize it.content
-    if it.correlationID.length
-      @rpcAnswers[it.correlationID] msg
-      delete @rpcAnswers[it.correlationID]
+    if it.properties.correlationId.length
+      @rpcAnswers[it.properties.correlationId] common.RPC.Deserialize it.content
+      delete @rpcAnswers[it.properties.correlationId]
     else
+      msg = common.Message.Deserialize it.content
       @_emit msg.action, msg.body, it
-      @_emit \data, msg, it
+      @_emit \_event, msg, it
 
   _receive_rpc: (env) ->
-    console.log 'RECEIVE RPC' @rpcHandler, env
     msg = common.RPC.Deserialize env.content
     if not @rpcHandler[msg.bodyType]?
-      console.log 'NO HANDLER FOR' msg
-      return @rep.write common.RPC.Create(new Error err: "No handler for type #{msg.bodyType}").Serialize!
+      return @eventChannel.sendToQueue env.properties.replyTo, common.RPC.Create(new Error err: "No handler for type #{msg.bodyType}").Serialize!, do
+        deliveryMode: true
+        expiration: 3600
+        correlationId: env.properties.correlationId
+
+    @_emit \_rpc, msg, env
     @rpcHandler[msg.bodyType].call @rpcHandler, msg.body, env, (err, res) ~>
-      @_emit \data, msg, env
       answer = common.RPC.Create res .Serialize!
-      console.log 'Reply to ' env
       @eventChannel.sendToQueue env.properties.replyTo, answer, do
         deliveryMode: true
         expiration: 3600
@@ -66,7 +67,7 @@ export class Bus extends EventEmitter
       if not @[event] then @once event, ~> cb.apply @, args
       else cb.apply @, args
 
-  subscribe_event: @_Wait \eventReady (topic) ->
+  subscribe_events: @_Wait \eventReady (topic) ->
     @eventChannel.bindQueue @eventPrivateQueue, @eventQueue, topic
 
   subscribe_rpc: @_Wait \rpcReady (topic) ->
@@ -76,12 +77,52 @@ export class Bus extends EventEmitter
     msg = common.Message.Create event, obj
     @eventChannel.publish @eventQueue, topic, msg.Serialize!
 
-  ask: @_Wait \rpcReady (topic, data, cb) ->
+  ask: @_Wait \eventReady (topic, data, cb) ->
     msg = common.RPC.Create data
     @eventChannel.publish @rpcQueue, topic, msg.Serialize!, do
-      replyTo: @rpcPrivateQueue
-      correlationID: @correlationID + ''
-    @rpcAnswers[@correlationID++] = cb
+      replyTo: @eventPrivateQueue
+      correlationId: @correlationId + ''
+    @rpcAnswers[@correlationId++] = cb
+
+export class BusProxy extends Bus
+
+  ->
+    super ...
+    @subscribe_events \*
+    @subscribe_rpc \* if @rpcHandler?
+
+  _receive_event: ->
+    if it.properties.correlationId?.length
+      @rpcAnswers[+it.properties.correlationId] it
+      delete @rpcAnswers[+it.properties.correlationId]
+    else
+      @_emit \_event, it
+
+  _receive_rpc: (env) ->
+    @_emit \_rpc, env
+
+  emit: @_Wait \eventReady (env) ->
+    @eventChannel.publish @eventQueue, env.fields.routingKey, env.content
+
+  ask: @_Wait \eventReady (env_, cb) ->
+    env = {content: env_.content}
+    env.properties = {} <<< env_.properties
+    env.fields = {} <<< env_.fields
+    if cb?
+      env.properties.replyTo = @eventPrivateQueue
+      env.properties.correlationId = @correlationId + ''
+      @rpcAnswers[@correlationId++] = (recvEnv) ~>
+        cb recvEnv
+        @eventChannel.sendToQueue env_.properties.replyTo, recvEnv.content, do
+          deliveryMode: true
+          expiration: 3600
+          correlationId: env_.properties.correlationId
+
+
+    @eventChannel.publish @rpcQueue, env.fields.routingKey, env.content, do
+      replyTo: env.properties.replyTo
+      correlationId: env.properties.correlationId
+
 
 #
 # export class RPCProxy extends EventEmitter

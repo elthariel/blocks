@@ -1,59 +1,34 @@
+global import require \prelude-ls
 require! {
-  \prelude-ls
+  \../../common/generated_include/chunk_generated : {{fbs}:blocks}
+  \../common : {BusProxy, Player, PlayerAuth, Error, RPC, Message}
 }
 
-users = [
-  login: \test password: \test
-]
+export class Proxy
 
-global import prelude-ls
+  ->
+    @logged = {}
 
-# clients = new thrift.BiDirectServer do
-#   receiver:
-#     processor: Proxy
-#     port: 9001
-#   emitter:
-#     processor: Client
-#     port: 9002
-#   handler:
-#     auth: (login, pass, done) ->
-#       user = find (.login is login), users
-#       if user? and pass is user.password
-#         return done null, true
-#
-#         done null, false
-#
-#
-# mdsClient = new thrift.Client \localhost 9001
-# mds = new thrift.Emitter MDS, mdsClient, (client) ->
+    @clients = new BusProxy \events \rpc_queue {}
+    @servers = new BusProxy \events_server \rpc_queue_server
 
-# mds = new thrift.BiDirectClient do
-#   receiver:
-#     processor: Proxy
-#     host: \localhost
-#     port: 9002
-#   emitter:
-#     processor: MDS
-#     host: \localhost
-#     port: 9001
-#   handler:
-#     subscribe: (listener, watched, event) ->
-#     emit: (listener, watched, event) ->
-#
+    @clients.on \_rpc (env) ~>
+      sender = env.properties.replyTo
+      if @logged[sender]?
+        @servers.ask env
+      else
+        msg = RPC.Deserialize env.content
+        if msg.bodyType is fbs.AType.PlayerAuth
+          @servers.ask env, (env_) ~>
+            msg = RPC.Deserialize env_.content
+            if msg.bodyType is fbs.AType.Player
+              @logged[sender] = msg.body
+              console.log 'Logged: ' msg.body.login
+            else
+              console.log 'auth failed' msg
 
-# # Listen to clients
-# emitSocket = new thrift.Server 9002
-# recvSocket = new thrift.Server 9001
-#
-# emitter = new thrift.Emitter Client, emitSocket, (client) ->
-#   pos = new Types.Pos
-#   pos <<< x: 1 y: 1 z: 1
-#   client.set_position pos#, (err, res) -> console.log err, res
-#
-# receiver = new thrift.Receiver Proxy, recvSocket, do
-#   auth: (login, pass, done) ->
-#     user = find (.login is login), users
-#     if user? and pass is user.password
-#       return done null, true
-#
-#     done null, false
+    @servers.on \_event (env) ~>
+      @clients.emit env
+
+
+new Proxy

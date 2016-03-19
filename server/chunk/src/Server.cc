@@ -3,7 +3,7 @@
 namespace blocks {
 
     Server::Server()
-      : _bus("localhost", 5672, "events", this, true)
+      : _bus("localhost", 5672, "events_server", this, true)
     {
       init_handler_ptrs();
       init_handler_rpc_ptrs();
@@ -99,7 +99,6 @@ namespace blocks {
 
     void Server::on_ask_chunk(fbs::RPC *message, Bus<Server>::DoneCallback done)
     {
-      std::cout << "ASK CHUNK" << std::endl;
       auto pos = static_cast<const fbs::PosObj *>(message->body())->pos();
       common::cid _cid(pos->x(), pos->y(), pos->z());
 

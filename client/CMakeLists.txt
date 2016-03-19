@@ -2,17 +2,29 @@ cmake_minimum_required(VERSION 3.0)
 
 project(blocks_client)
 
+
+###############################################################################
+### Sources
+
 file(GLOB_RECURSE CLIENT_HEADERS ./include/ *.hh)
 file(GLOB_RECURSE CLIENT_SOURCES ./src/ *.cc)
+
+
+###############################################################################
+### Dependencies
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(BULLET bullet REQUIRED)
 
 
+###############################################################################
+### Dependencies
+
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
-  ${PANDA_INCLUDE_DIRS}
-  ${BULLET_INCLUDE_DIRS}
+  ${BLOCKS_INCLUDE_DIRS}
+  SYSTEM ${PANDA_INCLUDE_DIRS}
+  SYSTEM ${BULLET_INCLUDE_DIRS}
   ${THIRD_PARTY}/entityx
   ${THIRD_PARTY}/duktape
 )
@@ -23,13 +35,18 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
 )
 
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BLOCKS_CXXFLAGS}")
 add_definitions(-std=c++14)
+
+
+###############################################################################
+### Build
 
 add_executable(blocks_client ${CLIENT_HEADERS} ${CLIENT_SOURCES})
 set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_client
+  ${BLOCKS_LDFLAGS}
   common
   entityx
   ${PANDA_LIBRARIES}

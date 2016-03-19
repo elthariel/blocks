@@ -20,6 +20,7 @@ AlwaysBreakTemplateDeclarations: true
 BinPackArguments: false
 BinPackParameters: false
 BreakBeforeBinaryOperators: NonAssignment
+BreakConstructorInitializersBeforeComma: true
 # BreakStringLiterals: true
 ConstructorInitializerIndentWidth: 2
 ContinuationIndentWidth: 2

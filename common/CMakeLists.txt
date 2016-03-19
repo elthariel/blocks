@@ -58,7 +58,7 @@ add_library(common STATIC
   ${COMMON_HEADERS}
   ${COMMON_SOURCES}
   )
-target_link_libraries(${BLOCKS_LDFLAGS} common duktape)
+target_link_libraries(common ${BLOCKS_LDFLAGS} duktape mruby)
 
 if (UNIX)
   add_custom_command(
@@ -67,4 +67,21 @@ if (UNIX)
         ${CMAKE_SOURCE_DIR}/common/ruby
         ${DIST_RB}/common
     )
+endif()
+
+###############################################################################
+### Tests
+
+if (TESTS)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+  set(BUILD_SHARED_LIBRARIES OFF)
+  foreach (TEST_SRC ${COMMON_TESTS})
+    get_filename_component(TEST_NAME ${TEST_SRC} NAME_WE)
+    add_executable(common_test_${TEST_NAME} ${COMMON_HEADERS} ${TEST_SRC})
+    target_link_libraries(common_test_${TEST_NAME}
+      ${BLOCKS_LDFLAGS}
+      common
+      ${Boost_LIBRARIES}
+      boost_unit_test_framework)
+  endforeach()
 endif()

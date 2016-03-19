@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-using namespace blocks;
+using namespace blocks::common;
 using namespace std;
 
 BOOST_AUTO_TEST_CASE( accessors )

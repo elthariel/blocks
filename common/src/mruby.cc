@@ -1,5 +1,5 @@
-
 #include "mruby.hh"
+#include "mruby_value.hh"
 
 #include <mruby/string.h>
 
@@ -22,6 +22,21 @@ namespace blocks
       assert(_mrb != nullptr);
     }
 
+    mruby::~mruby()
+    {
+      mrb_close(_mrb);
+    }
+
+    bool mruby::operator==(const mruby &other)
+    {
+      return _mrb == other._mrb;
+    }
+
+    bool mruby::operator!=(const mruby &other)
+    {
+      return _mrb != other._mrb;
+    }
+
     value mruby::run(const std::string &path)
     {
       auto full_path = _base_path + "/" + path;
@@ -34,55 +49,58 @@ namespace blocks
       code << rb.rdbuf();
       rb.close();
 
-      return value(_mrb, mrb_load_string(_mrb, code.str().c_str()));
+      return value(*this, mrb_load_string(_mrb, code.str().c_str()));
     }
 
-    std::string value::as_string()
+    value mruby::eval(const std::string &code)
     {
-      if (!is_string())
-        return std::string();
-
-      return std::string(mrb_str_to_cstr(_mrb, _value));
+      return value(*this, mrb_load_string(_mrb, code.c_str()));
     }
 
-    array value::as_array()
+    value mruby::exception()
     {
-      if (!is_array())
-      {
-        std::cerr << "Not an array. The universe will collapse soon..." << std::endl;
-        return array(_mrb);
-      }
-      return array(_mrb, _value);
+      if (_mrb->exc == nullptr) return value(*this);
+
+      value res(*this, mrb_obj_value(_mrb->exc));
+
+      _mrb->exc = nullptr;
+
+      return res;
     }
 
-    hash value::as_hash()
+    value mruby::root()
     {
-      if (!is_hash())
-      {
-        std::cerr << "Not a hash. The fabric of the universe is impacted..." << std::endl;
-        return hash(_mrb);
-      }
-      return hash(_mrb, _value);
+      return value(*this, mrb_obj_value(_mrb->top_self));
     }
 
-    array hash::keys()
+    mrb_state *mruby::unwrap()
     {
-      return array(_mrb, mrb_hash_keys(_mrb, _value));
+      return _mrb;
     }
 
-    value hash::get(value key)
+    value mruby::make()
     {
-      return value(_mrb, mrb_hash_get(_mrb, _value, key.unwrap()));
+      return value(*this);
     }
 
-    void hash::each(std::function<void (value, value)> f)
+    value mruby::make(bool b)
     {
-      auto kz = keys();
-      for(auto key: kz)
-      {
-        auto v = get(key);
-        f(key, v);
-      }
+      return value(*this, mrb_bool_value(b));
+    }
+
+    value mruby::make(mrb_int i)
+    {
+      return value(*this, mrb_fixnum_value(i));
+    }
+
+    value mruby::make(float f)
+    {
+      return value(*this, mrb_float_value(_mrb, f));
+    }
+
+    value mruby::make(std::string s)
+    {
+      return value(*this, mrb_str_new_cstr(_mrb, s.c_str()));
     }
 
   }

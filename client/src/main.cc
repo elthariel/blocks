@@ -1,4 +1,3 @@
-
 #include "game.hh"
 #include "mruby.hh"
 

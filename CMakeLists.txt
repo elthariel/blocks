@@ -60,6 +60,10 @@ set(BLOCKS_INCLUDE_DIRS
 set(BLOCKS_CXXFLAGS "-fpermissive -Wall -Wextra")
 set(BLOCKS_LDFLAGS "")
 
+if (${WERROR})
+  set(BLOCKS_CXXFLAGS "${BLOCKS_CXXFLAGS} -Werror -Wno-unused-parameter")
+endif()
+
 if (DEFINED SANITIZE)
   message("-- Using Clang's sanitizer: ${SANITIZE}")
   set(ASAN_FLAG -fsanitize=${SANITIZE})

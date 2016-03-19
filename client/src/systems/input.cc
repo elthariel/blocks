@@ -20,7 +20,7 @@ namespace blocks
     Input::Input(PandaFramework &framework, WindowFramework &window)
       : _window(window), _last_pos(0, 0), _diff(0, 0)
     {
-      for(auto i = 0; i < _key_down.size(); ++i)
+      for(unsigned i = 0; i < _key_down.size(); ++i)
         _key_down[i] = false;
 
       register_mappings(framework);
@@ -63,7 +63,7 @@ namespace blocks
 
      void Input::process_key_events(ex::EventManager &event_manager)
     {
-      for (auto i = 0; i < _key_down.size(); i++) {
+      for (unsigned i = 0; i < _key_down.size(); i++) {
         if (_key_down[i])
         {
           events::key kp(events::key::ktype::REPEAT, events::key::kcode(i));

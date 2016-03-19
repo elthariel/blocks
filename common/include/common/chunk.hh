@@ -66,7 +66,7 @@ namespace blocks {
             auto res = ptr(new Chunk(_cid));
             auto size = blocks->Length();
 
-            for (int i = 0; i < size; i++)
+            for (unsigned i = 0; i < size; i++)
             {
                 auto block = blocks->Get(i);
                 res->at(i) = Block(block->id(), block->variant(), block->air(), block->transparent());

@@ -34,8 +34,8 @@ namespace blocks {
     void thread_loop();
     void process_chunk(common::Chunk::ptr chunk);
 
-    std::thread _thread;
     std::atomic_bool _running;
+    std::thread _thread;
 
     Pipe<common::Chunk::ptr> &_input_pipe;
     Pipe<MeshingThread::result> &_output_pipe;

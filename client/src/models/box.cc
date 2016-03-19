@@ -26,11 +26,13 @@ namespace blocks
     {
       PT(Geom) geom = new Geom(_vxd);
       PT(GeomTriangles) mesh = new GeomTriangles(Geom::UH_static);
-      std::array<LVector3f, 6> normals = {
-        LVector3f(-1.0, 0.0, 0.0), LVector3f(1.0, 0.0, 0.0),
-        LVector3f(0.0, -1.0, 0.0), LVector3f(0.0, 1.0, 0.0),
-        LVector3f(0.0, 0.0, -1.0), LVector3f(0.0, 0.0, 1.0)
-      };
+      // clang-format off
+      std::array<LVector3f, 6> normals {{
+        {-1.0, 0.0, 0.0}, {1.0, 0.0, 0.0},
+        {0.0, -1.0, 0.0}, {0.0, 1.0, 0.0},
+        {0.0, 0.0, -1.0}, {0.0, 0.0, 1.0}
+      }};
+      // clang-format on
 
       float whd[3] = {_w, _h, _d};
       for (auto d = 0; d < 3; d++)

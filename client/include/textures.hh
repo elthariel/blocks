@@ -12,7 +12,7 @@ namespace blocks
   public:
     Textures();
 
-    PT(Texture) for_block_id(unsigned bid) {}
+    PT(Texture) for_block_id(unsigned bid) { return PT(Texture)(); }
   protected:
     ruby::mruby _mrb;
   };

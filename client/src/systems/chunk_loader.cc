@@ -1,4 +1,3 @@
-
 #include "systems/chunk_loader.hh"
 #include "components/basic.hh"
 #include "common/position.hh"
@@ -25,7 +24,7 @@ namespace blocks
       if (threads < 1)
         threads = 1;
 
-      for (auto i = 0; i < threads; i++)
+      for (unsigned i = 0; i < threads; i++)
         _meshing_threads.push_back(
           std::make_shared<MeshingThread>(_pipe_to_mesher, _pipe_from_mesher)
         );
@@ -152,7 +151,7 @@ namespace blocks
       if (entity.valid())
       {
         ex::ComponentHandle<common::Chunk::ptr> chunk = entity.component<common::Chunk::ptr>();
-        ex::ComponentHandle<NodePath> chunk_node = entity.component<NodePath>();
+        // ex::ComponentHandle<NodePath> chunk_node = entity.component<NodePath>();
         (*chunk.get())->at(pos.cpos()).replace_by<fbs::Block>(bpos->block());
         _pipe_to_mesher << *chunk.get();
       }

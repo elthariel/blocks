@@ -1,4 +1,3 @@
-
 #include "duktape.hh"
 
 #include <iostream>
@@ -6,6 +5,8 @@
 extern "C" {
   static void on_error(duk_context *ctx, duk_errcode_t code, const char *msg)
   {
+    (void)ctx;
+
     std::cerr << "DukTape fatal error, code=" << std::to_string(code)
               << ", msg='" << msg << "'" << std::endl;
   }
@@ -78,6 +79,9 @@ namespace blocks
   bool DukTape::eval(const std::string &path)
   {
     duk_eval_file(_ctx, path.c_str());
+
+    // XXX: Check for errors
+    return true;
   }
 
 }

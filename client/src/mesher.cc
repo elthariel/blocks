@@ -71,21 +71,21 @@ namespace blocks {
   // Greedy Mesher !
   //
   // clang-format off
-  const std::array<LVector3f, 6> GreedyMesher::normals = {
-    LVector3f(1.0, 0.0, 0.0), LVector3f(-1.0, 0.0, 0.0),
-    LVector3f(0.0, 1.0, 0.0), LVector3f(0.0, -1.0, 0.0),
-    LVector3f(0.0, 0.0, 1.0), LVector3f(0.0, 0.0, -1.0)
-  };
+  const std::array<LVector3f, 6> GreedyMesher::normals {{
+    {1.0, 0.0, 0.0}, {-1.0, 0.0, 0.0},
+    {0.0, 1.0, 0.0}, {0.0, -1.0, 0.0},
+    {0.0, 0.0, 1.0}, {0.0, 0.0, -1.0}
+    }};
 
-  const std::array<const common::cpos, 6> GreedyMesher::neighbors = {
-    common::cpos(1, 0, 0), common::cpos(-1, 0, 0),
-    common::cpos(0, 1, 0), common::cpos(0, -1, 0),
-    common::cpos(0, 0, 1), common::cpos(0, 0, -1)
-  };
+  const std::array<const common::cpos, 6> GreedyMesher::neighbors {{
+    {1, 0, 0}, {-1, 0, 0},
+    {0, 1, 0}, {0, -1, 0},
+    {0, 0, 1}, {0, 0, -1}
+    }};
   // clang-format on
 
   GreedyMesher::GreedyMesher(common::Chunk::ptr c)
-  : _chunk(c), _work(c->size())
+    : _work(c->size()), _chunk(c)
   {
     compute_visible();
     _vxd = new GeomVertexData(_chunk->id(), GeomVertexFormat::get_v3n3t2(), Geom::UH_static);
@@ -106,7 +106,7 @@ namespace blocks {
       if (_chunk->at(pos).air())
         continue;
 
-      for (auto f = 0; f < neighbors.size(); ++f)
+      for (size_t f = 0; f < neighbors.size(); ++f)
       {
         common::cpos pos_nb = pos + neighbors[f];
         if (!pos_nb.valid() || _chunk->at(pos_nb).air()

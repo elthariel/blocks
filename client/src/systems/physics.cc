@@ -44,10 +44,12 @@ static int64_t floor_to_int(double d, double margin = 100.0)
   else
     {
       if (1.0 - std::fabs(floored - d) <= margin * epsilon)
+      {
         if (d > 0)
           floored = d + margin * epsilon;
         else
           floored = d + margin * epsilon - 1;
+      }
 
       result = floored;
     }

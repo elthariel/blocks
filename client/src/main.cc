@@ -28,6 +28,7 @@ int main(int ac, char **av)
   chdir_to_bin(av[0]);
 
   blocks::Game game(ac, av);
+  Game::instance(&game);
   game.start();
 
   // ruby::mruby mrb("../ruby/");

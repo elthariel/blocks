@@ -2,66 +2,113 @@
 
 #include "common/util.hh"
 
-#include <typeinfo>
-#include <typeindex>
-#include <unordered_map>
+#include <memory>
+#include <array>
+
+#ifndef SESSION_STORAGE_SIZE
+# define SESSION_STORAGE_SIZE 32
+#endif
 
 namespace blocks
 {
-  class Session;
-
-  class SessionObject: public nocopy
+  // Base type for the Session Objects. It provides a non templated base type
+  // which pointer will be used for storage.
+  class BaseSessionObject : public nocopy
   {
-    friend class Session;
   public:
-    virtual ~SessionObject() {}
+    // Type for the session object storage index
+    typedef size_t type_index;
+    typedef std::shared_ptr<BaseSessionObject> ptr;
+
+    virtual ~BaseSessionObject() {}
+
+  protected:
+    static type_index __storage_index;
   };
 
-  class Session: public nocopy
+  // This templated class allow us to generate a unique storage index per child.
+  // This is shamelessly stolen from entityX
+  template <class Derived>
+  class SessionObject : public BaseSessionObject
   {
   public:
-    typedef std::unordered_map<std::type_index, SessionObject *> storage_type;
-
-    ~Session();
-    static Session &instance();
-    static void destroy();
-
-    template <class T> static T &get()
+    static type_index storage_index()
     {
-      return Session::instance()._get<T>();
+      static type_index index = __storage_index++;
+      return index;
+    }
+  };
+
+  template <class Derived>
+  class Session : public nocopy
+  {
+    static Derived *_instance;
+
+  public:
+    typedef std::array<BaseSessionObject::ptr, SESSION_STORAGE_SIZE>
+      storage_type;
+
+    static Derived &instance()
+    {
+      if (_instance == nullptr)
+        std::cerr
+          << "Trying to access session instance before it's initialized."
+          << "I'm so disappointed I'm going to crash !" << std::endl;
+
+      return *_instance;
     }
 
-    template <class T> T &_get()
+    template <class T>
+    static std::shared_ptr<T> &service()
     {
-      auto idx = std::type_index(typeid(T));
-      if (_storage[idx] != nullptr)
-        return *dynamic_cast<T *>(_storage[idx]);
+      return instance().template __service<T>();
+    }
+
+    template <class T, typename... Args>
+    static void make_service(Args &&... args)
+    {
+      instance().template __make_service<T>(std::forward<Args>(args)...);
+    }
+
+  protected:
+    static void instance(Derived *s)
+    {
+      if (_instance != nullptr)
+        std::cerr
+          << "Trying to intialize already initialized session instance. "
+          << "Please hold the line while we corrupt program's memory :)"
+          << std::endl;
+
+      _instance = s;
+    }
+
+    template <class T>
+    std::shared_ptr<T> &__service()
+    {
+      auto idx = T::storage_index();
+      if (_storage[idx])
+        return std::static_pointer_cast<T>(_storage[idx]);
       else
       {
         std::cerr << "Accessing a non initialized Session Object" << std::endl;
+        return std::shared_ptr<T>();
       }
     }
 
-    template <class T, typename ... Args>
-    static void make(Args && ... args)
+    template <class T, typename... Args>
+    void __make_service(Args &&... args)
     {
-      Session::instance()._make<T>(std::forward<Args>(args) ...);
-    }
+      auto idx = T::storage_index();
 
-    template <class T, typename ... Args>
-    void _make(Args && ... args)
-    {
-      auto idx = std::type_index(typeid(T));
-      if (_storage[idx] != nullptr)
-      {
-        T *o = new T(std::forward<Args>(args) ...);
-        _storage[idx] = o;
+      if (_storage[idx]) {
+        auto so       = std::make_shared<T>(std::forward<Args>(args)...);
+        _storage[idx] = so;
       }
     }
-
-  private:
-    static Session *_instance;
 
     storage_type _storage;
   };
+
+  template <class Derived>
+  Derived *Session<Derived>::_instance = nullptr;
 }

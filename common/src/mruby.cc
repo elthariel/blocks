@@ -37,7 +37,7 @@ namespace blocks
       return _mrb != other._mrb;
     }
 
-    value mruby::run(const std::string &path)
+    value mruby::eval_file(const std::string &path)
     {
       auto full_path = _base_path + "/" + path;
       ifstream rb(full_path);

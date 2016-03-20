@@ -19,13 +19,13 @@ namespace blocks
     class mruby : public nocopy
     {
     public:
-      mruby(const std::string &base_path);
+      mruby(const std::string &base_path = "../ruby");
       ~mruby();
 
       bool operator==(const mruby &other);
       bool operator!=(const mruby &other);
 
-      value run(const std::string &path);
+      value eval_file(const std::string &path);
       value eval(const std::string &code);
 
       value exception();

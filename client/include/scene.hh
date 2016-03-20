@@ -4,7 +4,7 @@
 #include "common/position.hh"
 
 #include <pandaFramework.h>
-#include <pandaSystem.h>
+// #include <pandaSystem.h>
 
 #include <memory>
 

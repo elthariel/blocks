@@ -34,11 +34,24 @@ bullet-filter-algorithm groups-mask
 )PRC";
 
 namespace blocks {
-  Game::Game(int ac, char **av)
+  AsyncTaskAdapter::AsyncTaskAdapter(Game &g)
+    : _game(g)
   {
-    Session::instance();
-    Session::make<Textures>();
+  }
 
+  AsyncTask::DoneStatus AsyncTaskAdapter::do_task()
+  {
+    double dt = get_dt();
+
+    _game.tick(dt);
+
+    // Can never return something else or deadlock
+    return AsyncTask::DS_cont;
+  }
+
+  Game::Game(int ac, char **av)
+    : _async(*this)
+  {
     load_prc_file_data("blocks.prc", prc);
     _framework.open_framework(ac, av);
     _scene = make_shared<Scene>(_framework);
@@ -49,7 +62,6 @@ namespace blocks {
 
   Game::~Game()
   {
-    Session::instance().destroy();
   }
 
   void Game::create_systems()
@@ -103,23 +115,24 @@ namespace blocks {
     return character;
   }
 
+  void Game::create_services()
+  {
+
+  }
+
   void Game::start()
   {
     cout << "Starting Game !" << endl;
 
-    AsyncTaskManager::get_global_ptr()->add(this);
+    AsyncTaskManager::get_global_ptr()->add(&_async);
 
     systems.configure();
     _scene->run();
   }
 
-  AsyncTask::DoneStatus Game::do_task()
+  void Game::tick(double dt)
   {
-    double dt = get_dt();
     update_systems(dt);
-
-    // Can never return something else or deadlock
-    return AsyncTask::DS_cont;
   }
 
 }

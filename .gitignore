@@ -27,6 +27,9 @@
 *.out
 *.app
 
+# Node dirty stuff
+node_modules
+
 # OS X shit
 .DS_Store
 

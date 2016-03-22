@@ -1,0 +1,40 @@
+#
+# Cmake Module to fix amqp-cpp
+#
+
+find_path(AMQPCPP_INCLUDE
+  amqpcpp.h
+  HINTS
+  ${DEPS_DIR}/amqpcpp/include
+  $ENV{HOME}/usr/local/include
+  )
+
+find_library(AMQPCPP_LIBRARY
+  amqp-cpp
+  HINTS
+  ${DEPS_DIR}/amqpcpp/lib
+  $ENV{HOME}/usr/local/lib
+  )
+
+message(-- "amqp-cpp:")
+if(AMQPCPP_INCLUDE-NOTFOUND)
+  message("---- AMQPCPP_INCLUDE: NOT FOUND")
+else(AMQPCPP_INCLUDE-NOTFOUND)
+  message("---- AMQPCPP_INCLUDE: ${AMQPCPP_INCLUDE}")
+endif(AMQPCPP_INCLUDE-NOTFOUND)
+
+
+message(-- "amqp-cpp:")
+if(AMQPCPP_LIBRARY-NOTFOUND)
+  message("---- AMQPCPP_LIBRARY: NOT FOUND")
+else(AMQPCPP_LIBRARY-NOTFOUND)
+  message("---- AMQPCPP_LIBRARY: ${AMQPCPP_LIBRARY}")
+endif(AMQPCPP_LIBRARY-NOTFOUND)
+
+
+if (AMQPCPP_INCLUDE-NOTFOUND OR LIBAMQPCPP-NOTFOUND)
+  set(AMQPCPP_FOUND no)
+else (AMQPCPP_INCLUDE-NOTFOUND OR LIBAMQPCPP-NOTFOUND)
+  set(AMQPCPP_FOUND yes)
+  set(AMQPCPP_INCLUDE_DIRS ${AMQPCPP_INCLUDE})
+endif(AMQPCPP_INCLUDE-NOTFOUND OR LIBAMQPCPP-NOTFOUND)

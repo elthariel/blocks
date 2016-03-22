@@ -41,6 +41,7 @@ find_package(Boost 1.55 REQUIRED
   )
 
 find_package(Panda REQUIRED)
+find_package(Amqpcpp REQUIRED)
 
 include(Livescript)
 

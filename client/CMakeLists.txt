@@ -26,13 +26,13 @@ include_directories(
   SYSTEM ${PANDA_INCLUDE_DIRS}
   SYSTEM ${BULLET_INCLUDE_DIRS}
   ${THIRD_PARTY}/entityx
-  ${THIRD_PARTY}/duktape
 )
 
 link_directories(
   ${PANDA_LIBRARY_DIRS}
   ${BULLET_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS}
+  ${THIRD_PARTY}/easylogging
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BLOCKS_CXXFLAGS}")

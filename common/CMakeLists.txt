@@ -43,7 +43,7 @@ endforeach(FBS_FILE)
 include_directories(
   ${BLOCKS_INCLUDE_DIRS}
   ${FLATBUFFERS_INCLUDE_DIRS}
-  ${THIRD_PARTY}/duktape
+  ${THIRD_PARTY}/easylogging
   )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BLOCKS_CXXFLAGS}")
@@ -58,7 +58,7 @@ add_library(common STATIC
   ${COMMON_HEADERS}
   ${COMMON_SOURCES}
   )
-target_link_libraries(${BLOCKS_LDFLAGS} common duktape)
+target_link_libraries(${BLOCKS_LDFLAGS} common)
 
 if (UNIX)
   add_custom_command(

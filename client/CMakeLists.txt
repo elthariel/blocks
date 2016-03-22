@@ -12,19 +12,16 @@ pkg_check_modules(BULLET bullet REQUIRED)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
-  ${PANDA_INCLUDE_DIRS}
-  ${BULLET_INCLUDE_DIRS}
-  # ${PROTON_INCLUDE_DIRS}
-  ${AMQPCPP_INCLUDE_DIRS}
-  ~/prog/AMQP-CPP
-  ${THIRD_PARTY}/entityx
-  ${THIRD_PARTY}/duktape
+  SYSTEM ${PANDA_INCLUDE_DIRS}
+  SYSTEM ${BULLET_INCLUDE_DIRS}
+  SYSTEM ${AMQPCPP_INCLUDE_DIRS}
+  SYSTEM ${THIRD_PARTY}/entityx
+  SYSTEM ${THIRD_PARTY}/duktape
 )
 
 link_directories(
   ${PANDA_LIBRARY_DIRS}
   ${BULLET_LIBRARY_DIRS}
-  # ${PROTON_LIBRARY_DIRS}
   ${AMQPCPP_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS}
 )
@@ -38,10 +35,8 @@ set_target_properties(blocks_client PROPERTIES DEBUG_POSTFIX _d)
 target_link_libraries(blocks_client
   common
   entityx
-  amqpcpp
   ${PANDA_LIBRARIES}
   ${BULLET_LIBRARIES}
-  # ${PROTON_LIBRARIES}
   ${AMQPCPP_LIBRARIES}
   ${Boost_LIBRARIES}
   ${LINUX_LIBS}
@@ -50,6 +45,10 @@ target_link_libraries(blocks_client
 
 add_custom_command(
   TARGET ${PROJECT_NAME} PRE_BUILD
-  COMMAND ln -sfT ${CMAKE_SOURCE_DIR}/media ${DIST}/media
-  COMMAND ln -sfT ${CMAKE_SOURCE_DIR}/client/ruby ${DIST_RB}/client
+  COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_SOURCE_DIR}/client/ruby
+        ${DIST_RB}/client
+  COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_SOURCE_DIR}/media
+        ${DIST}/media
 )

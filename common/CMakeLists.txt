@@ -38,16 +38,13 @@ add_definitions(-std=c++14)
 add_library(common STATIC
   ${COMMON_GENERATED_HEADERS} ${COMMON_HEADERS} ${COMMON_SOURCES}
 )
-target_link_libraries(common duktape)
+target_link_libraries(common duktape ${AMQPCCP_LIBRARIES})
 
-add_custom_command(
-  TARGET ${PROJECT_NAME} PRE_BUILD
-  COMMAND ln -sfT ${CMAKE_SOURCE_DIR}/ruby ${DIST_RB}/common
-)
-
-# Build tests !
-#set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-#set(BUILD_SHARED_LIBRARIES OFF)
-#set(CMAKE_EXE_LINKER_FLAGS "-static")
-# add_executable(common_tests ${COMMON_TESTS})
-# target_link_libraries(common_tests common boost_unit_test_framework)
+if (UNIX)
+  add_custom_command(
+    TARGET ${PROJECT_NAME} PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_SOURCE_DIR}/common/ruby
+        ${DIST_RB}/common
+    )
+endif()

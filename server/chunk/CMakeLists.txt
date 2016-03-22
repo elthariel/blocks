@@ -7,9 +7,8 @@ file(GLOB SERVER_SOURCES ./src/*.cc)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
-  ${PANDA_INCLUDE_DIRS}
-  ~/prog/AMQP-CPP
-
+  SYSTEM ${PANDA_INCLUDE_DIRS}
+  SYSTEM ${AMQPCPP_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -22,10 +21,9 @@ add_executable(blocks_server ${SERVER_HEADERS} ${SERVER_SOURCES})
 set_target_properties(blocks_server PROPERTIES DEBUG_POSTFIX _d)
 
 target_link_libraries(blocks_server
-  # odb
   common
   ${PANDA_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${AMQPCPP_LIBRARIES}
   ${LINUX_LIBS}
-  amqpcpp
 )

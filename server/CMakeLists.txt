@@ -17,6 +17,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${BLOCKS_INCLUDE_DIRS}
   SYSTEM ${PANDA_INCLUDE_DIRS}
+  SYSTEM ${THIRD_PARTY}/easylogging
 )
 
 link_directories(

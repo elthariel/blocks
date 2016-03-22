@@ -25,14 +25,14 @@ include_directories(
   ${BLOCKS_INCLUDE_DIRS}
   SYSTEM ${PANDA_INCLUDE_DIRS}
   SYSTEM ${BULLET_INCLUDE_DIRS}
-  ${THIRD_PARTY}/entityx
+  SYSTEM ${THIRD_PARTY}/easylogging
+  SYSTEM ${THIRD_PARTY}/entityx
 )
 
 link_directories(
   ${PANDA_LIBRARY_DIRS}
   ${BULLET_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS}
-  ${THIRD_PARTY}/easylogging
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BLOCKS_CXXFLAGS}")

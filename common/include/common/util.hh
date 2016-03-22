@@ -1,10 +1,5 @@
 #pragma once
 
-#include <iostream>
-
-#define DEBUG(msg) std::cout << msg << std::endl
-#define epsilon (std::numeric_limits<float>::epsilon())
-
 namespace blocks
 {
 

@@ -1,3 +1,4 @@
+#include "common/logging.hh"
 #include "systems/physics.hh"
 #include "components/basic.hh"
 
@@ -16,6 +17,7 @@
 
 using namespace std;
 
+static const float epsilon = std::numeric_limits<float>::epsilon();
 // static int64_t floor_to_int(double f, int64_t precision = 1000)
 // {
 //   f *= precision;
@@ -223,12 +225,12 @@ namespace blocks
 
         if (_debug.is_hidden())
         {
-          DEBUG("Show physics debug layer");
+          LOG(INFO) << "Show physics debug layer";
           _debug.show();
         }
         else
         {
-          DEBUG("Hide physics debug layer");
+          LOG(INFO) << "Hide physics debug layer";
           _debug.hide();
         }
       }

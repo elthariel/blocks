@@ -1,4 +1,4 @@
-
+#include "common/logging.hh"
 #include "game.hh"
 #include "mruby.hh"
 
@@ -18,8 +18,12 @@ static void chdir_to_bin(char *name)
   boost::filesystem::current_path(bin_folder);
 }
 
+INITIALIZE_EASYLOGGINGPP
+
 int main(int ac, char **av)
 {
+  logging::configure(ac, av);
+
   if (ac != 3)
   {
     std::cerr << "Usage : ./client IP PORT" << std::endl;
@@ -31,26 +35,5 @@ int main(int ac, char **av)
   blocks::Game game(ac, av);
   game.start();
 
-  // ruby::mruby mrb("../ruby/");
-  // auto v = mrb.run("client/textures.rb");
-  // auto h = v.as_hash();
-
-  // h.each([] (ruby::value k, ruby::value v)
-  //        {
-  //          std::cout << k.as_string() << ":" << v.as_string() << std::endl;
-  //        });
-
   return 0;
 }
-
-// #include "Client.hh"
-// int			   main(int ac, char **av)
-// {
-//   if (ac != 3)
-//   {
-//     std::cerr << "Usage : ./client IP PORT" << std::endl;
-//     return (0);
-//   }
-//   Client client(av[1], av[2]);
-//   return (0);
-// }

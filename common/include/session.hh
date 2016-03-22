@@ -2,6 +2,7 @@
 
 #include "common/util.hh"
 
+#include <iostream>
 #include <typeinfo>
 #include <typeindex>
 #include <unordered_map>
